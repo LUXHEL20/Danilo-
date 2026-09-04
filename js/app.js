@@ -97,7 +97,7 @@ function tekenKop() {
   const isLux = ctx.instellingen.rol === 'luxaqua';
   const bedrijf = ctx.instellingen.bedrijf?.naam || 'Lux Aqua';
   leeg(kopbalk).append(
-    h('div', { class: 'kopbalk__logo' }, '💧'),
+    logoElement(ctx.instellingen.logo),
     h('div', {},
       h('h1', {}, isLux ? `${bedrijf} · beheer` : bedrijf),
       h('span', { class: 'kopbalk__sub' },
@@ -106,6 +106,12 @@ function tekenKop() {
       !isLux && h('button', { class: 'icoonknop', title: 'Wissel van bak', 'aria-label': 'Wissel van bak', onclick: kiesBak }, '🐟'),
       h('button', { class: 'icoonknop', title: 'Instellingen', 'aria-label': 'Instellingen', onclick: () => ganaar('beheer') }, '⚙️')),
   );
+}
+
+/** Toont het geüploade logo, of anders het standaardmerkteken. */
+export function logoElement(logo, klasse = 'kopbalk__logo') {
+  if (logo) return h('img', { src: logo, class: `${klasse} ${klasse}--eigen`, alt: 'Logo' });
+  return h('img', { src: 'assets/logo.svg', class: klasse, alt: 'Logo', onerror: (e) => { e.target.replaceWith(h('div', { class: klasse }, '💧')); } });
 }
 
 function tekenNav(actief) {

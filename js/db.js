@@ -46,7 +46,7 @@ export const put = (store, obj) => tx(store, 'readwrite', (s) => { s.put(obj); r
 export const del = (store, id) => tx(store, 'readwrite', (s) => s.delete(id));
 export const get = (store, id) => tx(store, 'readonly', (s) => s.get(id));
 export const alles = (store) => tx(store, 'readonly', (s) => s.getAll());
-export const leeg = (store) => tx(store, 'readwrite', (s) => s.clear());
+export const wis = (store) => tx(store, 'readwrite', (s) => s.clear());
 
 export async function waar(store, index, waarde) {
   const db = await open();

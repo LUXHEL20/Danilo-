@@ -39,7 +39,7 @@ export function adviesKaart(actie, { open = false } = {}) {
         h('h4', {}, 'Wat doe je nu?'),
         ...actie.stappen.map((s, i) => h('div', { class: 'stap' }, h('span', { class: 'stap__nr' }, i + 1), h('span', {}, s)))) : null,
       actie.producten?.length ? h('div', {},
-        h('h4', { style: { marginTop: '12px' } }, 'Producten van Lux Aqua'),
+        h('h4', { style: { marginTop: '12px' } }, 'Aanbevolen producten'),
         ...actie.producten.map((p) => h('div', { class: 'kaart kaart--vlak', style: { padding: '11px', marginBottom: '8px' } },
           h('strong', {}, p.naam),
           p.dosis ? h('div', { class: 'badge badge--info', style: { marginLeft: '6px' } }, p.dosis.tekst) : null,

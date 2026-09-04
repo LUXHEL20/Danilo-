@@ -3,7 +3,7 @@ const CACHE = 'luxaqua-v1';
 const BESTANDEN = [
   './', './index.html', './manifest.webmanifest',
   './css/style.css',
-  './assets/icoon.svg', './assets/icoon-maskable.svg',
+  './assets/icoon.svg', './assets/icoon-maskable.svg', './assets/logo.svg',
   './js/app.js', './js/ui.js', './js/db.js', './js/store.js', './js/params.js',
   './js/products.js', './js/advies.js', './js/strip.js', './js/color.js',
   './js/charts.js', './js/delen.js',

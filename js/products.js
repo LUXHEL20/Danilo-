@@ -1,10 +1,12 @@
 /**
- * Productcatalogus Lux Aqua.
+ * Productcatalogus.
  *
- * LET OP: dit is een STARTCATALOGUS. Namen, verpakkingen, doseringen en prijzen
- * kunnen door Lux Aqua aangepast worden in het beheerdersscherm (Beheer > Producten).
- * De doseringen hieronder zijn opgebouwd volgens de gangbare normen voor
- * aquarium- en vijverproducten; vervang ze door de exacte waarden van jullie etiketten.
+ * LET OP: dit is een STARTCATALOGUS met NEUTRALE, FUNCTIONELE namen — geen merknamen.
+ * Vervang elke naam door de echte retailnaam zoals die op het schap staat, samen met
+ * de verpakkingen en de dosering van het etiket. Dat kan zonder programmeren via
+ * Beheer > Producten beheren, of hier rechtstreeks in dit bestand.
+ * De doseringen hieronder volgen de gangbare normen voor aquarium- en vijverproducten;
+ * ze zijn een vertrekpunt, geen productgegevens.
  *
  * Doseringsmodellen:
  *  - vast   : een vaste dosis per volume  -> {model:'vast', hoeveelheid, per, eenheid}
@@ -28,7 +30,7 @@ export const CATEGORIEEN = [
 export const PRODUCTEN = [
   {
     id: 'water-safe',
-    naam: 'Lux Aqua Water Safe',
+    naam: 'Waterbereider',
     categorie: 'waterbereiding',
     verpakkingen: ['250 ml', '500 ml', '1 l'],
     lost_op: ['cl2', 'cu'],
@@ -46,7 +48,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'bacto-start',
-    naam: 'Lux Aqua Bacto Start',
+    naam: 'Filterstarter',
     categorie: 'waterbereiding',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['no2', 'nh4'],
@@ -64,7 +66,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'kh-plus',
-    naam: 'Lux Aqua KH Plus',
+    naam: 'KH-Buffer',
     categorie: 'buffer',
     verpakkingen: ['250 g', '1 kg'],
     lost_op: ['kh', 'ph'],
@@ -82,7 +84,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'gh-mineral',
-    naam: 'Lux Aqua GH Mineral',
+    naam: 'GH-Mineralen',
     categorie: 'buffer',
     verpakkingen: ['250 g', '1 kg'],
     lost_op: ['gh'],
@@ -99,7 +101,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'ph-minus',
-    naam: 'Lux Aqua pH Minus',
+    naam: 'pH-Min',
     categorie: 'buffer',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['ph'],
@@ -109,14 +111,14 @@ export const PRODUCTEN = [
     toepassing: 'Verdund toevoegen bij de filteruitloop, in stappen van maximaal 0,2 pH per dag.',
     opvolging: [
       { na: '1 uur', actie: 'pH meten.' },
-      { na: '24 uur', actie: 'pH én KH meten: zakt de KH mee weg, dan eerst bufferen met KH Plus.' },
+      { na: '24 uur', actie: 'pH én KH meten: zakt de KH mee weg, dan eerst bufferen met de KH-Buffer.' },
     ],
     waarschuwingen: ['Nooit gebruiken bij KH lager dan 3 °dH.', 'Maximaal 0,2 pH per dag corrigeren.'],
     profielen: ['zoet_gezelschap', 'zoet_planten', 'garnalen'],
   },
   {
     id: 'ph-plus',
-    naam: 'Lux Aqua pH Plus',
+    naam: 'pH-Plus',
     categorie: 'buffer',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['ph'],
@@ -126,14 +128,14 @@ export const PRODUCTEN = [
     toepassing: 'Verdeeld over de dag toevoegen bij de filteruitloop.',
     opvolging: [
       { na: '1 uur', actie: 'pH meten.' },
-      { na: '24 uur', actie: 'pH en KH meten; is de KH te laag, gebruik dan KH Plus als basis.' },
+      { na: '24 uur', actie: 'pH en KH meten; is de KH te laag, gebruik dan de KH-Buffer als basis.' },
     ],
     waarschuwingen: ['Maximaal 0,2 pH per dag corrigeren.'],
     profielen: ['zoet_gezelschap', 'zoet_malawi', 'vijver_koi', 'vijver_sier'],
   },
   {
     id: 'nitrite-rescue',
-    naam: 'Lux Aqua Nitrite Rescue',
+    naam: 'Nitrietbinder',
     categorie: 'noodhulp',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['no2', 'nh4'],
@@ -146,12 +148,12 @@ export const PRODUCTEN = [
       { na: '12 uur', actie: 'NO₂ en NH₄ meten, waterverversing herhalen als de waarde nog niet daalt.' },
       { na: 'dagelijks tot 0', actie: 'Dagelijks meten tot NO₂ twee dagen na elkaar op 0 staat.' },
     ],
-    waarschuwingen: ['Bij zichtbaar naar adem happende vissen: onmiddellijk beluchten en Lux Aqua contacteren via de hulpknop.'],
+    waarschuwingen: ['Bij zichtbaar naar adem happende vissen: onmiddellijk beluchten en hulp vragen via de knop in de app.'],
     profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'vijver_koi', 'vijver_sier'],
   },
   {
     id: 'nitrate-control',
-    naam: 'Lux Aqua Nitrate Control',
+    naam: 'Nitraatverlager',
     categorie: 'filter',
     verpakkingen: ['500 ml', '1 l'],
     lost_op: ['no3'],
@@ -168,7 +170,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'phosphate-control',
-    naam: 'Lux Aqua Phosphate Control',
+    naam: 'Fosfaatbinder',
     categorie: 'algen',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['po4'],
@@ -185,7 +187,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'plant-complete',
-    naam: 'Lux Aqua Plant Complete',
+    naam: 'Plantenvoeding compleet',
     categorie: 'voeding',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['no3', 'po4', 'fe'],
@@ -202,7 +204,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'iron-plus',
-    naam: 'Lux Aqua Iron Plus',
+    naam: 'IJzervoeding',
     categorie: 'voeding',
     verpakkingen: ['250 ml'],
     lost_op: ['fe'],
@@ -219,7 +221,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'algae-stop',
-    naam: 'Lux Aqua Algae Stop',
+    naam: 'Algenmiddel',
     categorie: 'algen',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: [],
@@ -237,7 +239,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'water-clear',
-    naam: 'Lux Aqua Water Clear',
+    naam: 'Waterhelder (vlokmiddel)',
     categorie: 'algen',
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: [],
@@ -254,7 +256,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'filter-boost',
-    naam: 'Lux Aqua Filter Boost',
+    naam: 'Biologisch filtermedium',
     categorie: 'filter',
     verpakkingen: ['1 l', '5 l'],
     lost_op: ['no2', 'nh4', 'no3'],
@@ -271,7 +273,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'sea-salt',
-    naam: 'Lux Aqua Sea Salt',
+    naam: 'Zeezout',
     categorie: 'zeewater',
     verpakkingen: ['4 kg', '20 kg'],
     lost_op: ['dichtheid', 'ca', 'mg', 'kh'],
@@ -288,7 +290,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'reef-balance',
-    naam: 'Lux Aqua Reef Balance Ca/KH/Mg',
+    naam: 'Balansset Ca / KH / Mg',
     categorie: 'zeewater',
     verpakkingen: ['2 x 1 l', '2 x 5 l'],
     lost_op: ['ca', 'kh', 'mg'],
@@ -306,7 +308,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'pond-oxy',
-    naam: 'Lux Aqua Pond Oxy',
+    naam: 'Zuurstofpoeder vijver',
     categorie: 'vijver',
     verpakkingen: ['1 kg', '5 kg'],
     lost_op: ['o2'],
@@ -323,7 +325,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'pond-sludge',
-    naam: 'Lux Aqua Pond Sludge Remover',
+    naam: 'Slibafbraak vijver',
     categorie: 'vijver',
     verpakkingen: ['1 l', '2,5 l'],
     lost_op: ['no3', 'po4'],
@@ -340,7 +342,7 @@ export const PRODUCTEN = [
   },
   {
     id: 'vital-care',
-    naam: 'Lux Aqua Vital Care',
+    naam: 'Vitaminen & slijmvliesbescherming',
     categorie: 'zorg',
     verpakkingen: ['100 ml', '250 ml'],
     lost_op: [],

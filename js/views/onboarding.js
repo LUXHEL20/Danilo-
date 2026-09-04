@@ -2,7 +2,7 @@
 import { h, veld, invoer, keuze, tekstvak, melding } from '../ui.js';
 import * as store from '../store.js';
 import { PROFILES } from '../params.js';
-import { teken } from '../app.js';
+import { teken, logoElement } from '../app.js';
 
 export async function toonOnboarding() {
   const houder = h('div', { class: 'onboarding' });
@@ -25,8 +25,8 @@ export async function toonOnboarding() {
   function welkom() {
     return h('div', { class: 'kaart' },
       h('div', { class: 'midden' },
-        h('div', { style: { fontSize: '52px' } }, '💧'),
-        h('h1', {}, 'Welkom bij Lux Aqua'),
+        logoElement(null, 'logo-groot'),
+        h('h1', { style: { marginTop: '10px' } }, 'Welkom bij Lux Aqua'),
         h('p', { class: 'zacht' },
           'Met deze app hou je je waterwaarden bij, lees je je teststrip in met de camera ' +
           'en krijg je meteen te zien wat je kan doen. Loopt het toch mis, dan vraag je met één knop hulp of een huisbezoek.')),

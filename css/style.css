@@ -29,8 +29,10 @@
   --nav-hoogte: 64px;
 }
 
+/* Donkere modus. Drie toestanden: systeemvoorkeur, en de expliciete keuze van de
+   gebruiker die data-theme op de wortel zet. De tokens staan in beide gevallen gelijk. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --achtergrond: #071e26;
     --vlak: #0e2c37;
     --vlak-2: #12333f;
@@ -43,6 +45,20 @@
     --kritiek-vlak: #3c1a17;
     --schaduw: 0 2px 10px rgba(0, 0, 0, .3), 0 12px 28px rgba(0, 0, 0, .25);
   }
+}
+
+:root[data-theme="dark"] {
+    --achtergrond: #071e26;
+    --vlak: #0e2c37;
+    --vlak-2: #12333f;
+    --rand: #1d4553;
+    --tekst: #e8f4f7;
+    --tekst-zacht: #9dbac5;
+    --aqua-zacht: #123844;
+    --goed-vlak: #0f3628;
+    --letop-vlak: #3a2c0e;
+    --kritiek-vlak: #3c1a17;
+    --schaduw: 0 2px 10px rgba(0, 0, 0, .3), 0 12px 28px rgba(0, 0, 0, .25);
 }
 
 * { box-sizing: border-box; }
@@ -79,10 +95,13 @@ a { color: var(--aqua); }
 .kopbalk h1 { margin: 0; font-size: 1.12rem; font-weight: 650; letter-spacing: .2px; }
 .kopbalk__sub { font-size: .78rem; opacity: .78; display: block; font-weight: 400; }
 .kopbalk__logo {
-  width: 38px; height: 38px; border-radius: 12px; flex: none;
+  width: 40px; height: 40px; border-radius: 12px; flex: none;
   background: linear-gradient(140deg, var(--aqua-licht), var(--aqua));
-  display: grid; place-items: center; font-size: 20px;
+  display: grid; place-items: center; font-size: 20px; object-fit: contain;
 }
+.kopbalk__logo--eigen { background: #fff; padding: 3px; }
+.logo-groot { width: 96px; height: 96px; border-radius: 22px; object-fit: contain; }
+.logo-groot--eigen { background: #fff; padding: 6px; box-shadow: var(--schaduw); }
 .kopbalk__acties { margin-left: auto; display: flex; gap: 8px; }
 
 main {

@@ -5,7 +5,7 @@ import * as store from '../store.js';
 import * as db from '../db.js';
 import { CATEGORIEEN } from '../products.js';
 import { PARAMETERS, STRIP_PRESETS, param } from '../params.js';
-import { laadAfbeelding, naarCanvas, leesKleurenkaart } from '../strip.js';
+import { laadAfbeelding, naarCanvas, leesKleurenkaart, thumbnail } from '../strip.js';
 import { rgbToCss } from '../color.js';
 import { importeerBestand } from './luxaqua.js';
 
@@ -28,6 +28,42 @@ export async function toonBeheer() {
         class: `knop ${isLux ? 'knop--primair' : 'knop--stil'}`,
         onclick: async () => { await store.zetInstelling({ rol: 'luxaqua' }); ganaar('klanten'); teken(); },
       }, '🛠️ Lux Aqua-modus'))));
+
+  /* --- logo --- */
+  const logoVoorbeeld = h('div', { class: 'rij', style: { marginBottom: '10px' } },
+    i.logo
+      ? h('img', { src: i.logo, class: 'logo-groot logo-groot--eigen', alt: 'Huidig logo' })
+      : h('img', { src: 'assets/logo.svg', class: 'logo-groot', alt: 'Standaardlogo' }),
+    h('span', { class: 'klein zacht' }, i.logo ? 'Je eigen logo wordt gebruikt.' : 'Er wordt nog een plaatshouder gebruikt.'));
+  const logoInvoer = h('input', {
+    type: 'file', accept: 'image/*', hidden: true,
+    onchange: async (e) => {
+      const f = e.target.files?.[0]; if (!f) return;
+      try {
+        // svg en kleine bestanden houden we zoals ze zijn (transparantie blijft behouden),
+        // grotere foto's verkleinen we naar 512 px
+        const dataUrl = (f.type === 'image/svg+xml' || f.size < 400 * 1024)
+          ? await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); })
+          : await thumbnail(f, 512, 0.92);
+        await store.zetInstelling({ logo: dataUrl });
+        melding('Logo bewaard.', 'ok');
+        teken();
+      } catch (err) { melding(`Logo laden mislukt: ${err.message}`, 'fout'); }
+      finally { e.target.value = ''; }
+    },
+  });
+  wrap.append(kaart('🖼️ Logo',
+    h('p', { class: 'klein zacht' },
+      'Laad hier het Lux Aqua-logo op (png, jpg of svg). Het verschijnt in de kopbalk, op het welkomscherm ' +
+      'en boven elk afgedrukt dossier. Je kan het ook vast in de app zetten door assets/logo.svg te vervangen.'),
+    logoVoorbeeld, logoInvoer,
+    h('div', { class: 'knoprij' },
+      h('button', { class: 'knop knop--primair', onclick: () => logoInvoer.click() }, '📷 Logo kiezen'),
+      i.logo ? h('button', {
+        class: 'knop knop--stil', onclick: async () => {
+          await store.zetInstelling({ logo: null }); melding('Logo verwijderd.', 'ok'); teken();
+        },
+      }, 'Verwijderen') : null)));
 
   /* --- bedrijfsgegevens --- */
   const b = i.bedrijf || {};
@@ -110,7 +146,7 @@ export async function toonBeheer() {
       h('button', {
         class: 'knop knop--stil', onclick: async () => {
           if (await bevestig('Alles wissen?', 'Alle klanten, bakken, metingen en foto\'s op dit toestel worden definitief verwijderd. Maak eerst een back-up.', 'Alles wissen')) {
-            for (const s of db.STORES) await db.leeg(s);
+            for (const s of db.STORES) await db.wis(s);
             melding('Alles gewist.', 'ok');
             location.hash = '#/';
             location.reload();

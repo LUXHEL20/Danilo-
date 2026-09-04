@@ -80,11 +80,24 @@ van dat merk in plaats van de standaardkleuren.
 
 ---
 
+## Het logo
+
+`assets/logo.svg` is een **plaatshouder**. Twee manieren om het echte logo te gebruiken:
+
+- **Zonder programmeren**: *Beheer → Logo → Logo kiezen*. Het logo verschijnt in de
+  kopbalk, op het welkomscherm en boven elk afgedrukt dossier. Het blijft op het toestel
+  staan en gaat mee in de back-up.
+- **Vast in de app**: vervang `assets/logo.svg` door het echte bestand (svg of png, bij
+  voorkeur vierkant). Dan zien alle nieuwe gebruikers het meteen.
+
+---
+
 ## De producten aanpassen — lees dit eerst
 
-`js/products.js` bevat een **startcatalogus** van 18 producten met realistische
-doseringen en opvolgschema's, maar het zijn **niet** de echte productgegevens van
-Lux Aqua. Vervang ze door het echte assortiment:
+`js/products.js` bevat een **startcatalogus** van 19 producten met **neutrale, functionele
+namen** (Waterbereider, KH-Buffer, Nitrietbinder…) — bewust géén merknamen, want dit zijn
+geen echte productgegevens. Vervang elke naam door de **echte retailnaam** zoals die op het
+schap staat, samen met de verpakkingen en de dosering van het etiket:
 
 - **In de app**: *Beheer → Producten beheren*. Alles is aanpasbaar (naam, omschrijving,
   verpakkingen, dosering, toepassing, opvolging, waarschuwingen). Exporteer de catalogus

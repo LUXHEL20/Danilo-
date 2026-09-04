@@ -61,12 +61,15 @@ export async function toonProducten() {
       h('span', { class: 'pijl' }, '›'));
   }
 
-  wrap.append(kaart('🧴 Producten van Lux Aqua',
+  wrap.append(kaart('🧴 Producten',
     h('p', { class: 'klein zacht' },
       liters
         ? `De doseringen worden meteen berekend voor ${liters} liter — de inhoud van ${bak.naam || 'je bak'}.`
         : 'Vul de inhoud van je bak in om de doseringen automatisch te laten berekenen.'),
-    veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder));
+    veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder,
+    h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
+      'De namen hieronder zijn voorlopige, functionele namen. Vervang ze in Beheer → Producten beheren ' +
+      'door de echte retailnamen en de doseringen van het etiket.')));
 
   tekenLijst();
   return wrap;

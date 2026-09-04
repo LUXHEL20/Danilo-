@@ -1,0 +1,13 @@
+<!-- Plaatshouder. Vervang dit bestand door het echte Lux Aqua-logo (svg of png),
+     of laad het logo op via Beheer > Logo in de app zelf. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lux Aqua">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4fd1c5"/><stop offset="1" stop-color="#0b6b78"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#lg)"/>
+  <path d="M256 96c-52 74-92 128-92 174a92 92 0 0 0 184 0c0-46-40-100-92-174z" fill="#fff" opacity=".95"/>
+  <path d="M212 268a44 44 0 0 0 44 44" stroke="#0b6b78" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <path d="M120 404c28-16 40-16 68 0s40 16 68 0 40-16 68 0 40 16 68 0" stroke="#fff" stroke-width="20" stroke-linecap="round" fill="none" opacity=".85"/>
+</svg>

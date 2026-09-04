@@ -17,6 +17,7 @@ const STANDAARD_INSTELLINGEN = {
   actieveBak: null,
   productenOverride: null,   // aangepaste catalogus door Lux Aqua
   kalibratie: {},            // per strip-preset: eigen kleurenkaart
+  logo: null,                // eigen logo als data-URL (Beheer > Logo)
   bedrijf: {
     naam: 'Lux Aqua',
     telefoon: '',
