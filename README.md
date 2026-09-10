@@ -83,7 +83,10 @@ bestandsopslag van het toestel. Er komt geen bundler of framework bij: de code i
 | `npm run android` | Sync en opent het Android-project in Android Studio. |
 | `npm run ios` | Sync en opent het iOS-project in Xcode (enkel op een Mac). |
 | `npm run apk` | Sync en bouwt een debug-APK met Gradle (via `scripts/apk.mjs`, werkt op Windows, macOS en Linux). |
+| `npm run apk:release` | Sync en bouwt een **ondertekende** `.aab` (Play Console) en `.apk` (rechtstreekse installatie). Zie "Release-ondertekening" hieronder. |
 | `npm run assets` | Maakt alle app-iconen en splashschermen uit de bestanden in `resources/`. |
+| `npm run winkelbeelden` | Maakt het Play Store-icoon, de feature graphic en het App Store-icoon in `winkelmateriaal/`. |
+| `npm run screenshots` | Fotografeert de echte, draaiende app op de vereiste winkelformaten (`winkelmateriaal/screenshots/`). |
 | `npm run test` | Draait de Playwright-rooktest van de webversie (zet eerst `APP_URL`, zie hieronder). |
 | `npm run test:strip` | Test de teststriplezer met een gegenereerde stripfoto via de bestandskiezer. |
 | `npm run test:native` | Test de native tak (camera, deelmenu, terugknop) met een gemockte Capacitor-runtime. |
@@ -100,9 +103,40 @@ npm run apk
 ```
 
 Het resultaat staat in `android/app/build/outputs/apk/debug/app-debug.apk`. Dat bestand
-kunt u rechtstreeks op een Android-toestel installeren om te testen. Voor de Play Store
-bouwt u een ondertekende release (`./gradlew bundleRelease` in `android/`) met een eigen
-keystore; Android Studio begeleidt u daarbij via *Build, Generate Signed Bundle*.
+kunt u rechtstreeks op een Android-toestel installeren om te testen.
+
+### Release-ondertekening (voor de Play Store)
+
+Voor de Play Store is een **ondertekende** build nodig, met een eigen sleutel (keystore) die
+bewijst dat elke volgende update van dezelfde afzender komt. Die sleutel is al aangemaakt en
+apart aan u bezorgd (`lux-aqua-release.jks`), samen met het wachtwoord.
+
+1. Zet het bestand `lux-aqua-release.jks` in `android/app/` (naast `build.gradle`).
+2. Zet in `android/keystore.properties` (kopieer `keystore.properties.example`) het echte
+   wachtwoord. Beide bestanden staan in `.gitignore` en horen **nooit** in git.
+3. Bouw de release:
+   ```bash
+   npm run apk:release
+   ```
+   Resultaat:
+   - `android/app/build/outputs/bundle/release/app-release.aab` — dit bestand upload u naar
+     Play Console.
+   - `android/app/build/outputs/apk/release/app-release.apk` — een ondertekende APK om
+     rechtstreeks te installeren en te testen vóór u indient.
+
+**Bewaar de sleutel en het wachtwoord veilig en apart van de code** (een wachtwoordkluis of
+een versleutelde back-up), los van deze Drive-map of git-repository. Verliest u ze, dan kan
+Google Play u niet zomaar aan een nieuwe sleutel helpen als de app niet via *Play App
+Signing* loopt; met Play App Signing (de standaard sinds 2021 voor nieuwe apps) bewaart
+Google zelf de echte ondertekeningssleutel en is deze sleutel enkel de "upload-sleutel" —
+raakt die toch zoek, dan kan Play-ondersteuning helpen, maar dat kost tijd. Ga er dus van uit
+dat u ze nooit meer terugkrijgt als u ze kwijtraakt.
+
+### iOS-releasebuild
+
+Een IPA bouwen en ondertekenen kan enkel op een Mac met Xcode: Apple staat dat niet toe op
+Linux of Windows. Dit project staat er wel klaar voor (zie hieronder); het bouwen zelf is de
+stap die u morgen op de Mac zet.
 
 ### iOS openen op een Mac
 
@@ -149,6 +183,54 @@ De plugins `@capacitor/camera`, `@capacitor/share`, `@capacitor/filesystem`,
 Daarmee opent de camera rechtstreeks, gaat een dossier via het deelmenu van het toestel,
 worden bestanden op het toestel bewaard en kleuren statusbalk en splashscherm mee in het
 marineblauw van LUX AQUA (`#0D1730`).
+
+### Winkelmateriaal: alles voor Play Console en App Store Connect
+
+`winkelmateriaal/` bevat het beeld en de tekst voor de winkelvermeldingen, uitsluitend
+gemaakt uit de officiële logobestanden in `assets/brand/` (zie `BRAND.md`):
+
+| Bestand | Gebruik |
+|---|---|
+| `play-icoon-512.png` | App-icoon in Play Console (512×512) |
+| `appstore-icoon-1024.png` | App Store-icoon in App Store Connect (1024×1024, zonder alfa) |
+| `play-feature-graphic-1024x500.png` | Promotiebanner in Play Console (1024×500) |
+| `screenshots/android/*.png` | Telefoon-screenshots voor Play Console (niet in git, zie hieronder) |
+| `screenshots/ios/*.png` | Screenshots voor App Store Connect, 6,7″-formaat (niet in git) |
+| `privacybeleid.html` | Privacybeleid, door beide winkels verplicht. Host dit bij voorkeur onder `luxhelchteren.be` voor een stabiele, vertrouwde URL. |
+| `winkelteksten.md` | Kant-en-klare app-naam, beschrijvingen, trefwoorden en de antwoorden voor de privacyvragenlijsten van beide winkels |
+
+De iconen en de feature graphic staan in git; de screenshots niet (ze tonen de app in een
+bepaalde staat en verouderen bij elke visuele wijziging). Regenereer ze na een wijziging met:
+
+```bash
+npm run winkelbeelden   # icoon en feature graphic
+npm run screenshots     # echte schermafbeeldingen (zet eerst een server op poort 8123)
+```
+
+### Checklist om te publiceren
+
+**Google Play**
+1. Account aanmaken op [play.google.com/console](https://play.google.com/console) (eenmalige kost).
+2. Nieuwe app aanmaken, taal Nederlands, gratis.
+3. Store-vermelding invullen met `winkelteksten.md` en het beeld uit `winkelmateriaal/`.
+4. Formulieren *Gegevensveiligheid* en *Contentclassificatie* invullen (antwoorden staan in
+   `winkelteksten.md`).
+5. Privacybeleid-URL invullen.
+6. Onder *Productie* (of eerst *Interne test*) de `app-release.aab` uploaden
+   (`npm run apk:release`).
+7. Land(en) kiezen en indienen voor beoordeling.
+
+**Apple App Store**
+1. Apple Developer Program-lidmaatschap afsluiten (jaarlijkse kost) — vereist een Mac met
+   Xcode om in te schrijven en te bouwen.
+2. In App Store Connect een nieuwe app aanmaken met bundle-id `be.luxhelchteren.aqua`.
+3. Op de Mac: `npm install`, `npm run build`, `npx cap sync ios`, `npm run ios` opent Xcode.
+4. Onder *Signing & Capabilities* uw team kiezen.
+5. *Product → Archive*, dan *Distribute App → App Store Connect* om de build op te laden.
+6. In App Store Connect de vermelding invullen met `winkelteksten.md` en de screenshots uit
+   `winkelmateriaal/screenshots/ios/`, de privacyvragenlijst invullen, en de build koppelen.
+7. Optioneel eerst via **TestFlight** aan uzelf of testers bezorgen vóór u indient voor
+   beoordeling.
 
 ---
 

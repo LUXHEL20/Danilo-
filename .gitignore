@@ -24,3 +24,11 @@ ios/App/App.xcodeproj/xcuserdata/
 
 # Gradle/Kotlin daemon
 android/.kotlin/
+
+# Ondertekeningssleutel (NOOIT committen)
+android/keystore.properties
+android/app/*.jks
+android/app/*.keystore
+
+# Winkelscreenshots: regenereren per release met npm run screenshots
+winkelmateriaal/screenshots/
