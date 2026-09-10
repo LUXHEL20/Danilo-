@@ -4,6 +4,7 @@ import { ctx, ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import { PROFILES, profile } from '../params.js';
 import { comprimeer, thumbnail } from '../strip.js';
+import { kiesFoto } from '../native.js';
 
 export async function toonBak(arg) {
   if (arg === 'nieuw') return bakFormulier(null);
@@ -78,19 +79,15 @@ export async function toonBak(arg) {
   wrap.append(vissenBlok);
 
   /* --- foto's --- */
-  const fotoInvoer = h('input', {
-    type: 'file', accept: 'image/*', multiple: true, hidden: true,
-    onchange: async (e) => {
-      for (const f of e.target.files) await voegFotoToe(bak, f);
-      e.target.value = '';
-      teken();
-    },
+  const fotosKiezen = () => kiesFoto({ bron: 'vraag', meerdere: true }).then(async (bestanden) => {
+    if (!bestanden.length) return;
+    for (const f of bestanden) await voegFotoToe(bak, f);
+    teken();
   });
   const fotoBlok = kaart(
     h('span', { class: 'rij rij--tussen groei' },
       h('span', {}, '📷 Foto\'s'),
-      h('button', { class: 'chip', onclick: () => fotoInvoer.click() }, '+ Foto')),
-    fotoInvoer,
+      h('button', { class: 'chip', onclick: fotosKiezen }, '+ Foto')),
     h('p', { class: 'klein zacht' }, 'Foto\'s van de bak, van algen, van een zieke vis of van je filter: zo kan Lux Aqua van op afstand al veel zien.'));
   if (fotos.length) {
     fotoBlok.append(h('div', { class: 'fotoraster' }, ...fotos.map((f) =>
@@ -205,13 +202,10 @@ async function visFormulier(bak, bestaande) {
   const opmerking = invoer({ value: v.opmerking || '', placeholder: 'bv. kweekgroep, of: eet slecht' });
   let thumb = v.thumb || null;
   const voorbeeld = h('div', {});
-  const fotoInvoer = h('input', {
-    type: 'file', accept: 'image/*', hidden: true,
-    onchange: async (e) => {
-      const f = e.target.files?.[0]; if (!f) return;
-      thumb = await thumbnail(f, 320);
-      voorbeeld.replaceChildren(h('img', { src: thumb, class: 'foto', style: { width: '90px', height: '90px' }, alt: '' }));
-    },
+  const fotoKiezen = () => kiesFoto({ bron: 'vraag' }).then(async ([f]) => {
+    if (!f) return;
+    thumb = await thumbnail(f, 320);
+    voorbeeld.replaceChildren(h('img', { src: thumb, class: 'foto', style: { width: '90px', height: '90px' }, alt: '' }));
   });
   if (thumb) voorbeeld.append(h('img', { src: thumb, class: 'foto', style: { width: '90px', height: '90px' }, alt: '' }));
 
@@ -222,8 +216,8 @@ async function visFormulier(bak, bestaande) {
       veld('Aantal', aantal),
       veld('In de bak sinds', sinds),
       veld('Opmerking', opmerking),
-      veld('Foto', h('div', {}, fotoInvoer,
-        h('button', { class: 'knop knop--stil', onclick: () => fotoInvoer.click() }, '📷 Foto kiezen'), voorbeeld))),
+      veld('Foto', h('div', {},
+        h('button', { class: 'knop knop--stil', onclick: fotoKiezen }, '📷 Foto kiezen'), voorbeeld))),
     acties: [
       { label: 'Annuleren', waarde: false },
       {

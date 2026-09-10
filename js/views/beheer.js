@@ -8,6 +8,7 @@ import { PARAMETERS, STRIP_PRESETS, param } from '../params.js';
 import { laadAfbeelding, naarCanvas, leesKleurenkaart, thumbnail } from '../strip.js';
 import { rgbToCss } from '../color.js';
 import { importeerBestand } from './luxaqua.js';
+import { isNative, kiesFoto, bewaarEnDeelBestand } from '../native.js';
 
 export async function toonBeheer() {
   const i = await store.instellingen();
@@ -35,30 +36,26 @@ export async function toonBeheer() {
       ? h('img', { src: i.logo, class: 'logo-groot logo-groot--eigen', alt: 'Huidig logo' })
       : h('img', { src: 'assets/brand/LUX-AQUA-01-navy.svg', class: 'logo-groot', alt: 'LUX AQUA' }),
     h('span', { class: 'klein zacht' }, i.logo ? 'Een eigen logo is opgeladen.' : 'Het officiële LUX AQUA-logo wordt gebruikt.'));
-  const logoInvoer = h('input', {
-    type: 'file', accept: 'image/*', hidden: true,
-    onchange: async (e) => {
-      const f = e.target.files?.[0]; if (!f) return;
-      try {
-        // svg en kleine bestanden houden we zoals ze zijn (transparantie blijft behouden),
-        // grotere foto's verkleinen we naar 512 px
-        const dataUrl = (f.type === 'image/svg+xml' || f.size < 400 * 1024)
-          ? await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); })
-          : await thumbnail(f, 512, 0.92);
-        await store.zetInstelling({ logo: dataUrl });
-        melding('Logo bewaard.', 'ok');
-        teken();
-      } catch (err) { melding(`Logo laden mislukt: ${err.message}`, 'fout'); }
-      finally { e.target.value = ''; }
-    },
+  const logoKiezen = () => kiesFoto({ bron: 'galerij' }).then(async ([f]) => {
+    if (!f) return;
+    try {
+      // svg en kleine bestanden houden we zoals ze zijn (transparantie blijft behouden),
+      // grotere foto's verkleinen we naar 512 px
+      const dataUrl = (f.type === 'image/svg+xml' || f.size < 400 * 1024)
+        ? await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); })
+        : await thumbnail(f, 512, 0.92);
+      await store.zetInstelling({ logo: dataUrl });
+      melding('Logo bewaard.', 'ok');
+      teken();
+    } catch (err) { melding(`Logo laden mislukt: ${err.message}`, 'fout'); }
   });
   wrap.append(kaart('🖼️ Logo',
     h('p', { class: 'klein zacht' },
       'Laad hier het Lux Aqua-logo op (png, jpg of svg). Het verschijnt in de kopbalk, op het welkomscherm ' +
       'en boven elk afgedrukt dossier. Standaard gebruikt de app het officiële LUX AQUA-logo.'),
-    logoVoorbeeld, logoInvoer,
+    logoVoorbeeld,
     h('div', { class: 'knoprij' },
-      h('button', { class: 'knop knop--primair', onclick: () => logoInvoer.click() }, '📷 Logo kiezen'),
+      h('button', { class: 'knop knop--primair', onclick: logoKiezen }, '📷 Logo kiezen'),
       i.logo ? h('button', {
         class: 'knop knop--stil', onclick: async () => {
           await store.zetInstelling({ logo: null }); melding('Logo verwijderd.', 'ok'); teken();
@@ -114,7 +111,7 @@ export async function toonBeheer() {
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: () => beheerProducten() }, '✎ Producten beheren'),
       h('button', {
-        class: 'knop knop--stil', onclick: () => download('luxaqua-producten.json', JSON.stringify(catalogus, null, 2)),
+        class: 'knop knop--stil', onclick: () => bewaarEnDeelBestand('luxaqua-producten.json', JSON.stringify(catalogus, null, 2), 'application/json'),
       }, '⬇️ Exporteren'),
       h('button', { class: 'knop knop--stil', onclick: () => importeerProducten() }, '📥 Importeren'))));
 
@@ -176,7 +173,13 @@ async function maakBackup() {
       return r;
     }));
   }
-  download(`luxaqua-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(data));
+  const naam = `luxaqua-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  if (isNative()) {
+    const r = await bewaarEnDeelBestand(naam, JSON.stringify(data), 'application/json');
+    if (r === 'gedeeld') melding('Back-up gedeeld. (Foto\'s zitten als kleine versie in de back-up.)', 'ok');
+    return;
+  }
+  download(naam, JSON.stringify(data));
   melding('Back-up gedownload. (Foto\'s zitten als kleine versie in de back-up.)', 'ok');
 }
 
@@ -346,7 +349,10 @@ function importeerProducten() {
 /* ---------------------------------------------------------- kleurenkaart ijken */
 async function ijkKleurenkaart(instellingen) {
   const presetKeuze = keuze(STRIP_PRESETS.map((p) => ({ value: p.id, label: p.label })));
-  const bestand = h('input', { type: 'file', accept: 'image/*', capture: 'environment' , class: 'invoer' });
+  let kaartFoto = null;             // gekozen foto van de kleurenkaart
+  const kaartNaam = h('span', { class: 'klein zacht' }, 'Nog geen foto gekozen.');
+  const kaartKnop = h('button', { class: 'knop knop--stil', type: 'button' }, '📷 Foto nemen of kiezen');
+  const bestand = h('div', { class: 'rij' }, kaartKnop, kaartNaam);
   const houder = h('div', {});
   let raster = null, preset = STRIP_PRESETS[0], rect = null, canvas = null, imageData = null;
   let kolommen = 6;
@@ -354,7 +360,7 @@ async function ijkKleurenkaart(instellingen) {
   const kolomVeld = invoer({ type: 'number', min: 2, max: 12, value: kolommen });
 
   const analyseer = async () => {
-    const f = bestand.files?.[0]; if (!f) return;
+    const f = kaartFoto; if (!f) return;
     preset = STRIP_PRESETS.find((p) => p.id === presetKeuze.value) || STRIP_PRESETS[0];
     kolommen = Number(kolomVeld.value) || 6;
     const img = await laadAfbeelding(f);
@@ -387,7 +393,12 @@ async function ijkKleurenkaart(instellingen) {
       }));
   }
 
-  bestand.addEventListener('change', analyseer);
+  kaartKnop.addEventListener('click', () => kiesFoto({ bron: 'vraag' }).then(([f]) => {
+    if (!f) return;
+    kaartFoto = f;
+    kaartNaam.textContent = f.name || 'Foto gekozen';
+    analyseer();
+  }));
   kolomVeld.addEventListener('change', analyseer);
   presetKeuze.addEventListener('change', analyseer);
 

@@ -8,6 +8,7 @@ import * as store from '../store.js';
 import { maakDossier, dossierAlsTekst, exporteerDossier, deelDossier, whatsappLink, mailLink, printDossier, stuurNaarServer } from '../delen.js';
 import { maakAdvies } from '../advies.js';
 import { thumbnail, comprimeer } from '../strip.js';
+import { isNative, kiesFoto } from '../native.js';
 
 const SOORTEN = [
   { id: 'huisbezoek', icoon: '🏠', titel: 'Huisbezoek voor advies', tekst: 'Iemand van Lux Aqua komt langs, bekijkt je installatie en geeft advies ter plaatse.' },
@@ -73,7 +74,8 @@ export async function toonHulp() {
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: async () => deelDossier(await maakDossier(bak.id)) }, '📤 Delen'),
       h('button', { class: 'knop knop--stil', onclick: async () => exporteerDossier(await maakDossier(bak.id)) }, '⬇️ Bestand'),
-      h('button', { class: 'knop knop--stil', onclick: async () => printDossier(await maakDossier(bak.id)) }, '🖨️ Afdrukken / pdf'))));
+      h('button', { class: 'knop knop--stil', onclick: async () => printDossier(await maakDossier(bak.id)) },
+        isNative() ? '📄 Dossier als bestand delen' : '🖨️ Afdrukken / pdf'))));
 
   /* --- eerdere vragen --- */
   if (eerdere.length) {
@@ -123,17 +125,13 @@ async function hulpFormulier(soortId, bak, advies, instellingen) {
 
   const extraFotos = [];
   const fotoVoorbeeld = h('div', { class: 'fotoraster' });
-  const fotoInvoer = h('input', {
-    type: 'file', accept: 'image/*', multiple: true, hidden: true,
-    onchange: async (e) => {
-      for (const f of e.target.files) {
-        const thumb = await thumbnail(f, 420);
-        const blob = await comprimeer(f, 1400, 0.82);
-        extraFotos.push({ thumb, blob });
-        fotoVoorbeeld.append(h('img', { src: thumb, alt: '' }));
-      }
-      e.target.value = '';
-    },
+  const fotosKiezen = () => kiesFoto({ bron: 'vraag', meerdere: true }).then(async (bestanden) => {
+    for (const f of bestanden) {
+      const thumb = await thumbnail(f, 420);
+      const blob = await comprimeer(f, 1400, 0.82);
+      extraFotos.push({ thumb, blob });
+      fotoVoorbeeld.append(h('img', { src: thumb, alt: '' }));
+    }
   });
 
   const bevestigd = await dialoog({
@@ -146,8 +144,8 @@ async function hulpFormulier(soortId, bak, advies, instellingen) {
       veld('Hoe dringend is het?', urgentie),
       veld('Wat is er aan de hand?', omschrijving),
       soortId !== 'afstand' ? veld('Wanneer past een bezoek?', beschikbaarheid) : null,
-      veld('Extra foto\'s meesturen', h('div', {}, fotoInvoer,
-        h('button', { class: 'knop knop--stil', onclick: () => fotoInvoer.click() }, '📷 Foto toevoegen'), fotoVoorbeeld),
+      veld('Extra foto\'s meesturen', h('div', {},
+        h('button', { class: 'knop knop--stil', onclick: fotosKiezen }, '📷 Foto toevoegen'), fotoVoorbeeld),
         'Een foto van de volledige bak, van het probleem en van je filter helpt enorm.'),
       h('label', { class: 'rij klein', style: { gap: '8px', marginBottom: '6px' } }, metMetingen, h('span', {}, 'Mijn laatste metingen meesturen')),
       h('label', { class: 'rij klein', style: { gap: '8px' } }, metFotos, h('span', {}, 'Mijn foto\'s uit de app meesturen')),
@@ -195,7 +193,8 @@ async function verstuurKeuze(dossier, instellingen) {
         h('a', { class: 'knop knop--stil knop--vol', href: whatsappLink(tekst, b.telefoon || ''), target: '_blank', rel: 'noopener' }, '💬 Via WhatsApp'),
         h('a', { class: 'knop knop--stil knop--vol', href: mailLink(tekst, b.email || ''), target: '_blank', rel: 'noopener' }, '✉️ Via e-mail'),
         h('button', { class: 'knop knop--stil knop--vol', onclick: () => exporteerDossier(dossier) }, '⬇️ Als bestand bewaren'),
-        h('button', { class: 'knop knop--stil knop--vol', onclick: () => printDossier(dossier) }, '🖨️ Afdrukken of als pdf bewaren'),
+        h('button', { class: 'knop knop--stil knop--vol', onclick: () => printDossier(dossier) },
+          isNative() ? '📄 Dossier als bestand delen' : '🖨️ Afdrukken of als pdf bewaren'),
         h('button', { class: 'knop knop--stil knop--vol', onclick: () => kopieer(tekst) }, '📋 Samenvatting kopiëren'),
         instellingen.koppeling?.url
           ? h('button', {

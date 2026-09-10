@@ -4,6 +4,7 @@ const BESTANDEN = [
   './', './index.html', './manifest.webmanifest',
   './css/style.css',
   './assets/icoon.svg', './assets/icoon-maskable.svg',
+  './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/icons/maskable-512.png', './assets/icons/apple-touch-icon.png',
   './assets/brand/LUX-AQUA-01-navy.svg', './assets/brand/LUX-AQUA-03-wit.svg', './assets/brand/LUX-AQUA-06-app-icoon-navy.png',
   './js/app.js', './js/ui.js', './js/db.js', './js/store.js', './js/params.js',
   './js/products.js', './js/advies.js', './js/strip.js', './js/color.js',

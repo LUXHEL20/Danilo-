@@ -11,6 +11,7 @@ import { maakAdvies, opvolgTaken } from '../advies.js';
 import { laadAfbeelding, naarCanvas, comprimeer, thumbnail, zoekStrip, standaardKader, leesStrip } from '../strip.js';
 import { rgbToCss } from '../color.js';
 import { adviesKaart, parameterUitleg } from './onderdelen.js';
+import { kiesFoto } from '../native.js';
 
 export async function toonMeten() {
   const bak = ctx.bak;
@@ -36,19 +37,17 @@ export async function toonMeten() {
   const stripHouder = h('div', {});
 
   /* ------------------------------------------------------------- strip inlezen */
-  const bestandInvoer = h('input', {
-    type: 'file', accept: 'image/*', capture: 'environment', hidden: true,
-    onchange: (e) => { const f = e.target.files?.[0]; if (f) verwerkFoto(f); e.target.value = ''; },
-  });
+  // camera of galerij, natief via de Capacitor-camera en op het web via een bestandskiezer
+  const fotoKiezen = () => kiesFoto({ bron: 'vraag' }).then(([f]) => { if (f) verwerkFoto(f); });
 
   const stripKaart = kaart(h('span', {}, '📸 Teststrip inlezen'),
     h('p', { class: 'klein zacht' },
       'Dompel je strip volgens de handleiding, schud het overtollige water af en fotografeer de strip meteen ' +
       '(na de wachttijd op de verpakking) op een effen, donkere ondergrond bij daglicht — zonder flits en zonder schaduw over de strip.'),
     h('div', { class: 'knoprij' },
-      h('button', { class: 'knop knop--primair', onclick: () => bestandInvoer.click() }, '📷 Foto nemen of kiezen'),
+      h('button', { class: 'knop knop--primair', onclick: fotoKiezen }, '📷 Foto nemen of kiezen'),
       h('button', { class: 'knop knop--stil', onclick: () => toonStripHulp() }, 'Tips voor een goede foto')),
-    bestandInvoer, stripHouder);
+    stripHouder);
 
   wrap.append(stripKaart);
 
@@ -145,7 +144,7 @@ export async function toonMeten() {
       h('div', { class: 'knoprij' },
         h('button', { class: 'knop knop--stil', onclick: () => { staat.omgekeerd = !staat.omgekeerd; tekenStripUI(staat); } }, '🔄 Volgorde omkeren'),
         h('button', { class: 'knop knop--stil', onclick: () => { staat.rect = zoekStrip(staat.imageData) || standaardKader(staat.canvas.width, staat.canvas.height); tekenStripUI(staat); } }, '🎯 Opnieuw zoeken'),
-        h('button', { class: 'knop knop--stil', onclick: () => bestandInvoer.click() }, '📷 Nieuwe foto')),
+        h('button', { class: 'knop knop--stil', onclick: fotoKiezen }, '📷 Nieuwe foto')),
       h('div', { class: 'kaart kaart--vlak', style: { marginTop: '10px' } },
         h('h4', {}, 'Wat de app afleest'),
         ...stripAnalyse.resultaten.map((r) => stripVeldRij(r)),

@@ -3,6 +3,7 @@
  */
 import * as store from './store.js';
 import { h, leeg, melding, dialoog } from './ui.js';
+import { initNative, isNative } from './native.js';
 
 import { toonOnboarding } from './views/onboarding.js';
 import { toonStart } from './views/start.js';
@@ -178,8 +179,10 @@ window.addEventListener('hashchange', teken);
 store.onWijziging((soort) => { if (['instellingen', 'bakken', 'klanten'].includes(soort)) tekenKop(); });
 
 teken();
+initNative(); // terugknop, statusbalk en splashscherm in de native app; doet niets op het web
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+// In de native app staan alle bestanden lokaal: geen service worker nodig.
+if (!isNative() && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {/* offline werkt dan gewoon niet, geen ramp */});
   });

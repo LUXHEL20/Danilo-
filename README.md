@@ -58,6 +58,95 @@ Of publiceer de map met **GitHub Pages** (Settings → Pages → branch kiezen).
 
 ---
 
+## Als echte app op Android en iOS
+
+De webversie blijft de basis. Met **Capacitor** verpakken wij diezelfde bestanden in een
+echte app voor de Google Play Store en de Apple App Store. Capacitor zet de map `www/` in
+een native schil met een webview en geeft de app toegang tot de camera, het deelmenu en de
+bestandsopslag van het toestel. Er komt geen bundler of framework bij: de code in `js/` en
+`css/` is dezelfde als op het web.
+
+### Wat u nodig hebt
+
+- Node 22 en npm. Eenmalig `npm install` in de projectmap.
+- Voor Android: Android Studio (met SDK en build-tools) en Java 21.
+- Voor iOS: een Mac met Xcode en CocoaPods. Op Windows of Linux kunt u de iOS-map wel
+  aanmaken en instellen, maar niet bouwen.
+
+### De npm-scripts
+
+| Script | Wat het doet |
+|---|---|
+| `npm run build` | Maakt `www/` leeg en kopieert er `index.html`, `manifest.webmanifest`, `sw.js`, `css/`, `js/` en `assets/` in. |
+| `npm run sync` | Bouwt `www/` en kopieert ze naar de Android- en iOS-projecten (`npx cap sync`), inclusief de plugins. |
+| `npm run android` | Sync en opent het Android-project in Android Studio. |
+| `npm run ios` | Sync en opent het iOS-project in Xcode (enkel op een Mac). |
+| `npm run apk` | Sync en bouwt een debug-APK met Gradle. |
+| `npm run assets` | Maakt alle app-iconen en splashschermen uit de bestanden in `resources/`. |
+| `npm run test` | Draait de Playwright-rooktest van de webversie. |
+
+De eerste keer voegt u de platformen toe met `npx cap add android` en `npx cap add ios`.
+De mappen `android/` en `ios/` horen daarna in git; de bouwresultaten erin niet
+(zie `.gitignore`).
+
+### Een APK bouwen voor Android
+
+```bash
+npm run apk
+```
+
+Het resultaat staat in `android/app/build/outputs/apk/debug/app-debug.apk`. Dat bestand
+kunt u rechtstreeks op een Android-toestel installeren om te testen. Voor de Play Store
+bouwt u een ondertekende release (`./gradlew bundleRelease` in `android/`) met een eigen
+keystore; Android Studio begeleidt u daarbij via *Build, Generate Signed Bundle*.
+
+### iOS openen op een Mac
+
+```bash
+npm run ios
+```
+
+Xcode opent het project `ios/App/App.xcworkspace`. Kies onder *Signing & Capabilities* uw
+team, laat Xcode het provisioning profile aanmaken en start de app op een toestel of in de
+simulator. Voor testers en voor de App Store maakt u een archive (*Product, Archive*) en
+laadt u die op naar App Store Connect. Via **TestFlight** kunt u de app dan aan testers
+bezorgen voordat ze in de winkel komt.
+
+### Welke accounts u nodig hebt
+
+- **Google Play Console**: eenmalige registratiekost van 25 dollar.
+- **Apple Developer Program**: 99 dollar per jaar. Zonder dit account kunt u de app enkel
+  op uw eigen toestellen zetten via Xcode, niet via TestFlight of de App Store.
+
+### Naam, bundle-id, versie en icoon
+
+- De **bundle-id** is `be.luxhelchteren.aqua` en staat in `capacitor.config.json` (`appId`).
+  Ze staat ook in `android/app/build.gradle` (`applicationId`) en in het Xcode-project
+  zodra de platformen toegevoegd zijn. Kies ze goed voor de eerste publicatie; nadien kan
+  ze in de winkels niet meer veranderen.
+- De **naam** van de app staat in `capacitor.config.json` (`appName`, "LUX AQUA") en wordt
+  bij `npx cap add` overgenomen. Nadien past u ze aan in `android/app/src/main/res/values/strings.xml`
+  en in Xcode onder *Display Name*.
+- De **versie** staat in `package.json` (`version`) en in de platformen zelf:
+  `versionName` en `versionCode` in `android/app/build.gradle`, *Version* en *Build* in Xcode.
+  Verhoog ze bij elke nieuwe oplading naar de winkels.
+- Het **icoon** en de **splash** komen uit `resources/`: `icon-only.png` (1024 x 1024),
+  `icon-foreground.png` en `icon-background.png` (adaptive icon voor Android),
+  `splash.png` en `splash-dark.png` (2732 x 2732). Die bestanden en de iconen voor de
+  webversie in `assets/icons/` worden gemaakt met `node scripts/maak-iconen.mjs` uit de
+  officiële logobestanden in `assets/brand/` (zie `BRAND.md`; het logo wordt nooit
+  hertekend). Daarna zet `npm run assets` alle maten in het Android- en iOS-project.
+
+### Wat de native app extra kan
+
+De plugins `@capacitor/camera`, `@capacitor/share`, `@capacitor/filesystem`,
+`@capacitor/app`, `@capacitor/status-bar` en `@capacitor/splash-screen` zijn geïnstalleerd.
+Daarmee opent de camera rechtstreeks, gaat een dossier via het deelmenu van het toestel,
+worden bestanden op het toestel bewaard en kleuren statusbalk en splashscherm mee in het
+marineblauw van LUX AQUA (`#0D1730`).
+
+---
+
 ## Hoe de teststriplezer werkt
 
 1. De foto wordt verkleind naar maximaal 1000 px.
@@ -153,6 +242,14 @@ index.html              app-schil
 manifest.webmanifest    installeerbaar als app
 sw.js                   service worker (offline)
 css/style.css           stijlblad, licht en donker
+package.json            npm-scripts en Capacitor-pakketten
+capacitor.config.json   instellingen van de native app (bundle-id, naam, splash, statusbalk)
+scripts/
+  build-www.mjs         kopieert de webversie naar www/
+  maak-iconen.mjs       maakt iconen en splash uit assets/brand/
+resources/              bronbeelden voor npm run assets (icoon en splash)
+assets/brand/           officiële logobestanden (zie BRAND.md)
+assets/icons/           png-iconen voor manifest, favicon en apple-touch-icon
 js/
   app.js                opstarten, navigatie, routering
   db.js                 IndexedDB-wrapper
@@ -169,7 +266,8 @@ js/
                         hulp, kennis, luxaqua, beheer, onboarding, onderdelen)
 ```
 
-Geen dependencies, geen buildstap. Alles is ES-modules en gewone DOM.
+De webversie heeft geen dependencies en geen buildstap: alles is ES-modules en gewone DOM.
+De npm-pakketten dienen enkel voor de native app (zie hierboven).
 
 ---
 

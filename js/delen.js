@@ -7,6 +7,7 @@ import * as store from './store.js';
 import { fmt, param, profile, statusOf, STATUS_LABEL } from './params.js';
 import { maakAdvies } from './advies.js';
 import { download, kopieer, melding, blobNaarDataUrl } from './ui.js';
+import { isNative, deel, bewaarEnDeelBestand } from './native.js';
 
 export const DOSSIER_VERSIE = 1;
 
@@ -100,27 +101,23 @@ export function dossierAlsTekst(dossier) {
   return r.join('\n');
 }
 
-/** Downloadt het dossier als bestand dat Lux Aqua kan inlezen. */
+/** Bewaart het dossier als bestand dat Lux Aqua kan inlezen: download op het web, deelmenu in de native app. */
 export function exporteerDossier(dossier) {
   const naam = `luxaqua-dossier-${(dossier.bak?.naam || 'bak').replace(/[^\w-]+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.json`;
-  download(naam, JSON.stringify(dossier, null, 2));
+  const inhoud = JSON.stringify(dossier, null, 2);
+  if (isNative()) return bewaarEnDeelBestand(naam, inhoud, 'application/json');
+  download(naam, inhoud);
+  return 'gedownload';
 }
 
 /** Deelt via het deelmenu van het toestel, met terugval op kopiëren. */
 export async function deelDossier(dossier, { metBestand = true } = {}) {
   const tekst = dossierAlsTekst(dossier);
-  const bestand = metBestand
-    ? new File([JSON.stringify(dossier)], 'luxaqua-dossier.json', { type: 'application/json' })
-    : null;
-  try {
-    if (navigator.canShare && bestand && navigator.canShare({ files: [bestand] })) {
-      await navigator.share({ title: 'Lux Aqua dossier', text: tekst, files: [bestand] });
-      return 'gedeeld';
-    }
-    if (navigator.share) { await navigator.share({ title: 'Lux Aqua dossier', text: tekst }); return 'gedeeld'; }
-  } catch (e) {
-    if (e?.name === 'AbortError') return 'geannuleerd';
-  }
+  const bestanden = metBestand
+    ? [new File([JSON.stringify(dossier)], 'luxaqua-dossier.json', { type: 'application/json' })]
+    : [];
+  const r = await deel({ titel: 'LUX AQUA dossier', tekst, bestanden });
+  if (r !== 'niet-mogelijk') return r;
   await kopieer(tekst);
   return 'gekopieerd';
 }
@@ -173,9 +170,8 @@ export async function stuurNaarServer(dossier) {
   }
 }
 
-/** Printbare weergave (kan via de printdialoog als pdf bewaard worden). */
-export async function printDossier(dossier) {
-  const inst = await store.instellingen();
+/** Bouwt de printbare weergave van een dossier als volledige HTML-pagina. */
+export function dossierAlsHtml(dossier, inst = {}) {
   const bedrijf = inst.bedrijf || {};
   const logo = inst.logo || 'assets/brand/LUX-AQUA-01-navy.svg';
   const b = dossier.bak;
@@ -220,6 +216,17 @@ export async function printDossier(dossier) {
   ${dossier.fotos?.length ? `<h2>Foto's</h2>${dossier.fotos.map((f) => `<img src="${f.thumb}" alt="${f.soort}">`).join('')}` : ''}
   <p class="voet">Dit dossier is opgemaakt met de ${bedrijf.naam || 'Lux Aqua'} app. De adviezen zijn een eerste inschatting op basis van de ingegeven waarden; een huisbezoek blijft de beste manier om een probleem definitief vast te stellen.</p>
   </body></html>`;
+  return html;
+}
+
+/**
+ * Printbare weergave: op het web via de printdialoog (kan als pdf bewaard worden).
+ * Een WebView kan niet afdrukken; in de native app delen we het dossier als html-bestand.
+ */
+export async function printDossier(dossier) {
+  const inst = await store.instellingen();
+  const html = dossierAlsHtml(dossier, inst);
+  if (isNative()) return bewaarEnDeelBestand('luxaqua-dossier.html', html, 'text/html');
   const v = window.open('', '_blank');
   if (!v) { melding('Sta pop-ups toe om het dossier af te drukken.', 'fout'); return; }
   v.document.write(html); v.document.close();
