@@ -177,7 +177,7 @@ export async function stuurNaarServer(dossier) {
 export async function printDossier(dossier) {
   const inst = await store.instellingen();
   const bedrijf = inst.bedrijf || {};
-  const logo = inst.logo || 'assets/logo.svg';
+  const logo = inst.logo || 'assets/brand/LUX-AQUA-01-navy.svg';
   const b = dossier.bak;
   const prof = profile(b.profiel);
   const rij = (l, w) => `<tr><th>${l}</th><td>${w ?? '–'}</td></tr>`;
@@ -191,7 +191,7 @@ export async function printDossier(dossier) {
     ul{padding-left:18px} img{max-width:220px;border-radius:8px;margin:6px 8px 0 0}
     .voet{margin-top:32px;font-size:12px;color:#6b7f89}
     .kop{display:flex;align-items:center;gap:14px;margin-bottom:6px}
-    .kop img{width:64px;height:64px;object-fit:contain;border-radius:12px}
+    .kop img{height:56px;width:auto;object-fit:contain}
     .kop h1{margin:0}
   </style></head><body>
   <div class="kop"><img src="${logo}" alt=""><div><h1>${bedrijf.naam || 'Lux Aqua'} — dossier</h1>

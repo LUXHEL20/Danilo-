@@ -19,11 +19,13 @@ const STANDAARD_INSTELLINGEN = {
   kalibratie: {},            // per strip-preset: eigen kleurenkaart
   logo: null,                // eigen logo als data-URL (Beheer > Logo)
   bedrijf: {
-    naam: 'Lux Aqua',
-    telefoon: '',
-    email: '',
-    website: '',
-    werkgebied: '',
+    naam: 'LUX AQUA',
+    telefoon: '011 91 92 91',
+    email: 'info@luxhelchteren.be',
+    website: 'https://www.luxhelchteren.be',
+    werkgebied: 'Helchteren en omgeving',
+    adres: 'Kazernelaan 11, 3530 Helchteren',
+    onderdeelVan: 'LUX 2.0',
   },
   koppeling: { url: '', sleutel: '' }, // optionele server-koppeling voor Lux Aqua
   onboardingKlaar: false,

@@ -1,9 +1,10 @@
 /* Service worker: de app blijft werken zonder internet. */
-const CACHE = 'luxaqua-v1';
+const CACHE = 'luxaqua-v2';
 const BESTANDEN = [
   './', './index.html', './manifest.webmanifest',
   './css/style.css',
-  './assets/icoon.svg', './assets/icoon-maskable.svg', './assets/logo.svg',
+  './assets/icoon.svg', './assets/icoon-maskable.svg',
+  './assets/brand/LUX-AQUA-01-navy.svg', './assets/brand/LUX-AQUA-03-wit.svg', './assets/brand/LUX-AQUA-06-app-icoon-navy.png',
   './js/app.js', './js/ui.js', './js/db.js', './js/store.js', './js/params.js',
   './js/products.js', './js/advies.js', './js/strip.js', './js/color.js',
   './js/charts.js', './js/delen.js',

@@ -6,8 +6,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f3f7f8",
-  "theme_color": "#0b3f4e",
+  "background_color": "#0D1730",
+  "theme_color": "#0D1730",
   "lang": "nl-BE",
   "categories": ["utilities", "lifestyle"],
   "icons": [

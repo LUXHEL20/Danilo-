@@ -108,10 +108,17 @@ function tekenKop() {
   );
 }
 
-/** Toont het geüploade logo, of anders het standaardmerkteken. */
-export function logoElement(logo, klasse = 'kopbalk__logo') {
-  if (logo) return h('img', { src: logo, class: `${klasse} ${klasse}--eigen`, alt: 'Logo' });
-  return h('img', { src: 'assets/logo.svg', class: klasse, alt: 'Logo', onerror: (e) => { e.target.replaceWith(h('div', { class: klasse }, '💧')); } });
+/** Officiële logobestanden (zie BRAND.md). */
+export const LOGO = {
+  navy: 'assets/brand/LUX-AQUA-01-navy.svg',
+  wit: 'assets/brand/LUX-AQUA-03-wit.svg',
+  icoon: 'assets/brand/LUX-AQUA-06-app-icoon-navy.png',
+};
+
+/** Toont het geüploade logo, of anders het officiële LUX AQUA-logo in de gevraagde variant. */
+export function logoElement(logo, klasse = 'kopbalk__logo', variant = 'wit') {
+  if (logo) return h('img', { src: logo, class: `${klasse} ${klasse}--eigen`, alt: 'LUX AQUA' });
+  return h('img', { src: LOGO[variant] || LOGO.navy, class: klasse, alt: 'LUX AQUA' });
 }
 
 function tekenNav(actief) {

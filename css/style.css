@@ -1,11 +1,14 @@
 /* Lux Aqua — stijlblad. Mobile-first, werkt ook op tablet en desktop. */
 
 :root {
-  --diep: #062a35;
-  --diep-2: #0b3f4e;
-  --aqua: #17a2b8;
-  --aqua-licht: #4fd1c5;
-  --aqua-zacht: #e6f7f9;
+  /* Aquapalet van LUX AQUA (scherm): marine, aqua diep, aqua scherm. Zie BRAND.md. */
+  --marine: #0D1730;
+  --navy: #0B1530;
+  --diep: #0D1730;
+  --diep-2: #0f2a3d;
+  --aqua: #0C9494;
+  --aqua-licht: #40D0C4;
+  --aqua-zacht: #e3f5f4;
   --zand: #f6f3ec;
 
   --achtergrond: #f3f7f8;
@@ -39,7 +42,7 @@
     --rand: #1d4553;
     --tekst: #e8f4f7;
     --tekst-zacht: #9dbac5;
-    --aqua-zacht: #123844;
+    --aqua-zacht: #0f3a3a;
     --goed-vlak: #0f3628;
     --letop-vlak: #3a2c0e;
     --kritiek-vlak: #3c1a17;
@@ -54,7 +57,7 @@
     --rand: #1d4553;
     --tekst: #e8f4f7;
     --tekst-zacht: #9dbac5;
-    --aqua-zacht: #123844;
+    --aqua-zacht: #0f3a3a;
     --goed-vlak: #0f3628;
     --letop-vlak: #3a2c0e;
     --kritiek-vlak: #3c1a17;
@@ -86,7 +89,7 @@ a { color: var(--aqua); }
 
 .kopbalk {
   position: sticky; top: 0; z-index: 20;
-  background: linear-gradient(135deg, var(--diep) 0%, var(--diep-2) 60%, #0d5c6b 100%);
+  background: linear-gradient(135deg, var(--diep) 0%, var(--diep-2) 55%, var(--aqua) 100%);
   color: #fff;
   padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
   display: flex; align-items: center; gap: 12px;
@@ -95,13 +98,12 @@ a { color: var(--aqua); }
 .kopbalk h1 { margin: 0; font-size: 1.12rem; font-weight: 650; letter-spacing: .2px; }
 .kopbalk__sub { font-size: .78rem; opacity: .78; display: block; font-weight: 400; }
 .kopbalk__logo {
-  width: 40px; height: 40px; border-radius: 12px; flex: none;
-  background: linear-gradient(140deg, var(--aqua-licht), var(--aqua));
-  display: grid; place-items: center; font-size: 20px; object-fit: contain;
+  height: 34px; width: auto; max-width: 72px; flex: none; object-fit: contain;
+  display: grid; place-items: center; font-size: 20px;
 }
-.kopbalk__logo--eigen { background: #fff; padding: 3px; }
-.logo-groot { width: 96px; height: 96px; border-radius: 22px; object-fit: contain; }
-.logo-groot--eigen { background: #fff; padding: 6px; box-shadow: var(--schaduw); }
+.kopbalk__logo--eigen { background: #fff; padding: 3px; border-radius: 10px; height: 40px; }
+.logo-groot { height: 84px; width: auto; max-width: 180px; object-fit: contain; }
+.logo-groot--eigen { background: #fff; padding: 6px; border-radius: 18px; box-shadow: var(--schaduw); }
 .kopbalk__acties { margin-left: auto; display: flex; gap: 8px; }
 
 main {
@@ -155,7 +157,7 @@ main {
 }
 .knop:active { transform: scale(.98); }
 .knop:disabled { opacity: .55; cursor: default; }
-.knop--primair { background: linear-gradient(135deg, var(--aqua) 0%, #0d7f92 100%); color: #fff; }
+.knop--primair { background: linear-gradient(135deg, var(--aqua) 0%, #0a7676 100%); color: #fff; }
 .knop--stil { background: var(--vlak-2); color: var(--tekst); border-color: var(--rand); }
 .knop--gevaar { background: var(--kritiek); color: #fff; }
 .knop--hulp { background: linear-gradient(135deg, #ff8a3d 0%, #f4511e 100%); color: #fff; }
@@ -311,7 +313,7 @@ main {
   z-index: 80; display: flex; flex-direction: column; gap: 8px; pointer-events: none; align-items: center;
 }
 .melding {
-  background: var(--diep); color: #fff; padding: 11px 16px; border-radius: 12px;
+  background: var(--marine); color: #fff; padding: 11px 16px; border-radius: 12px;
   font-size: .88rem; box-shadow: var(--schaduw); opacity: 0; transform: translateY(8px);
   transition: opacity .2s ease, transform .2s ease; max-width: 480px;
 }

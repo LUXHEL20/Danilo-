@@ -33,8 +33,8 @@ export async function toonBeheer() {
   const logoVoorbeeld = h('div', { class: 'rij', style: { marginBottom: '10px' } },
     i.logo
       ? h('img', { src: i.logo, class: 'logo-groot logo-groot--eigen', alt: 'Huidig logo' })
-      : h('img', { src: 'assets/logo.svg', class: 'logo-groot', alt: 'Standaardlogo' }),
-    h('span', { class: 'klein zacht' }, i.logo ? 'Je eigen logo wordt gebruikt.' : 'Er wordt nog een plaatshouder gebruikt.'));
+      : h('img', { src: 'assets/brand/LUX-AQUA-01-navy.svg', class: 'logo-groot', alt: 'LUX AQUA' }),
+    h('span', { class: 'klein zacht' }, i.logo ? 'Een eigen logo is opgeladen.' : 'Het officiële LUX AQUA-logo wordt gebruikt.'));
   const logoInvoer = h('input', {
     type: 'file', accept: 'image/*', hidden: true,
     onchange: async (e) => {
@@ -55,7 +55,7 @@ export async function toonBeheer() {
   wrap.append(kaart('🖼️ Logo',
     h('p', { class: 'klein zacht' },
       'Laad hier het Lux Aqua-logo op (png, jpg of svg). Het verschijnt in de kopbalk, op het welkomscherm ' +
-      'en boven elk afgedrukt dossier. Je kan het ook vast in de app zetten door assets/logo.svg te vervangen.'),
+      'en boven elk afgedrukt dossier. Standaard gebruikt de app het officiële LUX AQUA-logo.'),
     logoVoorbeeld, logoInvoer,
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: () => logoInvoer.click() }, '📷 Logo kiezen'),
