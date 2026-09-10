@@ -93,6 +93,29 @@
   .vraag strong { display: block; margin-bottom: 2px; }
   .vraag span { color: var(--tekst-zacht); font-size: .92rem; }
 
+  .melding {
+    border-radius: 14px; padding: 15px 18px; margin: 0 0 16px;
+    font-size: .95rem; border: 1px solid transparent;
+  }
+  .melding--let-op { background: #fdf1dd; border-color: #f0d9ae; color: #6b4a05; }
+  .melding--goed { background: #e4f5ec; border-color: #b7e2c9; color: #10613f; }
+  @media (prefers-color-scheme: dark) {
+    .melding--let-op { background: #3a2c0e; border-color: #5c4a1c; color: #f5e3bd; }
+    .melding--goed { background: #0f3628; border-color: #1e5940; color: #cdeedd; }
+  }
+
+  .wijs-omlaag {
+    display: block; text-align: center; font-size: 1.6rem; color: var(--aqua);
+    margin: 6px 0 -4px; animation: op-en-neer 1.6s ease-in-out infinite;
+  }
+  @keyframes op-en-neer {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wijs-omlaag { animation: none; }
+  }
+
   footer {
     text-align: center; color: var(--tekst-zacht); font-size: .85rem;
     padding: 0 20px calc(env(safe-area-inset-bottom) + 34px);
@@ -109,7 +132,11 @@
 </header>
 
 <main>
-  <a class="knop" href="./">De app openen</a>
+  <!-- Deze zone wordt door het script ingevuld volgens het toestel van de bezoeker.
+       Zonder JavaScript blijft de gewone knop staan en werkt alles nog. -->
+  <div id="actiezone">
+    <a class="knop" href="./">De app openen</a>
+  </div>
 
   <div class="kaart" style="margin-top:20px">
     <h2>Waarom op uw beginscherm?</h2>
@@ -169,11 +196,81 @@
 </footer>
 
 <script>
-  // Toont standaard de uitleg die bij het toestel van de bezoeker past.
-  // Zonder JavaScript blijven beide uitleggen gewoon zichtbaar.
   (function () {
-    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    var ua = navigator.userAgent;
+    var isIOS = /iPad|iPhone|iPod/.test(ua)
       || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    // Browsers ín een andere app (Facebook, Instagram, WhatsApp, ...) kunnen niets
+    // op het beginscherm zetten. Daar moet de bezoeker eerst naar Safari of Chrome.
+    var inAndereApp = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|LinkedInApp|Snapchat|Pinterest|TikTok/.test(ua);
+    var alGeinstalleerd = window.matchMedia('(display-mode: standalone)').matches
+      || navigator.standalone === true;
+
+    var zone = document.getElementById('actiezone');
+    var wachtendeVraag = null; // de installatievraag van Chrome, zodra die beschikbaar is
+
+    function html(inhoud) { zone.innerHTML = inhoud; }
+    var openKnop = '<a class="knop" href="./">De app openen</a>';
+
+    function toonStandaard() {
+      html(openKnop);
+    }
+
+    function toonAlGeinstalleerd() {
+      html('<div class="melding melding--goed">De app staat al op uw toestel. U kan ze gewoon openen.</div>' + openKnop);
+    }
+
+    function toonInAndereApp() {
+      var browser = isIOS ? 'Safari' : 'Chrome';
+      html('<div class="melding melding--let-op"><strong>Even dit eerst.</strong> U bekijkt deze pagina in een '
+        + 'andere app. Om LUX AQUA op uw beginscherm te kunnen zetten, opent u deze pagina eerst in '
+        + browser + '. Tik daarvoor op de drie puntjes rechtsboven en kies <strong>Openen in ' + browser
+        + '</strong>.</div>' + openKnop);
+    }
+
+    function toonAndroidKnop() {
+      html('<button class="knop" id="installeer" type="button">Zet de app op mijn telefoon</button>'
+        + '<p style="text-align:center;color:var(--tekst-zacht);font-size:.88rem;margin:10px 0 0">'
+        + 'U hoeft niets op te zoeken. Tik op de knop en bevestig.</p>');
+      document.getElementById('installeer').addEventListener('click', function () {
+        if (!wachtendeVraag) return;
+        wachtendeVraag.prompt();
+        wachtendeVraag.userChoice.then(function (keuze) {
+          wachtendeVraag = null;
+          if (keuze && keuze.outcome === 'accepted') {
+            html('<div class="melding melding--goed">Gelukt. LUX AQUA staat nu bij uw apps.</div>' + openKnop);
+          } else {
+            html('<div class="melding melding--let-op">U kan dit later altijd nog doen, via de drie puntjes '
+              + 'rechtsboven in uw browser.</div>' + openKnop);
+          }
+        });
+      });
+    }
+
+    function toonIphone() {
+      html('<div class="melding melding--let-op"><strong>Op iPhone doet u dit zelf, in twee tikken.</strong> '
+        + 'Apple laat niet toe dat een website zichzelf installeert. Hieronder staat hoe u het doet.</div>'
+        + openKnop + '<span class="wijs-omlaag" aria-hidden="true">&#8595;</span>');
+    }
+
+    // Chrome meldt zelf wanneer de app installeerbaar is. Wij vangen die melding op
+    // en tonen er onze eigen knop voor, in plaats van de bezoeker door het menu te sturen.
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      wachtendeVraag = e;
+      if (!alGeinstalleerd && !inAndereApp) toonAndroidKnop();
+    });
+
+    window.addEventListener('appinstalled', function () {
+      html('<div class="melding melding--goed">Gelukt. LUX AQUA staat nu bij uw apps.</div>' + openKnop);
+    });
+
+    if (alGeinstalleerd) toonAlGeinstalleerd();
+    else if (inAndereApp) toonInAndereApp();
+    else if (isIOS) toonIphone();
+    else toonStandaard(); // op Android vervangt beforeinstallprompt dit zodra het kan
+
+    // De uitleg die bij het toestel past, staat meteen open.
     var knoppen = { android: document.getElementById('tab-android'), ios: document.getElementById('tab-ios') };
     var panelen = { android: document.getElementById('uitleg-android'), ios: document.getElementById('uitleg-ios') };
 
