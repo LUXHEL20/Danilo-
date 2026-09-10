@@ -1,4 +1,4 @@
-/** Beheerdersschermen voor Lux Aqua: klanten opvolgen en hulpvragen behandelen. */
+/** Beheerdersschermen voor LUX AQUA: klanten opvolgen en hulpvragen behandelen. */
 import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, datum, geleden, legeStaat, kopieer } from '../ui.js';
 import { ganaar, teken } from '../app.js';
 import * as store from '../store.js';
@@ -110,7 +110,7 @@ export async function toonKlant(id) {
     h('div', { class: 'knoprij' },
       klant.telefoon ? h('a', { class: 'knop knop--stil', href: `tel:${klant.telefoon.replace(/\s/g, '')}` }, '📞 Bellen') : null,
       klant.telefoon ? h('a', { class: 'knop knop--stil', href: whatsappLink('', klant.telefoon), target: '_blank', rel: 'noopener' }, '💬 WhatsApp') : null,
-      klant.email ? h('a', { class: 'knop knop--stil', href: mailLink('', klant.email, 'Lux Aqua — opvolging van je aquarium') }, '✉️ Mailen') : null)));
+      klant.email ? h('a', { class: 'knop knop--stil', href: mailLink('', klant.email, 'LUX AQUA: opvolging van uw aquarium') }, '✉️ Mailen') : null)));
 
   for (const bak of bakken) {
     const metingen = await store.metingenVanBak(bak.id);
@@ -121,7 +121,7 @@ export async function toonKlant(id) {
 
     const blok = kaart(bakSamenvatting(bak, laatste, advies));
     if (laatste) {
-      blok.append(h('h4', { style: { marginTop: '10px' } }, `Laatste meting — ${datum(laatste.datum)}`), waardeTegels(laatste, bak));
+      blok.append(h('h4', { style: { marginTop: '10px' } }, `Laatste meting van ${datum(laatste.datum)}`), waardeTegels(laatste, bak));
       if (laatste.opmerking) blok.append(h('p', { class: 'klein' }, h('strong', {}, 'Klant noteerde: '), laatste.opmerking));
       if (laatste.strip) blok.append(h('p', { class: 'mini zacht' },
         `Via teststrip · betrouwbaarheid: ${laatste.strip.resultaten.map((r) => `${param(r.param)?.short || r.param} ${r.betrouwbaarheid}`).join(', ')}`));
@@ -139,7 +139,7 @@ export async function toonKlant(id) {
           bak.leidingwater ? h('li', {}, `Leidingwater: ${bak.leidingwater}`) : null,
           bak.opmerking ? h('li', {}, `Opmerking: ${bak.opmerking}`) : null),
         vissen.length
-          ? h('ul', { class: 'opsomming klein' }, ...vissen.map((v) => h('li', {}, `${v.aantal}× ${v.soort}${v.opmerking ? ` — ${v.opmerking}` : ''}`)))
+          ? h('ul', { class: 'opsomming klein' }, ...vissen.map((v) => h('li', {}, `${v.aantal}× ${v.soort}${v.opmerking ? ` (${v.opmerking})` : ''}`)))
           : h('p', { class: 'zacht klein' }, 'Geen vissenbestand ingevuld.'))));
 
     if (fotos.length) {
@@ -169,7 +169,7 @@ export async function toonKlant(id) {
   wrap.append(vraagBlok);
 
   /* --- interne notities --- */
-  const notitie = tekstvak({ value: klant.opmerkingen || '', placeholder: 'Interne notities: afspraken, wat je ter plaatse zag, welke producten meegegeven…' });
+  const notitie = tekstvak({ value: klant.opmerkingen || '', placeholder: 'Interne notities: afspraken, wat u ter plaatse zag, welke producten meegegeven…' });
   wrap.append(kaart('📝 Interne notities', notitie,
     h('button', {
       class: 'knop knop--primair knop--vol', onclick: async () => {
@@ -241,7 +241,7 @@ function hulpvraagRij(v, klant) {
 async function hulpvraagDetail(v, klant) {
   const status = keuze([
     { value: 'nieuw', label: 'Nieuw', selected: v.status === 'nieuw' },
-    { value: 'opgenomen', label: 'Opgenomen — contact gehad', selected: v.status === 'opgenomen' },
+    { value: 'opgenomen', label: 'Opgenomen, contact gehad', selected: v.status === 'opgenomen' },
     { value: 'gepland', label: 'Bezoek gepland', selected: v.status === 'gepland' },
     { value: 'afgerond', label: 'Afgerond', selected: v.status === 'afgerond' },
   ]);
@@ -256,7 +256,7 @@ async function hulpvraagDetail(v, klant) {
       v.beschikbaarheid ? h('p', { class: 'klein zacht' }, `Beschikbaar: ${v.beschikbaarheid}`) : null,
       klant?.telefoon ? h('div', { class: 'knoprij' },
         h('a', { class: 'knop knop--stil', href: `tel:${klant.telefoon.replace(/\s/g, '')}` }, '📞 Bellen'),
-        h('a', { class: 'knop knop--stil', href: whatsappLink('Dag, met Lux Aqua. Ik bel over je hulpvraag.', klant.telefoon), target: '_blank', rel: 'noopener' }, '💬 WhatsApp')) : null,
+        h('a', { class: 'knop knop--stil', href: whatsappLink('Dag, met LUX AQUA. Ik bel over uw hulpvraag.', klant.telefoon), target: '_blank', rel: 'noopener' }, '💬 WhatsApp')) : null,
       veld('Status', status),
       veld('Afspraak', afspraak),
       veld('Notitie / antwoord', antwoord),

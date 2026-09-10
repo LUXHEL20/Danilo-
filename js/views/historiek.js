@@ -1,4 +1,4 @@
-/** Historiek: alle metingen, grafieken per waarde en de evolutie van je bak. */
+/** Historiek: alle metingen, grafieken per waarde en de evolutie van uw bak. */
 import { h, kaart, badge, datum, geleden, bevestig, melding, dialoog, download, legeStaat } from '../ui.js';
 import { ctx, ganaar, teken } from '../app.js';
 import * as store from '../store.js';
@@ -13,7 +13,7 @@ export async function toonHistoriek(arg) {
 
   const metingen = await store.metingenVanBak(bak.id);
   if (!metingen.length) {
-    return legeStaat('📈', 'Nog geen metingen', 'Zodra je meet, zie je hier de evolutie van je waarden.',
+    return legeStaat('📈', 'Nog geen metingen', 'Zodra u meet, ziet u hier de evolutie van uw waarden.',
       h('button', { class: 'knop knop--primair', onclick: () => ganaar('meten') }, 'Eerste meting doen'));
   }
 
@@ -46,7 +46,7 @@ export async function toonHistoriek(arg) {
       h('div', { class: 'rij rij--tussen' },
         h('h3', {}, p?.label || gekozen),
         laatste ? badge(fmt(gekozen, laatste.waarde), statusOf(gekozen, laatste.waarde, bak.profiel)) : null),
-      doel ? h('p', { class: 'mini zacht' }, `Streefwaarde: ${fmt(gekozen, doel.ideal[0])} – ${fmt(gekozen, doel.ideal[1])} · aanvaardbaar: ${fmt(gekozen, doel.ok[0])} – ${fmt(gekozen, doel.ok[1])}`) : null,
+      doel ? h('p', { class: 'mini zacht' }, `Streefwaarde: ${fmt(gekozen, doel.ideal[0])} tot ${fmt(gekozen, doel.ideal[1])} · aanvaardbaar: ${fmt(gekozen, doel.ok[0])} tot ${fmt(gekozen, doel.ok[1])}`) : null,
       punten.length >= 2 ? lijnGrafiek(punten, gekozen, bak.profiel, { breedte: 340, hoogte: 150 })
         : h('p', { class: 'zacht klein' }, 'Nog te weinig metingen voor een grafiek.'),
       h('button', {

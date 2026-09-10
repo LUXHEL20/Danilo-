@@ -10,7 +10,7 @@ export async function toonBak(arg) {
   if (arg === 'nieuw') return bakFormulier(null);
   const bak = ctx.bak;
   if (!bak) {
-    return legeStaat('🐠', 'Nog geen bak', 'Voeg je aquarium of vijver toe.',
+    return legeStaat('🐠', 'Nog geen bak', 'Voeg uw aquarium of vijver toe.',
       h('button', { class: 'knop knop--primair', onclick: () => ganaar('bak/nieuw') }, 'Bak toevoegen'));
   }
   if (arg === 'bewerk') return bakFormulier(bak);
@@ -42,10 +42,10 @@ export async function toonBak(arg) {
 
   if (bak.opgestart && (Date.now() - bak.opgestart) < 42 * 86400e3) {
     wrap.append(h('section', { class: 'kaart kaart--aandacht' },
-      h('h3', {}, '🌱 Je bak is nog aan het indraaien'),
+      h('h3', {}, '🌱 Uw bak is nog aan het indraaien'),
       h('p', { class: 'klein' },
-        'De eerste 4 tot 6 weken bouwt je filter zijn bacteriën op. Meet in deze periode om de 2 à 3 dagen NO₂ en NH₄, ' +
-        'voeder heel weinig, spoel je filter niet uit en zet pas nieuwe vissen bij als beide waarden twee metingen na elkaar 0 zijn.')));
+        'De eerste 4 tot 6 weken bouwt uw filter zijn bacteriën op. Meet in deze periode om de 2 à 3 dagen NO₂ en NH₄, ' +
+        'voeder heel weinig, spoel uw filter niet uit en zet pas nieuwe vissen bij als beide waarden twee metingen na elkaar 0 zijn.')));
   }
 
   /* --- vissenbestand --- */
@@ -55,7 +55,7 @@ export async function toonBak(arg) {
       h('button', { class: 'chip', onclick: () => visFormulier(bak) }, '+ Toevoegen')));
   if (!vissen.length) {
     vissenBlok.append(h('p', { class: 'zacht klein' },
-      'Nog niets ingevuld. Het vissenbestand helpt Lux Aqua om van op afstand in te schatten of je bak overbezet is en welke waarden voor jouw dieren het belangrijkst zijn.'));
+      'Nog niets ingevuld. Het vissenbestand helpt LUX AQUA om van op afstand in te schatten of uw bak overbezet is en welke waarden voor uw dieren het belangrijkst zijn.'));
   } else {
     vissenBlok.append(h('ul', { class: 'lijst' }, ...vissen.map((v) =>
       h('li', {},
@@ -88,7 +88,7 @@ export async function toonBak(arg) {
     h('span', { class: 'rij rij--tussen groei' },
       h('span', {}, '📷 Foto\'s'),
       h('button', { class: 'chip', onclick: fotosKiezen }, '+ Foto')),
-    h('p', { class: 'klein zacht' }, 'Foto\'s van de bak, van algen, van een zieke vis of van je filter: zo kan Lux Aqua van op afstand al veel zien.'));
+    h('p', { class: 'klein zacht' }, 'Foto\'s van de bak, van algen, van een zieke vis of van uw filter: zo kan LUX AQUA van op afstand al veel zien.'));
   if (fotos.length) {
     fotoBlok.append(h('div', { class: 'fotoraster' }, ...fotos.map((f) =>
       h('div', { class: 'fotokaart' },
@@ -116,7 +116,7 @@ export async function toonBak(arg) {
     log.length
       ? h('ul', { class: 'lijst' }, ...log.slice(0, 15).map((l) =>
         h('li', {}, h('span', { class: 'groei' }, l.tekst, h('br'), h('span', { class: 'mini zacht' }, datum(l.datum))))))
-      : h('p', { class: 'zacht klein' }, 'Noteer hier wat je doet: waterverversingen, filterbeurten, nieuwe vissen, medicatie. Dat maakt later zoeken naar de oorzaak veel makkelijker.')));
+      : h('p', { class: 'zacht klein' }, 'Noteer hier wat u doet: waterverversingen, filterbeurten, nieuwe vissen, medicatie. Dat maakt later zoeken naar de oorzaak veel makkelijker.')));
 
   wrap.append(h('div', { class: 'knoprij' },
     h('button', { class: 'knop knop--stil', onclick: () => ganaar('bak/nieuw') }, '+ Nog een bak'),
@@ -137,7 +137,7 @@ export async function toonBak(arg) {
 async function bakFormulier(bestaande) {
   const b = bestaande || { profiel: 'zoet_gezelschap', afmetingen: {} };
   const naam = invoer({ value: b.naam || '', placeholder: 'bv. Woonkamer 300 l' });
-  const prof = keuze(Object.values(PROFILES).map((p) => ({ value: p.id, label: `${p.group} — ${p.label}`, selected: p.id === b.profiel })));
+  const prof = keuze(Object.values(PROFILES).map((p) => ({ value: p.id, label: `${p.group}: ${p.label}`, selected: p.id === b.profiel })));
   const lengte = invoer({ type: 'number', inputmode: 'decimal', value: b.afmetingen?.lengte || '' });
   const breedte = invoer({ type: 'number', inputmode: 'decimal', value: b.afmetingen?.breedte || '' });
   const hoogte = invoer({ type: 'number', inputmode: 'decimal', value: b.afmetingen?.hoogte || '' });
@@ -149,7 +149,7 @@ async function bakFormulier(bestaande) {
   const bodem = invoer({ value: b.bodem || '', placeholder: 'bv. grind 2-3 mm, voedingsbodem' });
   const verversing = invoer({ value: b.verversing || '', placeholder: 'bv. 30% per week' });
   const leidingwater = invoer({ value: b.leidingwater || '', placeholder: 'bv. hard, KH 12, nitraat 25' });
-  const opmerking = tekstvak({ value: b.opmerking || '', placeholder: 'Wat wil je bereiken? Wat loopt er mis?' });
+  const opmerking = tekstvak({ value: b.opmerking || '', placeholder: 'Wat wilt u bereiken? Wat loopt er mis?' });
 
   [lengte, breedte, hoogte].forEach((i) => i.addEventListener('input', () => {
     const l = store.berekenLiters({ lengte: lengte.value, breedte: breedte.value, hoogte: hoogte.value });
@@ -241,7 +241,7 @@ function beoordeelBezetting(vissen, bak) {
   if (!totaal) return null;
   const perVis = liters / totaal;
   if (bak.profiel?.startsWith('vijver')) return null;
-  if (perVis < 3) return { soort: 'kritiek', tekst: `⚠️ ${totaal} dieren in ${liters} liter is veel. Bij een hoge bezetting stijgen nitraat en fosfaat snel: ververs vaker en laat je bezetting nakijken.` };
+  if (perVis < 3) return { soort: 'kritiek', tekst: `⚠️ ${totaal} dieren in ${liters} liter is veel. Bij een hoge bezetting stijgen nitraat en fosfaat snel: ververs vaker en laat uw bezetting nakijken.` };
   if (perVis < 6) return { soort: 'let-op', tekst: `Let op met bijzetten: ${totaal} dieren in ${liters} liter is al een stevige bezetting.` };
   return { soort: 'goed', tekst: `Bezetting oogt rustig (${totaal} dieren in ${liters} liter). Hou wel rekening met de volwassen grootte van elke soort.` };
 }

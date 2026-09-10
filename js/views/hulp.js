@@ -11,17 +11,17 @@ import { thumbnail, comprimeer } from '../strip.js';
 import { isNative, kiesFoto } from '../native.js';
 
 const SOORTEN = [
-  { id: 'huisbezoek', icoon: '🏠', titel: 'Huisbezoek voor advies', tekst: 'Iemand van Lux Aqua komt langs, bekijkt je installatie en geeft advies ter plaatse.' },
-  { id: 'testen', icoon: '🧪', titel: 'Komen testen en bijsturen', tekst: 'We meten alles zelf na met druppeltests en sturen je water ter plaatse bij.' },
-  { id: 'afstand', icoon: '📱', titel: 'Advies op afstand', tekst: 'Je stuurt je dossier met foto\'s door en krijgt een eerste inschatting zonder bezoek.' },
-  { id: 'noodgeval', icoon: '🚨', titel: 'Noodgeval', tekst: 'Je vissen zijn in nood: ze happen naar adem, hangen stil of er is sterfte.' },
+  { id: 'huisbezoek', icoon: '🏠', titel: 'Huisbezoek voor advies', tekst: 'Iemand van LUX AQUA komt langs, bekijkt uw installatie en geeft advies ter plaatse.' },
+  { id: 'testen', icoon: '🧪', titel: 'Komen testen en bijsturen', tekst: 'Wij meten alles zelf na met druppeltests en sturen uw water ter plaatse bij.' },
+  { id: 'afstand', icoon: '📱', titel: 'Advies op afstand', tekst: 'U stuurt uw dossier met foto\'s door en krijgt een eerste inschatting zonder bezoek.' },
+  { id: 'noodgeval', icoon: '🚨', titel: 'Noodgeval', tekst: 'Uw vissen zijn in nood: ze happen naar adem, hangen stil of er is sterfte.' },
 ];
 
 const URGENTIES = [
   { id: 'laag', label: 'Geen haast' },
   { id: 'normaal', label: 'Binnen de week' },
   { id: 'dringend', label: 'Zo snel mogelijk' },
-  { id: 'nood', label: 'Vandaag nog — noodgeval' },
+  { id: 'nood', label: 'Vandaag nog (noodgeval)' },
 ];
 
 export async function toonHulp() {
@@ -31,7 +31,7 @@ export async function toonHulp() {
 
   if (!bak) {
     wrap.append(kaart('🆘 Hulp nodig?',
-      h('p', {}, 'Maak eerst je bak aan, dan kunnen we meteen je gegevens meesturen.'),
+      h('p', {}, 'Maak eerst uw bak aan, dan kunnen wij meteen uw gegevens meesturen.'),
       h('button', { class: 'knop knop--primair knop--vol', onclick: () => ganaar('bak/nieuw') }, 'Bak toevoegen')));
     return wrap;
   }
@@ -44,8 +44,8 @@ export async function toonHulp() {
   /* --- hoofdknop --- */
   wrap.append(h('section', { class: 'hulpblok' },
     h('h3', {}, '🆘 Ik heb hulp nodig'),
-    h('p', {}, 'Kies wat je nodig hebt. Je bakgegevens, vissenbestand, laatste metingen, foto\'s en het advies gaan automatisch mee, ' +
-      'zodat Lux Aqua van op afstand al een goed eerste beeld heeft.'),
+    h('p', {}, 'Kies wat u nodig hebt. Uw bakgegevens, vissenbestand, laatste metingen, foto\'s en het advies gaan automatisch mee, ' +
+      'zodat LUX AQUA van op afstand al een goed eerste beeld heeft.'),
     ...SOORTEN.map((s) => h('button', {
       class: 'knop knop--vol', style: { marginBottom: '8px', justifyContent: 'flex-start' },
       onclick: () => hulpFormulier(s.id, bak, advies, instellingen),
@@ -53,24 +53,24 @@ export async function toonHulp() {
 
   if (advies?.huisbezoekAangeraden) {
     wrap.append(h('section', { class: 'kaart kaart--kritiek' },
-      h('h3', {}, 'Je laatste meting vraagt aandacht'),
+      h('h3', {}, 'Uw laatste meting vraagt aandacht'),
       h('p', { class: 'klein' }, advies.samenvatting),
-      h('p', { class: 'klein zacht' }, 'Start ondertussen alvast met de voorgestelde acties op je startscherm — dat is meestal de helft van de oplossing.')));
+      h('p', { class: 'klein zacht' }, 'Start ondertussen alvast met de voorgestelde acties op uw startscherm. Dat is meestal de helft van de oplossing.')));
   }
 
   /* --- eerste hulp --- */
   wrap.append(kaart('🚑 Eerste hulp bij paniek',
-    h('p', { class: 'klein zacht' }, 'Doe dit terwijl je op antwoord wacht. Het lost de oorzaak niet op, maar het houdt je vissen recht.'),
+    h('p', { class: 'klein zacht' }, 'Doe dit terwijl u op antwoord wacht. Het lost de oorzaak niet op, maar het houdt uw vissen recht.'),
     h('ul', { class: 'opsomming klein' },
       h('li', {}, h('strong', {}, 'Vissen happen aan het oppervlak: '), 'zet extra beluchting bij, verlaag de temperatuur traag, stop met voederen.'),
       h('li', {}, h('strong', {}, 'Nitriet of ammoniak gemeten: '), 'ververs 30 tot 50% water op temperatuur, met waterbereider, en voeder 48 uur niet.'),
-      h('li', {}, h('strong', {}, 'Troebel of stinkend water: '), 'zuig de bodem af, spoel je filter uit in aquariumwater (nooit onder de kraan).'),
-      h('li', {}, h('strong', {}, 'Plotse sterfte: '), 'haal dode dieren er meteen uit, ververs water, meet NO₂, NH₄ en pH, en verander verder niets tot je advies hebt.'),
+      h('li', {}, h('strong', {}, 'Troebel of stinkend water: '), 'zuig de bodem af, spoel uw filter uit in aquariumwater (nooit onder de kraan).'),
+      h('li', {}, h('strong', {}, 'Plotse sterfte: '), 'haal dode dieren er meteen uit, ververs water, meet NO₂, NH₄ en pH, en verander verder niets tot u advies hebt.'),
       h('li', {}, h('strong', {}, 'Na een behandeling: '), 'geen actieve kool in de filter tijdens de kuur, wel erna om restanten weg te halen.'))));
 
   /* --- dossier delen zonder hulpvraag --- */
   wrap.append(kaart('📤 Mijn dossier delen',
-    h('p', { class: 'klein zacht' }, 'Je kan je dossier ook gewoon doorsturen, bijvoorbeeld als je in de winkel langskomt of iets wil laten nakijken.'),
+    h('p', { class: 'klein zacht' }, 'U kan uw dossier ook gewoon doorsturen, bijvoorbeeld als u in de winkel langskomt of iets wilt laten nakijken.'),
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: async () => deelDossier(await maakDossier(bak.id)) }, '📤 Delen'),
       h('button', { class: 'knop knop--stil', onclick: async () => exporteerDossier(await maakDossier(bak.id)) }, '⬇️ Bestand'),
@@ -90,7 +90,7 @@ export async function toonHulp() {
           h('p', { class: 'klein' }, v.omschrijving || 'Geen omschrijving.'),
           v.beschikbaarheid ? h('p', { class: 'mini zacht' }, `Beschikbaar: ${v.beschikbaarheid}`) : null,
           h('p', { class: 'mini zacht' }, `Aangemaakt op ${datum(v.aangemaakt)} · urgentie: ${v.urgentie}`),
-          v.antwoord ? h('div', { class: 'kaart kaart--goed' }, h('strong', {}, 'Antwoord van Lux Aqua: '), v.antwoord) : null)));
+          v.antwoord ? h('div', { class: 'kaart kaart--goed' }, h('strong', {}, 'Antwoord van LUX AQUA: '), v.antwoord) : null)));
     }
     wrap.append(blok);
   }
@@ -116,7 +116,7 @@ async function hulpFormulier(soortId, bak, advies, instellingen) {
     selected: soortId === 'noodgeval' ? u.id === 'nood' : u.id === 'normaal',
   })));
   const omschrijving = tekstvak({
-    placeholder: 'Wat is er aan de hand? Wat heb je al geprobeerd? Sinds wanneer speelt het?',
+    placeholder: 'Wat is er aan de hand? Wat hebt u al geprobeerd? Sinds wanneer speelt het?',
     value: advies?.huisbezoekAangeraden ? `Uit mijn laatste meting: ${advies.samenvatting}\n\n` : '',
   });
   const beschikbaarheid = invoer({ placeholder: 'bv. weekdagen na 17 u, zaterdagvoormiddag' });
@@ -146,11 +146,11 @@ async function hulpFormulier(soortId, bak, advies, instellingen) {
       soortId !== 'afstand' ? veld('Wanneer past een bezoek?', beschikbaarheid) : null,
       veld('Extra foto\'s meesturen', h('div', {},
         h('button', { class: 'knop knop--stil', onclick: fotosKiezen }, '📷 Foto toevoegen'), fotoVoorbeeld),
-        'Een foto van de volledige bak, van het probleem en van je filter helpt enorm.'),
+        'Een foto van de volledige bak, van het probleem en van uw filter helpt enorm.'),
       h('label', { class: 'rij klein', style: { gap: '8px', marginBottom: '6px' } }, metMetingen, h('span', {}, 'Mijn laatste metingen meesturen')),
       h('label', { class: 'rij klein', style: { gap: '8px' } }, metFotos, h('span', {}, 'Mijn foto\'s uit de app meesturen')),
       h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
-        'Je gegevens worden pas verstuurd wanneer je hieronder zelf een manier van doorsturen kiest.')),
+        'Uw gegevens worden pas verstuurd wanneer u hieronder zelf een manier van doorsturen kiest.')),
     acties: [
       { label: 'Annuleren', waarde: false },
       { label: 'Doorgaan', stijl: 'knop--primair', waarde: true },
@@ -180,14 +180,14 @@ async function hulpFormulier(soortId, bak, advies, instellingen) {
   teken();
 }
 
-/** Laat de klant kiezen hoe de hulpvraag bij Lux Aqua geraakt. */
+/** Laat de klant kiezen hoe de hulpvraag bij LUX AQUA geraakt. */
 async function verstuurKeuze(dossier, instellingen) {
   const tekst = dossierAlsTekst(dossier);
   const b = instellingen.bedrijf || {};
   await dialoog({
-    titel: 'Hoe stuur je dit door?', breed: true,
+    titel: 'Hoe stuurt u dit door?', breed: true,
     inhoud: h('div', {},
-      h('p', { class: 'klein zacht' }, 'Je hulpvraag is bewaard in de app. Kies hieronder hoe je ze bij Lux Aqua krijgt.'),
+      h('p', { class: 'klein zacht' }, 'Uw hulpvraag is bewaard in de app. Kies hieronder hoe u ze bij LUX AQUA krijgt.'),
       h('div', { class: 'kolom' },
         h('button', { class: 'knop knop--primair knop--vol', onclick: () => deelDossier(dossier) }, '📤 Delen via mijn toestel (WhatsApp, mail, …)'),
         h('a', { class: 'knop knop--stil knop--vol', href: whatsappLink(tekst, b.telefoon || ''), target: '_blank', rel: 'noopener' }, '💬 Via WhatsApp'),
@@ -200,9 +200,9 @@ async function verstuurKeuze(dossier, instellingen) {
           ? h('button', {
             class: 'knop knop--stil knop--vol', onclick: async () => {
               const r = await stuurNaarServer(dossier);
-              if (r.ok) melding('Doorgestuurd naar Lux Aqua.', 'ok');
+              if (r.ok) melding('Doorgestuurd naar LUX AQUA.', 'ok');
             },
-          }, '☁️ Rechtstreeks naar Lux Aqua sturen') : null),
+          }, '☁️ Rechtstreeks naar LUX AQUA sturen') : null),
       h('details', { class: 'uitklap', style: { marginTop: '12px' } },
         h('summary', {}, 'Wat wordt er precies verstuurd?'),
         h('div', { class: 'uitklap__inhoud' },
@@ -210,5 +210,5 @@ async function verstuurKeuze(dossier, instellingen) {
           dossier.fotos?.length ? h('p', { class: 'mini zacht' }, `+ ${dossier.fotos.length} foto('s)`) : null))),
     acties: [{ label: 'Klaar', stijl: 'knop--primair', waarde: true }],
   });
-  melding('Je hulpvraag staat genoteerd.', 'ok');
+  melding('Uw hulpvraag staat genoteerd.', 'ok');
 }

@@ -1,4 +1,4 @@
-/** Productcatalogus met omschrijving, dosering voor jouw bak en opvolging. */
+/** Productcatalogus met omschrijving, dosering voor uw bak en opvolging. */
 import { h, kaart, badge, invoer, veld, dialoog, melding, kopieer } from '../ui.js';
 import { ctx } from '../app.js';
 import * as store from '../store.js';
@@ -64,8 +64,8 @@ export async function toonProducten() {
   wrap.append(kaart('🧴 Producten',
     h('p', { class: 'klein zacht' },
       liters
-        ? `De doseringen worden meteen berekend voor ${liters} liter — de inhoud van ${bak.naam || 'je bak'}.`
-        : 'Vul de inhoud van je bak in om de doseringen automatisch te laten berekenen.'),
+        ? `De doseringen worden meteen berekend voor ${liters} liter, de inhoud van ${bak.naam || 'uw bak'}.`
+        : 'Vul de inhoud van uw bak in om de doseringen automatisch te laten berekenen.'),
     veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder,
     h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
       'De namen hieronder zijn voorlopige, functionele namen. Vervang ze in Beheer → Producten beheren ' +
@@ -93,7 +93,7 @@ export async function toonProduct(p, liters, bak) {
     const r = berekenDosis(p, l, d);
     uitkomst.replaceChildren(
       h('div', { class: 'rij rij--tussen' },
-        h('span', { class: 'zacht klein' }, 'Jouw dosering'),
+        h('span', { class: 'zacht klein' }, 'Uw dosering'),
         h('strong', { style: { fontSize: '1.3rem' } }, r ? `${r.hoeveelheid} ${r.eenheid}` : '–')),
       h('p', { class: 'mini zacht', style: { margin: '4px 0 0' } }, p.dosering?.omschrijving || ''));
   };
@@ -110,7 +110,7 @@ export async function toonProduct(p, liters, bak) {
       p.verpakkingen?.length ? h('p', { class: 'mini zacht' }, `Verkrijgbaar in: ${p.verpakkingen.join(', ')}`) : null,
 
       h('h4', {}, 'Dosering berekenen'),
-      veld('Inhoud van je bak (liter)', doseerVeld),
+      veld('Inhoud van uw bak (liter)', doseerVeld),
       deltaVeld ? veld(`Gewenste verschuiving (${param(p.dosering.param)?.unit || ''})`, deltaVeld,
         `Standaard geeft ${p.dosering.hoeveelheid} ${p.dosering.eenheid} per ${p.dosering.per} l een verschuiving van ${p.dosering.effect}.`) : null,
       uitkomst,
@@ -138,7 +138,7 @@ export async function toonProduct(p, liters, bak) {
         label: '📓 In logboek zetten', stijl: 'knop--primair', actie: async () => {
           if (!bak) { melding('Geen bak geselecteerd.', 'fout'); return false; }
           const r = berekenDosis(p, Number(doseerVeld.value) || 0, deltaVeld ? Number(deltaVeld.value) : undefined);
-          await store.logboek(bak.id, `${p.naam} gedoseerd${r ? ` — ${r.hoeveelheid} ${r.eenheid}` : ''}`, 'product');
+          await store.logboek(bak.id, `${p.naam} gedoseerd${r ? `: ${r.hoeveelheid} ${r.eenheid}` : ''}`, 'product');
           const taken = (p.opvolging || []).map((o, i) => ({
             id: `taak-${p.id}-${i}-${Date.now()}`, omschrijving: o.actie, termijn: o.na, product: p.naam,
             vervalt: Date.now() + termijnMs(o.na), klaar: false,

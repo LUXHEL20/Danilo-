@@ -18,8 +18,8 @@ export async function toonBeheer() {
   /* --- rol --- */
   wrap.append(kaart('👤 Modus',
     h('p', { class: 'klein zacht' }, isLux
-      ? 'Je zit in de beheerdersmodus van Lux Aqua: je ziet alle klanten en hun hulpvragen.'
-      : 'Je zit in de klantmodus: je volgt je eigen bak op.'),
+      ? 'U zit in de beheerdersmodus van LUX AQUA: u ziet alle klanten en hun hulpvragen.'
+      : 'U zit in de klantmodus: u volgt uw eigen bak op.'),
     h('div', { class: 'knoprij' },
       h('button', {
         class: `knop ${isLux ? 'knop--stil' : 'knop--primair'}`,
@@ -28,7 +28,7 @@ export async function toonBeheer() {
       h('button', {
         class: `knop ${isLux ? 'knop--primair' : 'knop--stil'}`,
         onclick: async () => { await store.zetInstelling({ rol: 'luxaqua' }); ganaar('klanten'); teken(); },
-      }, '🛠️ Lux Aqua-modus'))));
+      }, '🛠️ LUX AQUA-modus'))));
 
   /* --- logo --- */
   const logoVoorbeeld = h('div', { class: 'rij', style: { marginBottom: '10px' } },
@@ -51,7 +51,7 @@ export async function toonBeheer() {
   });
   wrap.append(kaart('🖼️ Logo',
     h('p', { class: 'klein zacht' },
-      'Laad hier het Lux Aqua-logo op (png, jpg of svg). Het verschijnt in de kopbalk, op het welkomscherm ' +
+      'Laad hier het LUX AQUA-logo op (png, jpg of svg). Het verschijnt in de kopbalk, op het welkomscherm ' +
       'en boven elk afgedrukt dossier. Standaard gebruikt de app het officiële LUX AQUA-logo.'),
     logoVoorbeeld,
     h('div', { class: 'knoprij' },
@@ -64,12 +64,12 @@ export async function toonBeheer() {
 
   /* --- bedrijfsgegevens --- */
   const b = i.bedrijf || {};
-  const bNaam = invoer({ value: b.naam || 'Lux Aqua' });
+  const bNaam = invoer({ value: b.naam || 'LUX AQUA' });
   const bTel = invoer({ type: 'tel', value: b.telefoon || '', placeholder: 'Telefoonnummer met landcode, bv. +32 4xx xx xx xx' });
   const bMail = invoer({ type: 'email', value: b.email || '' });
   const bWeb = invoer({ type: 'url', value: b.website || '', placeholder: 'https://' });
   const bGebied = invoer({ value: b.werkgebied || '', placeholder: 'bv. regio Antwerpen en Kempen' });
-  wrap.append(kaart('🏢 Gegevens van Lux Aqua',
+  wrap.append(kaart('🏢 Gegevens van LUX AQUA',
     h('p', { class: 'klein zacht' }, 'Deze gegevens worden gebruikt voor de contactknoppen en om hulpvragen door te sturen.'),
     veld('Naam', bNaam), veld('Telefoon (WhatsApp)', bTel), veld('E-mail', bMail),
     veld('Website', bWeb), veld('Werkgebied', bGebied),
@@ -86,8 +86,8 @@ export async function toonBeheer() {
   /* --- kleurenkaart ijken --- */
   wrap.append(kaart('🎨 Kleurenkaart ijken',
     h('p', { class: 'klein zacht' },
-      'Elke fabrikant gebruikt eigen kleuren. Fotografeer één keer de kleurenkaart van je verpakking: ' +
-      'de app leest de kleuren uit en gebruikt die daarna om je strips af te lezen. Dat maakt het merkbaar nauwkeuriger.'),
+      'Elke fabrikant gebruikt eigen kleuren. Fotografeer één keer de kleurenkaart van uw verpakking: ' +
+      'de app leest de kleuren uit en gebruikt die daarna om uw strips af te lezen. Dat maakt het merkbaar nauwkeuriger.'),
     h('div', { class: 'chips', style: { marginBottom: '10px' } },
       ...STRIP_PRESETS.map((p) => badge(
         `${p.label}${i.kalibratie?.[p.id] ? ' ✓' : ''}`, i.kalibratie?.[p.id] ? 'goed' : ''))),
@@ -107,7 +107,7 @@ export async function toonBeheer() {
   wrap.append(kaart('🧴 Producten',
     h('p', { class: 'klein zacht' },
       `${catalogus.length} producten. ` +
-      (i.productenOverride ? 'Je gebruikt een aangepaste catalogus.' : 'Je gebruikt de standaardcatalogus. Pas namen, doseringen en verpakkingen aan naar jullie echte assortiment.')),
+      (i.productenOverride ? 'U gebruikt een aangepaste catalogus.' : 'U gebruikt de standaardcatalogus. Pas namen, doseringen en verpakkingen aan naar uw echte assortiment.')),
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: () => beheerProducten() }, '✎ Producten beheren'),
       h('button', {
@@ -122,7 +122,7 @@ export async function toonBeheer() {
     wrap.append(kaart('☁️ Automatisch doorsturen (optioneel)',
       h('p', { class: 'klein zacht' },
         'Zonder koppeling werkt alles lokaal op het toestel en delen klanten hun dossier via WhatsApp, e-mail of een bestand. ' +
-        'Heb je een eigen server of webhook, vul die dan hier in: klanten krijgen dan de knop om rechtstreeks door te sturen.'),
+        'Hebt u een eigen server of webhook, vul die dan hier in: klanten krijgen dan de knop om rechtstreeks door te sturen.'),
       veld('Webadres (POST)', kUrl), veld('Sleutel', kSleutel),
       h('button', {
         class: 'knop knop--primair knop--vol', onclick: async () => {
@@ -134,7 +134,7 @@ export async function toonBeheer() {
 
   /* --- gegevens --- */
   wrap.append(kaart('💾 Gegevens en back-up',
-    h('p', { class: 'klein zacht' }, 'Alles staat op dit toestel. Maak regelmatig een back-up, zeker vóór je van toestel verandert.'),
+    h('p', { class: 'klein zacht' }, 'Alles staat op dit toestel. Maak regelmatig een back-up, zeker vóór u van toestel verandert.'),
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: maakBackup }, '⬇️ Back-up maken'),
       h('button', { class: 'knop knop--stil', onclick: zetBackupTerug }, '📥 Back-up terugzetten'),
@@ -154,10 +154,10 @@ export async function toonBeheer() {
   /* --- over --- */
   wrap.append(kaart('ℹ️ Over deze app',
     h('ul', { class: 'opsomming klein' },
-      h('li', {}, 'Werkt offline: je kan meten en noteren zonder internet.'),
-      h('li', {}, 'Je gegevens blijven op je toestel tot jij ze zelf deelt.'),
-      h('li', {}, 'Voeg de app toe aan je beginscherm om ze als een gewone app te gebruiken.'),
-      h('li', {}, 'De aflezing van een teststrip is een hulpmiddel: bij twijfel of bij een alarmerende waarde bevestig je met een druppeltest.')),
+      h('li', {}, 'Werkt offline: u kan meten en noteren zonder internet.'),
+      h('li', {}, 'Uw gegevens blijven op uw toestel tot u ze zelf deelt.'),
+      h('li', {}, 'Voeg de app toe aan uw beginscherm om ze als een gewone app te gebruiken.'),
+      h('li', {}, 'De aflezing van een teststrip is een hulpmiddel: bij twijfel of bij een alarmerende waarde bevestigt u met een druppeltest.')),
     h('p', { class: 'mini zacht' }, `Gegevens laatst gewijzigd: ${datum(Date.now())}`)));
 
   return wrap;
@@ -227,7 +227,7 @@ async function beheerProducten() {
     titel: 'Producten beheren', breed: true,
     inhoud: h('div', {},
       h('p', { class: 'klein zacht' },
-        'Pas de productnamen, omschrijvingen en doseringen aan naar het echte assortiment van Lux Aqua. ' +
+        'Pas de productnamen, omschrijvingen en doseringen aan naar het echte assortiment van LUX AQUA. ' +
         'De app gebruikt deze gegevens om automatisch de juiste dosering voor de bak van de klant te berekenen.'),
       lijst,
       h('button', {
@@ -240,7 +240,7 @@ async function beheerProducten() {
       { label: 'Annuleren', waarde: false },
       {
         label: 'Standaard herstellen', actie: async () => {
-          if (!await bevestig('Herstellen?', 'De standaardcatalogus wordt teruggezet en je aanpassingen gaan verloren.', 'Herstellen')) return false;
+          if (!await bevestig('Herstellen?', 'De standaardcatalogus wordt teruggezet en uw aanpassingen gaan verloren.', 'Herstellen')) return false;
           await store.zetInstelling({ productenOverride: null });
           return true;
         },
@@ -273,7 +273,7 @@ async function productFormulier(p, catalogus, index) {
     { value: 'druppel', label: 'druppels', selected: p.dosering?.eenheid === 'druppel' },
   ]);
   const per = invoer({ type: 'number', value: p.dosering?.per ?? 50 });
-  const doelParam = keuze([{ value: '', label: '—' }, ...Object.values(PARAMETERS).map((x) => ({ value: x.id, label: x.label, selected: x.id === p.dosering?.param }))]);
+  const doelParam = keuze([{ value: '', label: '(geen)' }, ...Object.values(PARAMETERS).map((x) => ({ value: x.id, label: x.label, selected: x.id === p.dosering?.param }))]);
   const effect = invoer({ type: 'number', step: 0.1, value: p.dosering?.effect ?? 1 });
   const doseringTekst = invoer({ value: p.dosering?.omschrijving || '' });
   const toepassing = tekstvak({ value: p.toepassing || '' });
@@ -406,7 +406,7 @@ async function ijkKleurenkaart(instellingen) {
     titel: 'Kleurenkaart ijken', breed: true,
     inhoud: h('div', {},
       h('p', { class: 'klein zacht' },
-        'Fotografeer de kleurenkaart van je verpakking. De app leest per testveld de kleuren uit en gebruikt die ' +
+        'Fotografeer de kleurenkaart van uw verpakking. De app leest per testveld de kleuren uit en gebruikt die ' +
         'voortaan in plaats van de standaardkleuren.'),
       veld('Welke strip?', presetKeuze),
       veld('Aantal kleurniveaus per veld', kolomVeld),
@@ -434,5 +434,5 @@ async function ijkKleurenkaart(instellingen) {
       },
     ],
   });
-  if (bewaard) { melding('IJking bewaard. Je strips worden nu met jouw kaart gelezen.', 'ok'); teken(); }
+  if (bewaard) { melding('IJking bewaard. Uw strips worden nu met uw kaart gelezen.', 'ok'); teken(); }
 }

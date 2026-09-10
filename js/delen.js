@@ -1,5 +1,5 @@
 /**
- * Dossier opbouwen en delen: alles wat Lux Aqua nodig heeft om van op afstand
+ * Dossier opbouwen en delen: alles wat LUX AQUA nodig heeft om van op afstand
  * een eerste indruk te krijgen — bakgegevens, vissenbestand, laatste metingen,
  * advies, foto's en de hulpvraag.
  */
@@ -57,16 +57,16 @@ export function dossierAlsTekst(dossier) {
   const b = dossier.bak;
   const prof = profile(b.profiel);
   const r = [];
-  r.push(`*Lux Aqua — dossier ${b.naam || 'aquarium'}*`);
+  r.push(`*LUX AQUA: dossier ${b.naam || 'aquarium'}*`);
   if (dossier.klant) r.push(`Klant: ${dossier.klant.naam || '–'}${dossier.klant.telefoon ? ` (${dossier.klant.telefoon})` : ''}`);
-  r.push(`Type: ${prof.label} — ${b.liters || '?'} liter`);
+  r.push(`Type: ${prof.label}, ${b.liters || '?'} liter`);
   if (b.opgestart) r.push(`Opgestart: ${new Date(b.opgestart).toLocaleDateString('nl-BE')}`);
   if (b.filter) r.push(`Filter: ${b.filter}`);
   if (b.verlichting) r.push(`Verlichting: ${b.verlichting}`);
 
   if (dossier.vissen?.length) {
     r.push('', '*Vissenbestand*');
-    for (const v of dossier.vissen) r.push(`• ${v.aantal}× ${v.soort}${v.opmerking ? ` — ${v.opmerking}` : ''}`);
+    for (const v of dossier.vissen) r.push(`• ${v.aantal}× ${v.soort}${v.opmerking ? ` (${v.opmerking})` : ''}`);
   }
 
   const m = dossier.metingen?.[0];
@@ -101,7 +101,7 @@ export function dossierAlsTekst(dossier) {
   return r.join('\n');
 }
 
-/** Bewaart het dossier als bestand dat Lux Aqua kan inlezen: download op het web, deelmenu in de native app. */
+/** Bewaart het dossier als bestand dat LUX AQUA kan inlezen: download op het web, deelmenu in de native app. */
 export function exporteerDossier(dossier) {
   const naam = `luxaqua-dossier-${(dossier.bak?.naam || 'bak').replace(/[^\w-]+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.json`;
   const inhoud = JSON.stringify(dossier, null, 2);
@@ -125,10 +125,10 @@ export async function deelDossier(dossier, { metBestand = true } = {}) {
 export const whatsappLink = (tekst, nummer = '') =>
   `https://wa.me/${nummer.replace(/[^\d]/g, '')}?text=${encodeURIComponent(tekst)}`;
 
-export const mailLink = (tekst, adres = '', onderwerp = 'Lux Aqua — dossier en hulpvraag') =>
+export const mailLink = (tekst, adres = '', onderwerp = 'LUX AQUA: dossier en hulpvraag') =>
   `mailto:${adres}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(tekst)}`;
 
-/** Leest een dossierbestand in bij Lux Aqua en voegt het toe aan de eigen gegevens. */
+/** Leest een dossierbestand in bij LUX AQUA en voegt het toe aan de eigen gegevens. */
 export async function importeerDossier(json) {
   const d = typeof json === 'string' ? JSON.parse(json) : json;
   if (!d?.bak) throw new Error('Dit bestand bevat geen geldig dossier.');
@@ -178,7 +178,7 @@ export function dossierAlsHtml(dossier, inst = {}) {
   const prof = profile(b.profiel);
   const rij = (l, w) => `<tr><th>${l}</th><td>${w ?? '–'}</td></tr>`;
   const m = dossier.metingen?.[0];
-  const html = `<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>Lux Aqua dossier — ${b.naam || ''}</title>
+  const html = `<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>LUX AQUA, dossier ${b.naam || 'aquarium'}</title>
   <style>
     body{font:14px/1.5 system-ui,sans-serif;color:#12232e;margin:32px;max-width:800px}
     h1{color:#0b6b78;margin-bottom:4px} h2{margin-top:28px;border-bottom:2px solid #0b6b78;padding-bottom:4px;color:#0b6b78}
@@ -190,7 +190,7 @@ export function dossierAlsHtml(dossier, inst = {}) {
     .kop img{height:56px;width:auto;object-fit:contain}
     .kop h1{margin:0}
   </style></head><body>
-  <div class="kop"><img src="${logo}" alt=""><div><h1>${bedrijf.naam || 'Lux Aqua'} — dossier</h1>
+  <div class="kop"><img src="${logo}" alt=""><div><h1>${bedrijf.naam || 'LUX AQUA'}: dossier</h1>
   <div style="font-size:12px;color:#6b7f89">${[bedrijf.telefoon, bedrijf.email, bedrijf.website].filter(Boolean).join(' · ')}</div></div></div>
   <p>${b.naam || 'Aquarium'} · ${prof.label} · ${b.liters || '?'} liter · opgemaakt op ${new Date(dossier.gegenereerd).toLocaleString('nl-BE')}</p>
   <h2>Klant</h2><table>
@@ -202,19 +202,19 @@ export function dossierAlsHtml(dossier, inst = {}) {
     ${rij('Filter', b.filter)}${rij('Verlichting', b.verlichting)}${rij('CO₂', b.co2)}${rij('Bodem', b.bodem)}
     ${rij('Waterverversing', b.verversing)}${rij('Opmerkingen', b.opmerking)}</table>
   <h2>Vissenbestand</h2>
-  ${dossier.vissen?.length ? `<ul>${dossier.vissen.map((v) => `<li>${v.aantal}× ${v.soort}${v.opmerking ? ` — ${v.opmerking}` : ''}</li>`).join('')}</ul>` : '<p>Nog niet ingevuld.</p>'}
+  ${dossier.vissen?.length ? `<ul>${dossier.vissen.map((v) => `<li>${v.aantal}× ${v.soort}${v.opmerking ? ` (${v.opmerking})` : ''}</li>`).join('')}</ul>` : '<p>Nog niet ingevuld.</p>'}
   <h2>Laatste meting</h2>
   ${m ? `<p>${new Date(m.datum).toLocaleString('nl-BE')}</p><table>${Object.entries(m.waarden || {}).filter(([, w]) => w !== '' && w != null)
-      .map(([id, w]) => { const st = statusOf(id, Number(w), b.profiel); return `<tr><th>${param(id)?.label || id}</th><td class="${st}">${fmt(id, Number(w))} — ${STATUS_LABEL[st]}</td></tr>`; }).join('')}</table>`
+      .map(([id, w]) => { const st = statusOf(id, Number(w), b.profiel); return `<tr><th>${param(id)?.label || id}</th><td class="${st}">${fmt(id, Number(w))} (${STATUS_LABEL[st]})</td></tr>`; }).join('')}</table>`
     : '<p>Nog geen meting.</p>'}
   <h2>Advies</h2>
   ${dossier.advies ? `<p><strong>${dossier.advies.samenvatting}</strong> (score ${dossier.advies.score}/100)</p>` +
       dossier.advies.acties.map((a) => `<h3>${a.titel}</h3><p>${a.waarom || ''}</p><ul>${(a.stappen || []).map((s) => `<li>${s}</li>`).join('')}</ul>` +
-        (a.producten?.length ? `<p><em>Producten:</em> ${a.producten.map((p) => `${p.naam}${p.dosis ? ` — ${p.dosis.tekst}` : ''}`).join('; ')}</p>` : '')).join('')
+        (a.producten?.length ? `<p><em>Producten:</em> ${a.producten.map((p) => `${p.naam}${p.dosis ? `: ${p.dosis.tekst}` : ''}`).join('; ')}</p>` : '')).join('')
     : '<p>Geen advies beschikbaar.</p>'}
   ${dossier.hulpvraag ? `<h2>Hulpvraag</h2><table>${rij('Type', dossier.hulpvraag.type)}${rij('Urgentie', dossier.hulpvraag.urgentie)}${rij('Beschikbaarheid', dossier.hulpvraag.beschikbaarheid)}${rij('Omschrijving', dossier.hulpvraag.omschrijving)}</table>` : ''}
   ${dossier.fotos?.length ? `<h2>Foto's</h2>${dossier.fotos.map((f) => `<img src="${f.thumb}" alt="${f.soort}">`).join('')}` : ''}
-  <p class="voet">Dit dossier is opgemaakt met de ${bedrijf.naam || 'Lux Aqua'} app. De adviezen zijn een eerste inschatting op basis van de ingegeven waarden; een huisbezoek blijft de beste manier om een probleem definitief vast te stellen.</p>
+  <p class="voet">Dit dossier is opgemaakt met de app van ${bedrijf.naam || 'LUX AQUA'}. De adviezen zijn een eerste inschatting op basis van de ingegeven waarden; met een huisbezoek stellen wij een probleem definitief vast. LUX AQUA is onderdeel van LUX 2.0.</p>
   </body></html>`;
   return html;
 }

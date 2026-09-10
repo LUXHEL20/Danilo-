@@ -43,7 +43,7 @@ await stap('bakgegevens invullen', async () => {
 });
 await page.waitForTimeout(500);
 await stap('startscherm', async () => {
-  await page.waitForSelector('text=Doe je eerste meting', { timeout: 3000 });
+  await page.waitForSelector('text=Doe uw eerste meting', { timeout: 3000 });
 });
 await stap('meting invullen met live advies', async () => {
   await page.locator('.navigatie a', { hasText: 'Meten' }).click();
@@ -101,7 +101,7 @@ await stap('hulpvraag aanmaken', async () => {
   await page.locator('.dialoog textarea').first().fill('Water is troebel sinds een week.');
   await page.getByRole('button', { name: 'Doorgaan' }).click();
   await page.waitForTimeout(800);
-  await page.waitForSelector('text=Hoe stuur je dit door', { timeout: 4000 });
+  await page.waitForSelector('text=Hoe stuurt u dit door', { timeout: 4000 });
   await page.getByRole('button', { name: 'Klaar' }).click();
   await page.waitForTimeout(600);
 });
@@ -112,10 +112,10 @@ await stap('kennisbank', async () => {
   await page.waitForSelector('.dialoog');
   await page.locator('.dialoog .icoonknop').click();
 });
-await stap('beheer + wissel naar Lux Aqua-modus', async () => {
+await stap('beheer + wissel naar LUX AQUA-modus', async () => {
   await page.goto(`${BASIS}#/beheer`);
   await page.waitForTimeout(500);
-  await page.getByRole('button', { name: /Lux Aqua-modus/ }).click();
+  await page.getByRole('button', { name: /LUX AQUA-modus/ }).click();
   await page.waitForTimeout(800);
   const tekst = await page.locator('#scherm').innerText();
   if (!/Klanten/.test(tekst)) throw new Error('klantenscherm niet geladen');
@@ -135,8 +135,8 @@ await stap('klantdetail', async () => {
   await page.locator('summary', { hasText: 'Installatie en vissenbestand' }).click();
   await page.waitForTimeout(200);
   const tekst = await page.locator('#scherm').innerText();
-  if (!/Neonzalm/.test(tekst)) throw new Error('vissenbestand niet zichtbaar bij Lux Aqua');
-  if (!/Laatste meting/.test(tekst)) throw new Error('meting niet zichtbaar bij Lux Aqua');
+  if (!/Neonzalm/.test(tekst)) throw new Error('vissenbestand niet zichtbaar bij LUX AQUA');
+  if (!/Laatste meting/.test(tekst)) throw new Error('meting niet zichtbaar bij LUX AQUA');
 });
 
 

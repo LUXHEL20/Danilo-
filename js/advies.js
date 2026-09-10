@@ -41,7 +41,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
       param: paramId,
       urgentie: status === 'kritiek' ? 'kritiek' : 'let-op',
       titel: `${p.label} ${teHoog ? 'te hoog' : 'te laag'}: ${fmt(paramId, v)}`,
-      streef: `Streefwaarde voor ${prof.label.toLowerCase()}: ${fmt(paramId, t.ideal[0])} – ${fmt(paramId, t.ideal[1])}`,
+      streef: `Streefwaarde voor ${prof.label.toLowerCase()}: ${fmt(paramId, t.ideal[0])} tot ${fmt(paramId, t.ideal[1])}`,
       waarom: p.info,
       oorzaken: p.causes || [],
       stappen: [],
@@ -82,10 +82,10 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
 
   if (kh != null && kh < 4 && ph != null) {
     acties.push(combi('combi-kh-ph', 'let-op',
-      'Weinig buffer: je pH kan plots wegzakken',
-      `Je KH is ${fmt('kh', kh)}. Onder 4 °dH heeft je water bijna geen buffer meer en kan de pH van de ene dag op de andere onderuit gaan (een pH-crash). Dat is een van de meest voorkomende oorzaken van plots vissterfte.`,
+      'Weinig buffer: uw pH kan plots wegzakken',
+      `Uw KH is ${fmt('kh', kh)}. Onder 4 °dH heeft uw water bijna geen buffer meer en kan de pH van de ene dag op de andere onderuit gaan (een pH-crash). Dat is een veelvoorkomende oorzaak van plotse vissterfte.`,
       [
-        'Breng eerst de KH op peil vóór je iets aan de pH doet.',
+        'Breng eerst de KH op peil vóór u iets aan de pH doet.',
         'Verhoog maximaal 2 °dH per dag.',
         'Meet de pH een week lang elke dag op hetzelfde moment.',
       ],
@@ -96,12 +96,12 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
   if (nh4 != null && nh4 > 0 && ph != null && ph >= 7.5) {
     acties.push(combi('combi-nh3', 'kritiek',
       'Gevaar op ammoniakvergiftiging',
-      `Je meet ${fmt('nh4', nh4)} ammonium bij een pH van ${fmt('ph', ph)}. Vanaf pH 7,5 slaat ammonium om in ammoniak, en dat is zeer giftig. Dezelfde waarde is bij een lage pH ongevaarlijk en bij een hoge pH levensbedreigend.`,
+      `U meet ${fmt('nh4', nh4)} ammonium bij een pH van ${fmt('ph', ph)}. Vanaf pH 7,5 slaat ammonium om in ammoniak, en dat is zeer giftig. Dezelfde waarde is bij een lage pH ongevaarlijk en bij een hoge pH levensbedreigend.`,
       [
         'Ververs onmiddellijk 30–50% van het water (op temperatuur, met waterbereider).',
         'Stop 48 uur met voederen.',
         'Zet extra beluchting bij.',
-        'Verhoog de pH nu NIET — dat maakt de ammoniak nog giftiger.',
+        'Verhoog de pH nu zeker niet: dat maakt de ammoniak nog giftiger.',
       ],
       productenMetDosis(['nitrite-rescue', 'bacto-start'], liters, catalogus),
       [{ na: '2 uur', actie: 'NH₄ en NO₂ opnieuw meten.' }, { na: 'dagelijks', actie: 'Dagelijks meten tot beide waarden 0 zijn.' }],
@@ -125,7 +125,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
   if (temp != null && temp > 27 && (o2 == null || o2 < 7)) {
     acties.push(combi('combi-warm', 'let-op',
       'Warm water houdt weinig zuurstof vast',
-      `Bij ${fmt('temp', temp)} kan je water veel minder zuurstof opnemen, terwijl je vissen er net méér verbruiken.`,
+      `Bij ${fmt('temp', temp)} kan uw water veel minder zuurstof opnemen, terwijl uw vissen er net méér verbruiken.`,
       [
         'Zet extra beluchting of een stromingspomp aan het oppervlak.',
         'Laat de verlichting korter branden.',
@@ -138,12 +138,12 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
 
   if (no2 != null && no2 > 0 && historiek.length < 4) {
     acties.push(combi('combi-instart', 'kritiek',
-      'Je bak is waarschijnlijk nog niet ingedraaid',
+      'Uw bak is waarschijnlijk nog niet ingedraaid',
       'Nitriet in een jonge bak betekent dat de filterbacteriën nog niet volgroeid zijn. Deze fase duurt normaal 3 tot 6 weken.',
       [
         'Zet geen nieuwe vissen bij tot NO₂ twee metingen na elkaar 0 is.',
         'Voeder heel weinig.',
-        'Spoel je filter niet uit in deze periode.',
+        'Spoel uw filter niet uit in deze periode.',
         'Meet elke dag en noteer het hier in de app.',
       ],
       productenMetDosis(['bacto-start', 'nitrite-rescue'], liters, catalogus),
@@ -157,10 +157,10 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
   // ---- 4. Alles goed ---------------------------------------------------------------
   if (!acties.length) {
     acties.push({
-      id: 'alles-ok', urgentie: 'info', titel: 'Je waarden zitten goed',
-      waarom: 'Alle gemeten waarden vallen binnen de streefwaarden van je profiel. Blijven meten is de beste manier om problemen vóór te zijn.',
+      id: 'alles-ok', urgentie: 'info', titel: 'Uw waarden zitten goed',
+      waarom: 'Alle gemeten waarden vallen binnen de streefwaarden van uw profiel. Door te blijven meten bent u problemen vóór.',
       stappen: [
-        'Hou je ritme aan: wekelijks 20–30% water verversen.',
+        'Hou uw ritme aan: wekelijks 20–30% water verversen.',
         'Meet minstens één keer per week en noteer het hier.',
         'Voeg af en toe een foto toe zodat de evolutie zichtbaar blijft.',
       ],
@@ -178,7 +178,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
   return {
     acties, score, huisbezoekAangeraden,
     samenvatting: kritiek
-      ? `${kritiek} kritieke ${kritiek === 1 ? 'waarde' : 'waarden'}${letop ? ` en ${letop} aandachtspunt${letop === 1 ? '' : 'en'}` : ''} — vraag hulp aan Lux Aqua.`
+      ? `${kritiek} kritieke ${kritiek === 1 ? 'waarde' : 'waarden'}${letop ? ` en ${letop} aandachtspunt${letop === 1 ? '' : 'en'}` : ''}: vraag hulp aan LUX AQUA.`
       : letop
         ? `${letop} aandachtspunt${letop === 1 ? '' : 'en'} om bij te sturen.`
         : 'Alle waarden binnen de streefwaarden.',
@@ -209,8 +209,8 @@ const regelsPer = {
       'Ververs vandaag nog 30–50% van het water (zelfde temperatuur, met waterbereider).',
       'Stop 48 uur met voederen.',
       'Zet extra beluchting bij: nitriet blokkeert de zuurstofopname in het bloed.',
-      'Spoel je filter niet uit en vervang geen filtermateriaal.',
-      v > 0.5 ? 'Vraag via de hulpknop een huisbezoek aan — dit is een noodsituatie.' : 'Meet morgen opnieuw.',
+      'Spoel uw filter niet uit en vervang geen filtermateriaal.',
+      v > 0.5 ? 'Vraag via de hulpknop een huisbezoek aan: dit is een noodsituatie.' : 'Meet morgen opnieuw.',
     ],
   }),
   nh4: (v) => ({
@@ -225,29 +225,29 @@ const regelsPer = {
   }),
   no3: (v, { t }) => ({
     stappen: [
-      `Ververs 30% water en herhaal dit wekelijks tot je onder ${fmt('no3', t.ideal[1])} zit.`,
+      `Ververs 30% water en herhaal dit wekelijks tot u onder ${fmt('no3', t.ideal[1])} zit.`,
       'Zuig bij het verversen de bodem mee af.',
       'Voeder kleiner: alles moet binnen 2 minuten op zijn.',
-      'Meet ook je leidingwater — soms zit daar al 25 mg/l of meer in.',
+      'Meet ook uw leidingwater: soms zit daar al 25 mg/l of meer in.',
     ],
   }),
   ph: (v, { teHoog, t }) => ({
     stappen: teHoog
-      ? ['Controleer eerst je KH: die bepaalt hoe hard de pH vastzit.',
+      ? ['Controleer eerst uw KH: die bepaalt hoe hard de pH vastzit.',
          'Verlaag maximaal 0,2 pH per dag.',
          'Kijk na of er kalksteen of koraalgruis in de bak zit dat de pH omhoog duwt.']
-      : ['Controleer eerst je KH: een lage pH komt bijna altijd door een te lage buffer.',
+      : ['Controleer eerst uw KH: een lage pH komt bijna altijd door een te lage buffer.',
          'Verhoog maximaal 0,2 pH per dag.',
-         'Kijk na of hout of turf je water aan het verzuren is.'],
+         'Kijk na of hout of turf uw water aan het verzuren is.'],
   }),
   kh: (v, { teHoog }) => ({
     stappen: teHoog
       ? ['Ververs met zachter water (osmosewater bijmengen).', 'Verlaag traag: maximaal 2 °dH per dag.']
-      : ['Verhoog de KH vóór je iets aan de pH doet.', 'Maximaal 2 °dH per dag verhogen.', 'Meet ook de KH van je leidingwater.'],
+      : ['Verhoog de KH vóór u iets aan de pH doet.', 'Maximaal 2 °dH per dag verhogen.', 'Meet ook de KH van uw leidingwater.'],
   }),
   gh: (v, { teHoog }) => ({
     stappen: teHoog
-      ? ['Meng osmosewater bij je verversingswater om de GH te verlagen.']
+      ? ['Meng osmosewater bij uw verversingswater om de GH te verlagen.']
       : ['Vul mineralen aan in het verse verversingswater in plaats van in de bak zelf.', 'Belangrijk voor garnalen, slakken en jonge vissen.'],
   }),
   cl2: () => ({
@@ -260,13 +260,13 @@ const regelsPer = {
   }),
   po4: (v, { teHoog }) => ({
     stappen: teHoog
-      ? ['Voeder minder en verwijder voedselresten.', 'Ververs wekelijks 30% water.', 'Meet ook je leidingwater op fosfaat.']
-      : ['In een beplante bak heb je een klein beetje fosfaat nodig; dose bij met plantenvoeding.'],
+      ? ['Voeder minder en verwijder voedselresten.', 'Ververs wekelijks 30% water.', 'Meet ook uw leidingwater op fosfaat.']
+      : ['In een beplante bak hebt u een klein beetje fosfaat nodig; doseer bij met plantenvoeding.'],
   }),
   temp: (v, { teHoog }) => ({
     stappen: teHoog
-      ? ['Controleer de instelling van je verwarming.', 'Koel geleidelijk af (max. 1 °C per uur) en zorg voor extra beluchting.']
-      : ['Controleer of je verwarming werkt en juist staat.', 'Verwarm geleidelijk, max. 1 °C per uur.'],
+      ? ['Controleer de instelling van uw verwarming.', 'Koel geleidelijk af (max. 1 °C per uur) en zorg voor extra beluchting.']
+      : ['Controleer of uw verwarming werkt en juist staat.', 'Verwarm geleidelijk, max. 1 °C per uur.'],
   }),
   o2: () => ({
     stappen: [

@@ -1,6 +1,6 @@
 /**
  * Waterparameters, streefwaarden per waterprofiel en teststrip-presets.
- * Alle data staat hier centraal zodat Lux Aqua ze kan aanpassen zonder de app te herschrijven.
+ * Alle data staat hier centraal zodat LUX AQUA ze kan aanpassen zonder de app te herschrijven.
  */
 
 /**
@@ -13,13 +13,13 @@ export const PARAMETERS = {
   temp: {
     id: 'temp', label: 'Temperatuur', short: 'Temp', unit: '°C', decimals: 1, step: 0.1, min: 0, max: 40,
     kind: 'range', onStrip: false,
-    info: 'Bepaalt de stofwisseling van vissen, de zuurstofopname van het water en de snelheid van je filterbacteriën.',
+    info: 'Bepaalt de stofwisseling van vissen, de zuurstofopname van het water en de snelheid van uw filterbacteriën.',
     causes: ['Defecte of verkeerd ingestelde verwarming', 'Warme kamer of zon op de bak', 'Verlichting die te veel warmte afgeeft'],
   },
   ph: {
     id: 'ph', label: 'pH (zuurtegraad)', short: 'pH', unit: '', decimals: 1, step: 0.1, min: 4, max: 10,
     kind: 'range', onStrip: true,
-    info: 'De pH zegt hoe zuur of basisch het water is. Hij wordt vastgehouden door de KH: is je KH te laag, dan kan de pH plots wegzakken (pH-crash).',
+    info: 'De pH zegt hoe zuur of basisch het water is. Hij wordt vastgehouden door de KH: is uw KH te laag, dan kan de pH plots wegzakken (pH-crash).',
     causes: ['KH te laag waardoor de pH niet gebufferd wordt', 'Te veel CO2 (verlaagt pH) of te weinig CO2 (verhoogt pH)', 'Veel afbraak van voedselresten en planten', 'Kraantjeswater dat sterk afwijkt'],
     scale: [
       { value: 6.0, hex: '#f6e05e' }, { value: 6.4, hex: '#eddb52' }, { value: 6.8, hex: '#dcd558' },
@@ -30,7 +30,7 @@ export const PARAMETERS = {
   kh: {
     id: 'kh', label: 'KH (carbonaathardheid)', short: 'KH', unit: '°dH', decimals: 0, step: 1, min: 0, max: 25,
     kind: 'range', onStrip: true,
-    info: 'De KH is de buffer van je water: hij houdt de pH stabiel. Dit is de belangrijkste waarde om eerst in orde te brengen.',
+    info: 'De KH is de buffer van uw water: hij houdt de pH stabiel. Dit is de waarde om eerst in orde te brengen.',
     causes: ['Osmose- of regenwater zonder remineralisatie', 'Zuren uit hout, turf of veel bodemvoeding', 'Lang geen waterverversing gedaan'],
     scale: [
       { value: 0, hex: '#f3e9a8' }, { value: 3, hex: '#dfe08f' }, { value: 6, hex: '#c2d67f' },
@@ -50,7 +50,7 @@ export const PARAMETERS = {
   no2: {
     id: 'no2', label: 'Nitriet (NO₂)', short: 'NO₂', unit: 'mg/l', decimals: 2, step: 0.05, min: 0, max: 10,
     kind: 'zero', onStrip: true, critical: true,
-    info: 'Nitriet is acuut giftig: het blokkeert de zuurstofopname in het bloed van je vissen. Boven 0,3 mg/l is dit een noodgeval.',
+    info: 'Nitriet is acuut giftig: het blokkeert de zuurstofopname in het bloed van uw vissen. Boven 0,3 mg/l is dit een noodgeval.',
     causes: ['Nieuwe bak die nog niet ingedraaid is', 'Filter gespoeld met kraantjeswater of vervangen', 'Te veel vissen ineens bijgezet of te veel gevoederd', 'Medicatie die de filterbacteriën heeft gedood'],
     scale: [
       { value: 0, hex: '#fdf6e8' }, { value: 0.5, hex: '#f6cfd6' }, { value: 1, hex: '#ef9fb8' },
@@ -70,7 +70,7 @@ export const PARAMETERS = {
   nh4: {
     id: 'nh4', label: 'Ammonium / ammoniak (NH₄/NH₃)', short: 'NH₄', unit: 'mg/l', decimals: 2, step: 0.05, min: 0, max: 10,
     kind: 'zero', onStrip: true, critical: true,
-    info: 'Bij een hoge pH slaat ammonium om in ammoniak, en dat is zeer giftig. Hoe hoger je pH en temperatuur, hoe gevaarlijker dezelfde waarde is.',
+    info: 'Bij een hoge pH slaat ammonium om in ammoniak, en dat is zeer giftig. Hoe hoger uw pH en temperatuur, hoe gevaarlijker dezelfde waarde is.',
     causes: ['Bak nog niet ingedraaid', 'Dode vis of rottend plantmateriaal', 'Filter uitgevallen of te klein', 'Te veel voer'],
     scale: [
       { value: 0, hex: '#f7f3d9' }, { value: 0.5, hex: '#e4e59c' }, { value: 1, hex: '#c9d97e' },
@@ -80,7 +80,7 @@ export const PARAMETERS = {
   cl2: {
     id: 'cl2', label: 'Chloor (Cl₂)', short: 'Cl₂', unit: 'mg/l', decimals: 1, step: 0.1, min: 0, max: 5,
     kind: 'zero', onStrip: true,
-    info: 'Chloor uit het leidingnet beschadigt kieuwen en doodt je filterbacteriën. Altijd wegwerken vóór je water bijvult.',
+    info: 'Chloor uit het leidingnet beschadigt kieuwen en doodt uw filterbacteriën. Altijd wegwerken vóór u water bijvult.',
     causes: ['Vers leidingwater zonder waterbereider', 'Tijdelijke chloorpiek bij werken aan de waterleiding'],
     scale: [
       { value: 0, hex: '#fdfaf0' }, { value: 0.5, hex: '#f3dbe6' }, { value: 1, hex: '#e2aecd' },
@@ -100,13 +100,13 @@ export const PARAMETERS = {
   fe: {
     id: 'fe', label: 'IJzer (Fe)', short: 'Fe', unit: 'mg/l', decimals: 2, step: 0.01, min: 0, max: 2,
     kind: 'range', onStrip: false,
-    info: 'IJzer is de belangrijkste sporenstof voor planten. Te weinig geeft bleke, doorschijnende jonge bladeren.',
+    info: 'IJzer is een essentiële sporenstof voor planten. Te weinig geeft bleke, doorschijnende jonge bladeren.',
     causes: ['Geen of te weinig plantenmest', 'IJzer wordt snel afgebroken door sterk licht en UV'],
   },
   o2: {
     id: 'o2', label: 'Zuurstof (O₂)', short: 'O₂', unit: 'mg/l', decimals: 1, step: 0.5, min: 0, max: 20,
     kind: 'range', onStrip: false,
-    info: 'Zuurstof is levensnoodzakelijk voor vissen én voor je filterbacteriën. Warm water houdt minder zuurstof vast.',
+    info: 'Zuurstof is levensnoodzakelijk voor vissen én voor uw filterbacteriën. Warm water houdt minder zuurstof vast.',
     causes: ['Te weinig oppervlaktebeweging', 'Te warm water', 'Te veel vissen of veel rottend materiaal', 'Nachtelijk verbruik door planten en algen'],
   },
   cu: {
@@ -135,7 +135,7 @@ export const PARAMETERS = {
   },
 };
 
-/** Waterprofielen: elk profiel bepaalt welke waarden je opvolgt en wat de streefwaarden zijn. */
+/** Waterprofielen: elk profiel bepaalt welke waarden u opvolgt en wat de streefwaarden zijn. */
 export const PROFILES = {
   zoet_gezelschap: {
     id: 'zoet_gezelschap', label: 'Zoetwater gezelschapsbak', group: 'Aquarium',
@@ -245,7 +245,7 @@ export const PROFILES = {
 /**
  * Teststrip-presets. `pads` staat in de volgorde waarin de velden op de strip staan,
  * van het uiteinde van de strip (verst van de handgreep) naar de handgreep toe.
- * Klopt de volgorde niet met jouw merk? In de app kan je de strip omdraaien of
+ * Klopt de volgorde niet met uw merk? In de app kan u de strip omdraaien of
  * de velden handmatig toewijzen.
  */
 export const STRIP_PRESETS = [

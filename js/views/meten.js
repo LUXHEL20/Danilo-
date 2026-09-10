@@ -1,6 +1,6 @@
 /**
  * Meting toevoegen: teststrip fotograferen en laten uitlezen, of zelf invullen.
- * Terwijl je de waarden ingeeft, toont de app meteen de voorgestelde acties.
+ * Terwijl u de waarden ingeeft, toont de app meteen de voorgestelde acties.
  */
 import { h, kaart, badge, veld, invoer, tekstvak, melding, dialoog, legeStaat } from '../ui.js';
 import { ctx, ganaar, teken } from '../app.js';
@@ -16,7 +16,7 @@ import { kiesFoto } from '../native.js';
 export async function toonMeten() {
   const bak = ctx.bak;
   if (!bak) {
-    return legeStaat('🐠', 'Nog geen bak', 'Maak eerst je aquarium of vijver aan.',
+    return legeStaat('🐠', 'Nog geen bak', 'Maak eerst uw aquarium of vijver aan.',
       h('button', { class: 'knop knop--primair', onclick: () => ganaar('bak/nieuw') }, 'Bak toevoegen'));
   }
 
@@ -42,8 +42,8 @@ export async function toonMeten() {
 
   const stripKaart = kaart(h('span', {}, '📸 Teststrip inlezen'),
     h('p', { class: 'klein zacht' },
-      'Dompel je strip volgens de handleiding, schud het overtollige water af en fotografeer de strip meteen ' +
-      '(na de wachttijd op de verpakking) op een effen, donkere ondergrond bij daglicht — zonder flits en zonder schaduw over de strip.'),
+      'Dompel uw strip volgens de handleiding, schud het overtollige water af en fotografeer de strip meteen ' +
+      '(na de wachttijd op de verpakking) op een effen, donkere ondergrond bij daglicht, zonder flits en zonder schaduw over de strip.'),
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: fotoKiezen }, '📷 Foto nemen of kiezen'),
       h('button', { class: 'knop knop--stil', onclick: () => toonStripHulp() }, 'Tips voor een goede foto')),
@@ -138,9 +138,9 @@ export async function toonMeten() {
       h('div', { class: 'stripdoek', style: { marginTop: '12px' } }, doek),
       h('p', { class: 'mini zacht', style: { marginTop: '6px' } },
         stripAnalyse.veldjesGevonden
-          ? '✅ De testveldjes zijn automatisch gevonden. Klopt het kader niet? Sleep met je vinger een nieuw kader over de strip.'
+          ? '✅ De testveldjes zijn automatisch gevonden. Klopt het kader niet? Sleep met uw vinger een nieuw kader over de strip.'
           : '⚠️ De veldjes konden niet automatisch gevonden worden. Sleep een kader rond enkel de strip en controleer de waarden goed.'),
-      veld('Welke strip gebruik je?', presetKeuze),
+      veld('Welke strip gebruikt u?', presetKeuze),
       h('div', { class: 'knoprij' },
         h('button', { class: 'knop knop--stil', onclick: () => { staat.omgekeerd = !staat.omgekeerd; tekenStripUI(staat); } }, '🔄 Volgorde omkeren'),
         h('button', { class: 'knop knop--stil', onclick: () => { staat.rect = zoekStrip(staat.imageData) || standaardKader(staat.canvas.width, staat.canvas.height); tekenStripUI(staat); } }, '🎯 Opnieuw zoeken'),
@@ -149,8 +149,8 @@ export async function toonMeten() {
         h('h4', {}, 'Wat de app afleest'),
         ...stripAnalyse.resultaten.map((r) => stripVeldRij(r)),
         h('p', { class: 'mini zacht', style: { marginTop: '8px' } },
-          'Dit is een voorstel op basis van de kleuren. Kijk het altijd na met de kleurenkaart op je verpakking — ' +
-          'je kan elke waarde hieronder aanpassen. Bij twijfel: doe een druppeltest voor die ene waarde.')),
+          'Dit is een voorstel op basis van de kleuren. Kijk het altijd na met de kleurenkaart op uw verpakking: ' +
+          'u kan elke waarde hieronder aanpassen. Bij twijfel doet u een druppeltest voor die ene waarde.')),
     );
     tekenFormulier();
   }
@@ -172,18 +172,18 @@ export async function toonMeten() {
 
   async function toonStripHulp() {
     await dialoog({
-      titel: 'Zo krijg je een betrouwbare aflezing',
+      titel: 'Zo krijgt u een betrouwbare aflezing',
       inhoud: h('div', {},
         h('ul', { class: 'opsomming' },
-          h('li', {}, 'Respecteer de wachttijd op de verpakking — te vroeg of te laat fotograferen geeft een andere kleur.'),
+          h('li', {}, 'Respecteer de wachttijd op de verpakking: te vroeg of te laat fotograferen geeft een andere kleur.'),
           h('li', {}, 'Leg de strip plat op een effen, donkere en droge ondergrond.'),
           h('li', {}, 'Fotografeer recht van boven, bij daglicht, zonder flits.'),
-          h('li', {}, 'Zorg dat je eigen schaduw niet over de strip valt.'),
+          h('li', {}, 'Zorg dat uw eigen schaduw niet over de strip valt.'),
           h('li', {}, 'Vul de strip zo groot mogelijk in beeld, maar hou de volledige strip zichtbaar.'),
           h('li', {}, 'Schud het teveel aan water af zodat de kleuren niet uitlopen.')),
         h('p', { class: 'klein zacht' },
-          'Wil je het nóg nauwkeuriger? Fotografeer één keer de kleurenkaart van je verpakking bij ' +
-          'Beheer → Kleurenkaart ijken. De app gebruikt dan de kleuren van jouw merk in plaats van de standaardkaart.')),
+          'Wilt u het nog nauwkeuriger? Fotografeer één keer de kleurenkaart van uw verpakking bij ' +
+          'Beheer → Kleurenkaart ijken. De app gebruikt dan de kleuren van uw merk in plaats van de standaardkaart.')),
       acties: [{ label: 'Begrepen', stijl: 'knop--primair', waarde: true }],
     });
   }
@@ -214,12 +214,12 @@ export async function toonMeten() {
           bronnen[id] === 'strip' ? badge('strip', 'info') : null));
     });
 
-    const opmerking = tekstvak({ placeholder: 'Wat valt je op? (algen, gedrag van de vissen, geur, troebel water…)' });
+    const opmerking = tekstvak({ placeholder: 'Wat valt u op? (algen, gedrag van de vissen, geur, troebel water…)' });
     const datumVeld = invoer({ type: 'datetime-local', value: nuVoorInvoer() });
 
     formulierHouder.replaceChildren(
       kaart('✍️ Waarden',
-        h('p', { class: 'klein zacht' }, `Streefwaarden voor ${prof.label.toLowerCase()}. Laat leeg wat je niet gemeten hebt.`),
+        h('p', { class: 'klein zacht' }, `Streefwaarden voor ${prof.label.toLowerCase()}. Laat leeg wat u niet gemeten hebt.`),
         ...velden,
         veld('Datum en uur', datumVeld),
         veld('Opmerking', opmerking),
@@ -244,11 +244,11 @@ export async function toonMeten() {
     if (!ingevuld.length) { adviesHouder.replaceChildren(); return; }
     const advies = maakAdvies({ waarden: Object.fromEntries(ingevuld) }, bak, historiek, catalogus);
     const blok = kaart(h('span', {}, '💡 Voorgestelde acties ', badge(advies.samenvatting, advies.score >= 80 ? 'goed' : advies.score >= 50 ? 'let-op' : 'kritiek')),
-      h('p', { class: 'mini zacht' }, 'Dit werkt mee terwijl je invult, zodat je al kan starten vóór een eventueel huisbezoek.'));
+      h('p', { class: 'mini zacht' }, 'Dit werkt mee terwijl u invult, zodat u al kan starten vóór een eventueel huisbezoek.'));
     advies.acties.slice(0, 5).forEach((a) => blok.append(adviesKaart(a)));
     if (advies.huisbezoekAangeraden) {
       blok.append(h('button', { class: 'knop knop--hulp knop--vol', style: { marginTop: '10px' }, onclick: () => ganaar('hulp') },
-        '🆘 Dit bekijken we beter samen — hulp vragen'));
+        '🆘 Dit bekijken wij beter samen: hulp vragen'));
     }
     adviesHouder.replaceChildren(blok);
   }
@@ -301,7 +301,7 @@ export async function toonMeten() {
       advies.huisbezoekAangeraden
         ? h('div', { class: 'hulpblok', style: { marginTop: '12px' } },
           h('h3', {}, 'Laat dit even nakijken'),
-          h('p', {}, 'Op basis van deze waarden raden we aan om samen te kijken. Je dossier met foto\'s wordt automatisch meegestuurd.'))
+          h('p', {}, 'Op basis van deze waarden raden wij aan om samen te kijken. Uw dossier met foto\'s wordt automatisch meegestuurd.'))
         : null);
     const keuzeGemaakt = await dialoog({
       titel: 'Resultaat en advies', breed: true, inhoud,

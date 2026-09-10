@@ -12,7 +12,7 @@ export async function toonStart() {
   const bak = ctx.bak;
 
   if (!bak) {
-    return legeStaat('🐠', 'Nog geen bak', 'Voeg je aquarium of vijver toe om te beginnen met meten.',
+    return legeStaat('🐠', 'Nog geen bak', 'Voeg uw aquarium of vijver toe om te beginnen met meten.',
       h('button', { class: 'knop knop--primair', onclick: () => ganaar('bak/nieuw') }, 'Bak toevoegen'));
   }
 
@@ -28,7 +28,7 @@ export async function toonStart() {
       h('div', { class: 'rij' },
         scoreRing(advies.score),
         h('div', { class: 'groei' },
-          h('h2', { style: { marginBottom: '2px' } }, advies.score >= 80 ? 'Je bak zit goed' : advies.score >= 50 ? 'Even bijsturen' : 'Actie nodig'),
+          h('h2', { style: { marginBottom: '2px' } }, advies.score >= 80 ? 'Uw bak zit goed' : advies.score >= 50 ? 'Even bijsturen' : 'Actie nodig'),
           h('p', { class: 'klein zacht', style: { margin: 0 } }, advies.samenvatting),
           h('p', { class: 'mini zacht', style: { margin: '6px 0 0' } }, `Laatste meting ${geleden(laatste.datum)}`))),
       advies.huisbezoekAangeraden
@@ -39,8 +39,8 @@ export async function toonStart() {
     wrap.append(kaart(null,
       h('div', { class: 'midden' },
         h('div', { style: { fontSize: '40px' } }, '🧪'),
-        h('h2', {}, 'Doe je eerste meting'),
-        h('p', { class: 'zacht klein' }, 'Fotografeer je teststrip of vul de waarden zelf in. Je krijgt meteen te zien wat er goed zit en wat je kan verbeteren.'),
+        h('h2', {}, 'Doe uw eerste meting'),
+        h('p', { class: 'zacht klein' }, 'Fotografeer uw teststrip of vul de waarden zelf in. U krijgt meteen te zien wat er goed zit en wat u kan verbeteren.'),
         h('button', { class: 'knop knop--primair knop--groot knop--vol', onclick: () => ganaar('meten') }, 'Meting starten'))));
   }
 
@@ -49,7 +49,7 @@ export async function toonStart() {
   if (laatste && dagenGeleden > 10) {
     wrap.append(h('section', { class: 'kaart kaart--aandacht' },
       h('h3', {}, '⏰ Tijd voor een nieuwe meting'),
-      h('p', { class: 'klein zacht' }, `Je laatste meting is van ${Math.round(dagenGeleden)} dagen geleden. Wekelijks meten is de beste manier om problemen vóór te zijn.`),
+      h('p', { class: 'klein zacht' }, `Uw laatste meting is van ${Math.round(dagenGeleden)} dagen geleden. Met een wekelijkse meting bent u problemen vóór.`),
       h('button', { class: 'knop knop--primair knop--vol', onclick: () => ganaar('meten') }, 'Nu meten')));
   }
 
@@ -68,7 +68,7 @@ export async function toonStart() {
 
   /* --- adviezen --- */
   if (advies?.acties?.length) {
-    const blok = kaart('Wat kan je nu doen?');
+    const blok = kaart('Wat kan u nu doen?');
     advies.acties.slice(0, 4).forEach((a) => blok.append(adviesKaart(a)));
     if (advies.acties.length > 4) blok.append(h('p', { class: 'mini zacht' }, `+ ${advies.acties.length - 4} extra punten in de historiek.`));
     wrap.append(blok);

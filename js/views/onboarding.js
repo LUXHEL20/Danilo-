@@ -26,16 +26,16 @@ export async function toonOnboarding() {
     return h('div', { class: 'kaart' },
       h('div', { class: 'midden' },
         logoElement(null, 'logo-groot', 'navy'),
-        h('h1', { style: { marginTop: '10px' } }, 'Welkom bij Lux Aqua'),
+        h('h1', { style: { marginTop: '10px' } }, 'Welkom bij LUX AQUA'),
         h('p', { class: 'zacht' },
-          'Met deze app hou je je waterwaarden bij, lees je je teststrip in met de camera ' +
-          'en krijg je meteen te zien wat je kan doen. Loopt het toch mis, dan vraag je met één knop hulp of een huisbezoek.')),
+          'Met deze app houdt u uw waterwaarden bij, leest u uw teststrip in met de camera ' +
+          'en ziet u meteen wat u kan doen. Loopt het toch mis, dan vraagt u met één knop hulp of een huisbezoek.')),
       h('ul', { class: 'lijst' },
         ...[
           ['🧪', 'Teststrip fotograferen', 'De app leest de kleuren en stelt de waarden al voor.'],
-          ['📈', 'Alles bijhouden', 'Je ziet de evolutie van je bak in één oogopslag.'],
-          ['🧴', 'Concreet advies', 'Welk product, hoeveel, en wat je nadien moet opvolgen.'],
-          ['🆘', 'Hulp op afstand of aan huis', 'Deel je volledig dossier met foto\'s in één klik.'],
+          ['📈', 'Alles bijhouden', 'U ziet de evolutie van uw bak in één oogopslag.'],
+          ['🧴', 'Concreet advies', 'Welk product, hoeveel, en wat u nadien moet opvolgen.'],
+          ['🆘', 'Hulp op afstand of aan huis', 'Deel uw volledige dossier met foto\'s in één klik.'],
         ].map(([i, t, o]) => h('li', {}, h('span', { style: { fontSize: '22px' } }, i),
           h('span', {}, h('strong', {}, t), h('br'), h('span', { class: 'klein zacht' }, o))))),
       h('button', { class: 'knop knop--primair knop--vol knop--groot', onclick: volgende }, 'Beginnen'));
@@ -44,7 +44,7 @@ export async function toonOnboarding() {
   function rolKeuze() {
     const kies = async (rol) => { gegevens.rol = rol; if (rol === 'luxaqua') await afronden(); else volgende(); };
     return h('div', { class: 'kaart' },
-      h('h2', {}, 'Wie ben je?'),
+      h('h2', {}, 'Wie bent u?'),
       h('button', { class: 'klikbaar', onclick: () => kies('klant') },
         h('span', { style: { fontSize: '24px' } }, '🏠'),
         h('span', {}, h('strong', {}, 'Ik ben klant'), h('br'),
@@ -52,7 +52,7 @@ export async function toonOnboarding() {
         h('span', { class: 'pijl' }, '›')),
       h('button', { class: 'klikbaar', onclick: () => kies('luxaqua') },
         h('span', { style: { fontSize: '24px' } }, '🛠️'),
-        h('span', {}, h('strong', {}, 'Ik werk bij Lux Aqua'), h('br'),
+        h('span', {}, h('strong', {}, 'Ik werk bij LUX AQUA'), h('br'),
           h('span', { class: 'klein zacht' }, 'Ik volg de klanten en hun waarden op.')),
         h('span', { class: 'pijl' }, '›')),
       h('button', { class: 'knop knop--stil knop--vol', onclick: vorige }, 'Terug'));
@@ -61,14 +61,14 @@ export async function toonOnboarding() {
   function klantGegevens() {
     const naam = invoer({ placeholder: 'Voornaam en naam', autocomplete: 'name' });
     const tel = invoer({ type: 'tel', placeholder: '04xx xx xx xx', autocomplete: 'tel' });
-    const mail = invoer({ type: 'email', placeholder: 'jij@voorbeeld.be', autocomplete: 'email' });
+    const mail = invoer({ type: 'email', placeholder: 'naam@voorbeeld.be', autocomplete: 'email' });
     const gemeente = invoer({ placeholder: 'Gemeente', autocomplete: 'address-level2' });
     const adres = invoer({ placeholder: 'Straat en nummer', autocomplete: 'street-address' });
     return h('div', { class: 'kaart' },
-      h('h2', {}, 'Jouw gegevens'),
-      h('p', { class: 'klein zacht' }, 'Deze gegevens blijven op je toestel staan. Ze worden pas gedeeld wanneer jij zelf een dossier of hulpvraag doorstuurt naar Lux Aqua.'),
+      h('h2', {}, 'Uw gegevens'),
+      h('p', { class: 'klein zacht' }, 'Deze gegevens blijven op uw toestel staan. Ze worden pas gedeeld wanneer u zelf een dossier of hulpvraag doorstuurt naar LUX AQUA.'),
       veld('Naam', naam),
-      veld('Telefoon', tel, 'Zo kunnen we je snel bereiken bij een dringende hulpvraag.'),
+      veld('Telefoon', tel, 'Zo kunnen wij u snel bereiken bij een dringende hulpvraag.'),
       veld('E-mail', mail),
       veld('Adres', adres),
       veld('Gemeente', gemeente),
@@ -76,7 +76,7 @@ export async function toonOnboarding() {
         h('button', { class: 'knop knop--stil', onclick: vorige }, 'Terug'),
         h('button', {
           class: 'knop knop--primair', onclick: () => {
-            if (!naam.value.trim()) { melding('Vul zeker je naam in.', 'fout'); naam.focus(); return; }
+            if (!naam.value.trim()) { melding('Vul zeker uw naam in.', 'fout'); naam.focus(); return; }
             gegevens.klant = { naam: naam.value.trim(), telefoon: tel.value.trim(), email: mail.value.trim(), adres: adres.value.trim(), gemeente: gemeente.value.trim() };
             volgende();
           },
@@ -85,7 +85,7 @@ export async function toonOnboarding() {
 
   function bakGegevens() {
     const naam = invoer({ placeholder: 'bv. Woonkamer 300 l', value: 'Mijn aquarium' });
-    const prof = keuze(Object.values(PROFILES).map((p) => ({ value: p.id, label: `${p.group} — ${p.label}` })));
+    const prof = keuze(Object.values(PROFILES).map((p) => ({ value: p.id, label: `${p.group}: ${p.label}` })));
     const lengte = invoer({ type: 'number', inputmode: 'decimal', placeholder: 'L (cm)' });
     const breedte = invoer({ type: 'number', inputmode: 'decimal', placeholder: 'B (cm)' });
     const hoogte = invoer({ type: 'number', inputmode: 'decimal', placeholder: 'H (cm)' });
@@ -99,12 +99,12 @@ export async function toonOnboarding() {
     [lengte, breedte, hoogte].forEach((i) => i.addEventListener('input', herbereken));
 
     return h('div', { class: 'kaart' },
-      h('h2', {}, 'Je bak of vijver'),
+      h('h2', {}, 'Uw bak of vijver'),
       veld('Naam', naam),
-      veld('Type', prof, 'Hiermee weet de app welke streefwaarden voor jou gelden.'),
+      veld('Type', prof, 'Hiermee weet de app welke streefwaarden voor u gelden.'),
       h('div', { class: 'raster3' },
         veld('Lengte', lengte), veld('Breedte', breedte), veld('Hoogte', hoogte)),
-      veld('Netto inhoud (liter)', liters, 'Wordt automatisch berekend uit de afmetingen (min ongeveer 10% voor bodem en decoratie). Je mag hem zelf aanpassen.'),
+      veld('Netto inhoud (liter)', liters, 'Wordt automatisch berekend uit de afmetingen (min ongeveer 10% voor bodem en decoratie). U mag hem zelf aanpassen.'),
       veld('Opgestart op', opgestart, 'Een jonge bak van minder dan 6 weken vraagt extra opvolging.'),
       h('div', { class: 'knoprij' },
         h('button', { class: 'knop knop--stil', onclick: vorige }, 'Terug'),
@@ -125,13 +125,13 @@ export async function toonOnboarding() {
   function klaar() {
     const filter = invoer({ placeholder: 'bv. buitenfilter 1000 l/u' });
     const verlichting = invoer({ placeholder: 'bv. led 8 u per dag' });
-    const opmerking = tekstvak({ placeholder: 'Wat wil je graag verbeteren? Wat loopt er nu mis?' });
+    const opmerking = tekstvak({ placeholder: 'Wat wilt u graag verbeteren? Wat loopt er nu mis?' });
     return h('div', { class: 'kaart' },
-      h('h2', {}, 'Nog even dit (mag je overslaan)'),
-      h('p', { class: 'klein zacht' }, 'Hoe meer Lux Aqua weet, hoe beter het advies van op afstand.'),
+      h('h2', {}, 'Nog even dit (mag u overslaan)'),
+      h('p', { class: 'klein zacht' }, 'Hoe meer LUX AQUA weet, hoe gerichter het advies van op afstand.'),
       veld('Filter', filter),
       veld('Verlichting', verlichting),
-      veld('Wat wil je bereiken?', opmerking),
+      veld('Wat wilt u bereiken?', opmerking),
       h('div', { class: 'knoprij' },
         h('button', { class: 'knop knop--stil', onclick: vorige }, 'Terug'),
         h('button', {
@@ -155,7 +155,7 @@ export async function toonOnboarding() {
     const klant = await store.bewaarKlant(gegevens.klant);
     const bak = await store.bewaarBak({ ...gegevens.bak, klantId: klant.id });
     await store.zetInstelling({ rol: 'klant', actieveKlant: klant.id, actieveBak: bak.id, onboardingKlaar: true });
-    melding(`Welkom ${klant.naam.split(' ')[0]}! Je bak is aangemaakt.`, 'ok');
+    melding(`Welkom ${klant.naam.split(' ')[0]}! Uw bak is aangemaakt.`, 'ok');
     location.hash = '#/start';
     teken();
   }

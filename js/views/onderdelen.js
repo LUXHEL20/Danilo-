@@ -36,7 +36,7 @@ export function adviesKaart(actie, { open = false } = {}) {
       actie.streef ? h('p', { class: 'klein zacht' }, actie.streef) : null,
       actie.waarom ? h('p', {}, actie.waarom) : null,
       actie.stappen?.length ? h('div', {},
-        h('h4', {}, 'Wat doe je nu?'),
+        h('h4', {}, 'Wat doet u nu?'),
         ...actie.stappen.map((s, i) => h('div', { class: 'stap' }, h('span', { class: 'stap__nr' }, i + 1), h('span', {}, s)))) : null,
       actie.producten?.length ? h('div', {},
         h('h4', { style: { marginTop: '12px' } }, 'Aanbevolen producten'),
@@ -70,11 +70,11 @@ export function takenLijst(taken, { opWijziging } = {}) {
         h('br'),
         h('span', { class: 'mini zacht' },
           t.product ? `${t.product} · ` : '',
-          teLaat ? '⏰ te laat — ' : '', `${t.termijn} (${datum(t.vervalt, false)})`)));
+          teLaat ? '⏰ te laat · ' : '', `${t.termijn} (${datum(t.vervalt, false)})`)));
   }));
 }
 
-/** Kleine samenvatting van een bak, voor lijsten bij Lux Aqua. */
+/** Kleine samenvatting van een bak, voor lijsten bij LUX AQUA. */
 export function bakSamenvatting(bak, meting, advies) {
   const soort = !advies ? '' : advies.score >= 80 ? 'goed' : advies.score >= 50 ? 'let-op' : 'kritiek';
   return h('div', {},
