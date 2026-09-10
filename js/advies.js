@@ -53,7 +53,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
     Object.assign(actie, regelsPer[paramId]?.(v, { teHoog, t, prof, liters, waarden: val, status }) || {});
     if (!actie.stappen.length) {
       actie.stappen = teHoog
-        ? [`Ververs 25–30% van het water met voorbereid water en meet daarna opnieuw.`]
+        ? [`Ververs 25 tot 30% van het water met voorbereid water en meet daarna opnieuw.`]
         : [`Stuur de waarde stapsgewijs bij en meet na 6 uur opnieuw.`];
     }
 
@@ -98,7 +98,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
       'Gevaar op ammoniakvergiftiging',
       `U meet ${fmt('nh4', nh4)} ammonium bij een pH van ${fmt('ph', ph)}. Vanaf pH 7,5 slaat ammonium om in ammoniak, en dat is zeer giftig. Dezelfde waarde is bij een lage pH ongevaarlijk en bij een hoge pH levensbedreigend.`,
       [
-        'Ververs onmiddellijk 30–50% van het water (op temperatuur, met waterbereider).',
+        'Ververs onmiddellijk 30 tot 50% van het water (op temperatuur, met waterbereider).',
         'Stop 48 uur met voederen.',
         'Zet extra beluchting bij.',
         'Verhoog de pH nu zeker niet: dat maakt de ammoniak nog giftiger.',
@@ -160,7 +160,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
       id: 'alles-ok', urgentie: 'info', titel: 'Uw waarden zitten goed',
       waarom: 'Alle gemeten waarden vallen binnen de streefwaarden van uw profiel. Door te blijven meten bent u problemen vóór.',
       stappen: [
-        'Hou uw ritme aan: wekelijks 20–30% water verversen.',
+        'Hou uw ritme aan: wekelijks 20 tot 30% water verversen.',
         'Meet minstens één keer per week en noteer het hier.',
         'Voeg af en toe een foto toe zodat de evolutie zichtbaar blijft.',
       ],
@@ -206,7 +206,7 @@ const regelsPer = {
     urgentie: v > 0.3 ? 'kritiek' : 'let-op',
     huisbezoek: v > 0.5,
     stappen: [
-      'Ververs vandaag nog 30–50% van het water (zelfde temperatuur, met waterbereider).',
+      'Ververs vandaag nog 30 tot 50% van het water (zelfde temperatuur, met waterbereider).',
       'Stop 48 uur met voederen.',
       'Zet extra beluchting bij: nitriet blokkeert de zuurstofopname in het bloed.',
       'Spoel uw filter niet uit en vervang geen filtermateriaal.',
@@ -217,7 +217,7 @@ const regelsPer = {
     urgentie: v > 0.25 ? 'kritiek' : 'let-op',
     huisbezoek: v > 0.5,
     stappen: [
-      'Ververs 30–50% van het water.',
+      'Ververs 30 tot 50% van het water.',
       'Zoek naar een dode vis, rottende planten of voedselresten onder de decoratie.',
       'Stop tijdelijk met voederen.',
       'Verhoog de pH niet zolang er ammonium in het water zit.',
@@ -236,7 +236,7 @@ const regelsPer = {
       ? ['Controleer eerst uw KH: die bepaalt hoe hard de pH vastzit.',
          'Verlaag maximaal 0,2 pH per dag.',
          'Kijk na of er kalksteen of koraalgruis in de bak zit dat de pH omhoog duwt.']
-      : ['Controleer eerst uw KH: een lage pH komt bijna altijd door een te lage buffer.',
+      : ['Controleer eerst uw KH: een lage pH komt meestal door een te lage buffer.',
          'Verhoog maximaal 0,2 pH per dag.',
          'Kijk na of hout of turf uw water aan het verzuren is.'],
   }),

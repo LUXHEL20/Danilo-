@@ -7,12 +7,21 @@
  * valt elke functie hier terug op het gewone webgedrag. Elke plugin-aanroep zit in
  * een try/catch: een ontbrekende plugin mag de app nooit doen crashen.
  */
-import { download, melding } from './ui.js';
+import { download, melding, dialoog, h } from './ui.js';
 
 /** True enkel wanneer de app effectief in de native schil draait. */
 export function isNative() {
   try {
     return window.Capacitor?.isNativePlatform?.() === true;
+  } catch {
+    return false;
+  }
+}
+
+/** True in de native app op Android (daar laten de meeste apps de tekst vallen als er een bijlage meegaat). */
+export function isAndroid() {
+  try {
+    return isNative() && window.Capacitor?.getPlatform?.() === 'android';
   } catch {
     return false;
   }
@@ -53,6 +62,9 @@ const isTekst = (mime) => /^text\/|json|xml|javascript/i.test(mime || '');
 
 const bestandsnaam = (voorvoegsel, ext) => `${voorvoegsel}-${Date.now()}-${Math.floor(Math.random() * 1e4)}.${ext}`;
 
+/** Submap in de cachemap voor bestanden die gedeeld worden; wordt bij elke start geleegd. */
+const DEELMAP = 'delen';
+
 /**
  * Schrijft een bestand naar de cachemap van het toestel en geeft de native uri terug.
  * @param {string} naam
@@ -71,8 +83,17 @@ async function schrijfNaarCache(naam, inhoud, mime) {
   } else {
     data = await blobNaarBase64(inhoud); encoding = undefined; // base64 is de standaard
   }
-  const res = await Filesystem.writeFile({ path: naam, data, directory: 'CACHE', ...(encoding ? { encoding } : {}) });
+  const res = await Filesystem.writeFile({
+    path: `${DEELMAP}/${naam}`, data, directory: 'CACHE', recursive: true, ...(encoding ? { encoding } : {}),
+  });
   return res?.uri || res?.path || null;
+}
+
+/** Ruimt de gedeelde bestanden van een vorige keer op (het deelmenu heeft ze dan al overgenomen). */
+async function leegDeelmap() {
+  const Filesystem = plugin('Filesystem');
+  if (!Filesystem?.rmdir) return;
+  try { await Filesystem.rmdir({ path: DEELMAP, directory: 'CACHE', recursive: true }); } catch { /* bestond nog niet */ }
 }
 
 /* ----------------------------------------------------------------- foto kiezen */
@@ -80,22 +101,46 @@ async function schrijfNaarCache(naam, inhoud, mime) {
 /**
  * Laat de gebruiker een foto nemen of kiezen.
  * Belangrijk: synchroon aanroepen vanuit een klik, anders blokkeert de browser de kiezer.
- * @param {{bron?: 'camera'|'galerij'|'vraag', meerdere?: boolean}} opties
+ * Met bestand: true gaat het om een beeldbestand (bv. een logo) en niet om een foto: dan
+ * gebruiken we ook natief de gewone bestandskiezer, zodat svg en transparante png intact blijven
+ * (de camera-plugin geeft altijd jpeg terug).
+ * @param {{bron?: 'camera'|'galerij'|'vraag', meerdere?: boolean, bestand?: boolean, accept?: string}} opties
  * @returns {Promise<File[]>} leeg bij annuleren
  */
-export function kiesFoto({ bron = 'vraag', meerdere = false } = {}) {
-  const Camera = isNative() ? plugin('Camera') : null;
+export function kiesFoto({ bron = 'vraag', meerdere = false, bestand = false, accept = 'image/*' } = {}) {
+  const Camera = isNative() && !bestand ? plugin('Camera') : null;
   if (Camera) return kiesFotoNatief(Camera, bron, meerdere);
-  return kiesFotoWeb(bron, meerdere);
+  return kiesFotoWeb(bron, meerdere, accept);
+}
+
+/** Vraagt natief of de gebruiker één foto wil nemen of meerdere uit de galerij wil kiezen. */
+function vraagCameraOfGalerij() {
+  return dialoog({
+    titel: 'Foto toevoegen',
+    inhoud: h('p', { class: 'klein zacht' }, 'Neem een foto met de camera of kies een of meer foto\'s uit uw galerij.'),
+    acties: [
+      { label: 'Uit de galerij', waarde: 'galerij', stijl: 'knop--stil' },
+      { label: 'Foto nemen', waarde: 'camera', stijl: 'knop--primair' },
+    ],
+  });
 }
 
 async function kiesFotoNatief(Camera, bron, meerdere) {
   try {
     if (meerdere && typeof Camera.pickImages === 'function') {
+      if (bron === 'vraag') {
+        // pickImages is enkel de galerij; de klant moet ook ter plekke een foto kunnen nemen
+        const keuze = await vraagCameraOfGalerij();
+        if (keuze === 'camera') return kiesFotoNatief(Camera, 'camera', false);
+        if (keuze !== 'galerij') return [];
+      } else if (bron === 'camera') {
+        return kiesFotoNatief(Camera, 'camera', false);
+      }
       const res = await Camera.pickImages({ quality: 85, width: 1600 });
       const uit = [];
       for (const [i, p] of (res?.photos || []).entries()) {
-        const url = p.webPath || p.path;
+        // een file://-pad kan de WebView niet ophalen; de bridge zet het om
+        const url = p.webPath || (p.path && window.Capacitor?.convertFileSrc ? window.Capacitor.convertFileSrc(p.path) : null);
         if (!url) continue;
         const blob = await (await fetch(url)).blob();
         uit.push(new File([blob], bestandsnaam(`foto-${i + 1}`, p.format || 'jpg'), { type: blob.type || 'image/jpeg' }));
@@ -123,12 +168,12 @@ async function kiesFotoNatief(Camera, bron, meerdere) {
   }
 }
 
-function kiesFotoWeb(bron, meerdere) {
+function kiesFotoWeb(bron, meerdere, accept = 'image/*') {
   return new Promise((resolve) => {
     const inv = document.createElement('input');
     inv.type = 'file';
-    inv.accept = 'image/*';
-    if (bron === 'camera') inv.capture = 'environment';
+    inv.accept = accept;
+    if (bron === 'camera') inv.setAttribute('capture', 'environment');
     if (meerdere) inv.multiple = true;
     inv.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';
     let klaar = false;
@@ -144,12 +189,12 @@ function kiesFotoWeb(bron, meerdere) {
     inv.addEventListener('change', () => afronden(Array.from(inv.files || [])));
     inv.addEventListener('cancel', () => afronden([]));
     // terugval voor browsers zonder 'cancel'-event: komt de focus terug zonder change,
-    // dan heeft de gebruiker de kiezer gesloten
+    // dan heeft de gebruiker de kiezer gesloten (afronden is idempotent, dus dit botst niet met 'cancel')
     const opFocus = () => {
       clearTimeout(focusTimer);
       focusTimer = setTimeout(() => { if (!inv.files?.length) afronden([]); }, 1500);
     };
-    if (!('oncancel' in inv)) window.addEventListener('focus', opFocus);
+    window.addEventListener('focus', opFocus);
     document.body.append(inv);
     inv.click();
   });
@@ -159,8 +204,10 @@ function kiesFotoWeb(bron, meerdere) {
 
 /**
  * Deelt tekst en eventueel bestanden via het deelmenu van het toestel.
+ * 'niet-mogelijk' betekent dat er geen deelmenu is (de aanroeper kiest dan een andere weg);
+ * 'mislukt' betekent dat het native deelmenu een fout gaf (de gebruiker kreeg al een melding).
  * @param {{titel?: string, tekst?: string, bestanden?: File[]}} opties
- * @returns {Promise<'gedeeld'|'geannuleerd'|'niet-mogelijk'>}
+ * @returns {Promise<'gedeeld'|'geannuleerd'|'niet-mogelijk'|'mislukt'>}
  */
 export async function deel({ titel = 'LUX AQUA', tekst = '', bestanden = [] } = {}) {
   if (isNative() && plugin('Share')) {
@@ -186,7 +233,8 @@ async function deelNatief(titel, tekst, bestanden) {
   } catch (e) {
     if (isAnnulering(e)) return 'geannuleerd';
     console.error(e);
-    return 'niet-mogelijk';
+    melding(`Delen lukte niet: ${e?.message || e}`, 'fout');
+    return 'mislukt';
   }
 }
 
@@ -248,6 +296,14 @@ export async function initNative() {
   if (App?.addListener) {
     try {
       App.addListener('backButton', () => {
+        // een open dialoog sluit eerst (via de sluitknop, zodat de dialoog-promise netjes met null oplost)
+        const overlay = document.querySelector('.overlay');
+        if (overlay) {
+          const sluitknop = overlay.querySelector('.dialoog__kop .icoonknop');
+          if (sluitknop) sluitknop.click();
+          else { overlay.remove(); document.body.classList.remove('geen-scroll'); }
+          return;
+        }
         if (opStartscherm()) { try { App.exitApp?.(); } catch { /* dan blijft de app gewoon open */ } return; }
         if (history.length > 1) history.back();
         else location.hash = '#/';
@@ -265,4 +321,6 @@ export async function initNative() {
   if (SplashScreen) {
     try { await SplashScreen.hide(); } catch { /* geen ramp */ }
   }
+
+  leegDeelmap();
 }

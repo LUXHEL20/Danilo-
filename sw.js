@@ -1,14 +1,15 @@
 /* Service worker: de app blijft werken zonder internet. */
-const CACHE = 'luxaqua-v2';
+/* Verhoog CACHE bij elke wijziging aan de lijst hieronder; oude caches worden dan opgeruimd. */
+const CACHE = 'luxaqua-v3';
 const BESTANDEN = [
   './', './index.html', './manifest.webmanifest',
   './css/style.css',
-  './assets/icoon.svg', './assets/icoon-maskable.svg',
+  './assets/icoon.svg',
   './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/icons/maskable-512.png', './assets/icons/apple-touch-icon.png',
   './assets/brand/LUX-AQUA-01-navy.svg', './assets/brand/LUX-AQUA-03-wit.svg', './assets/brand/LUX-AQUA-06-app-icoon-navy.png',
   './js/app.js', './js/ui.js', './js/db.js', './js/store.js', './js/params.js',
   './js/products.js', './js/advies.js', './js/strip.js', './js/color.js',
-  './js/charts.js', './js/delen.js',
+  './js/charts.js', './js/delen.js', './js/native.js',
   './js/views/onboarding.js', './js/views/start.js', './js/views/meten.js',
   './js/views/bak.js', './js/views/historiek.js', './js/views/producten.js',
   './js/views/hulp.js', './js/views/kennis.js', './js/views/luxaqua.js',
@@ -36,7 +37,13 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(req, kopie));
         }
         return res;
-      }).catch(() => gecached || caches.match('./index.html'));
+      }).catch(() => {
+        if (gecached) return gecached;
+        // enkel een paginanavigatie mag terugvallen op index.html;
+        // een script of ander bestand krijgt nooit html als antwoord
+        if (req.mode === 'navigate') return caches.match('./index.html');
+        return Response.error();
+      });
       return gecached || netwerk;
     })
   );

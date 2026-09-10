@@ -149,7 +149,7 @@ export async function toonMeten() {
         h('h4', {}, 'Wat de app afleest'),
         ...stripAnalyse.resultaten.map((r) => stripVeldRij(r)),
         h('p', { class: 'mini zacht', style: { marginTop: '8px' } },
-          'Dit is een voorstel op basis van de kleuren. Kijk het altijd na met de kleurenkaart op uw verpakking: ' +
+          'Dit is een voorstel op basis van de kleuren. Kijk het na met de kleurenkaart op uw verpakking: ' +
           'u kan elke waarde hieronder aanpassen. Bij twijfel doet u een druppeltest voor die ene waarde.')),
     );
     tekenFormulier();

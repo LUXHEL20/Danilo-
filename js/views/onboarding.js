@@ -48,7 +48,7 @@ export async function toonOnboarding() {
       h('button', { class: 'klikbaar', onclick: () => kies('klant') },
         h('span', { style: { fontSize: '24px' } }, '🏠'),
         h('span', {}, h('strong', {}, 'Ik ben klant'), h('br'),
-          h('span', { class: 'klein zacht' }, 'Ik hou mijn eigen aquarium of vijver op.')),
+          h('span', { class: 'klein zacht' }, 'Ik onderhoud mijn eigen aquarium of vijver.')),
         h('span', { class: 'pijl' }, '›')),
       h('button', { class: 'klikbaar', onclick: () => kies('luxaqua') },
         h('span', { style: { fontSize: '24px' } }, '🛠️'),

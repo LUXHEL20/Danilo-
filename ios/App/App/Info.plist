@@ -5,7 +5,7 @@
   <key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>nl</string>
 	<key>CFBundleDisplayName</key>
         <string>LUX AQUA</string>
 	<key>CFBundleExecutable</key>

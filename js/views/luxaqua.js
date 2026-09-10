@@ -6,6 +6,7 @@ import { profile, param } from '../params.js';
 import { maakAdvies } from '../advies.js';
 import { waardeTegels, adviesKaart, bakSamenvatting } from './onderdelen.js';
 import { maakDossier, printDossier, dossierAlsTekst, importeerDossier, exporteerDossier, whatsappLink, mailLink } from '../delen.js';
+import { isNative } from '../native.js';
 
 /* --------------------------------------------------------------- klantenlijst */
 export async function toonKlanten() {
@@ -154,7 +155,7 @@ export async function toonKlant(id) {
       blok.append(adviesBlok);
     }
     blok.append(h('div', { class: 'knoprij', style: { marginTop: '10px' } },
-      h('button', { class: 'knop knop--stil', onclick: async () => printDossier(await maakDossier(bak.id)) }, '🖨️ Dossier'),
+      h('button', { class: 'knop knop--stil', onclick: async () => printDossier(await maakDossier(bak.id)) }, isNative() ? '📄 Dossier als bestand delen' : '🖨️ Dossier'),
       h('button', { class: 'knop knop--stil', onclick: async () => kopieer(dossierAlsTekst(await maakDossier(bak.id, { fotos: false }))) }, '📋 Samenvatting'),
       h('button', { class: 'knop knop--stil', onclick: async () => exporteerDossier(await maakDossier(bak.id)) }, '⬇️ Exporteren')));
     wrap.append(blok);
@@ -263,7 +264,7 @@ async function hulpvraagDetail(v, klant) {
       v.bakId ? h('button', {
         class: 'knop knop--stil knop--vol',
         onclick: async () => printDossier(await maakDossier(v.bakId, { hulpvraag: v })),
-      }, '🖨️ Dossier afdrukken') : null),
+      }, isNative() ? '📄 Dossier als bestand delen' : '🖨️ Dossier afdrukken') : null),
     acties: [
       { label: 'Sluiten', waarde: false },
       {

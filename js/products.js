@@ -53,7 +53,7 @@ export const PRODUCTEN = [
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['no2', 'nh4'],
     richting: 'omlaag',
-    omschrijving: 'Levende filterbacteriën die ammonium en nitriet afbreken. Onmisbaar bij het opstarten van een nieuwe bak, na een filterreiniging of na een antibioticakuur.',
+    omschrijving: 'Levende filterbacteriën die ammonium en nitriet afbreken. Aangewezen bij het opstarten van een nieuwe bak, na een filterreiniging of na een antibioticakuur.',
     dosering: { model: 'vast', hoeveelheid: 10, per: 50, eenheid: 'ml', omschrijving: '10 ml per 50 liter' },
     toepassing: 'Rechtstreeks in de filterstroom doseren. Filter minstens 24 uur laten draaien zonder UV-C en zonder actieve kool.',
     opvolging: [
@@ -140,9 +140,9 @@ export const PRODUCTEN = [
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['no2', 'nh4'],
     richting: 'neutraliseert',
-    omschrijving: 'Noodmiddel dat nitriet en ammoniak tijdelijk bindt zodat uw vissen weer zuurstof kunnen opnemen. Dit is een noodrem, geen oplossing: de oorzaak moet altijd aangepakt worden.',
+    omschrijving: 'Noodmiddel dat nitriet en ammoniak tijdelijk bindt zodat uw vissen weer zuurstof kunnen opnemen. Dit is een noodrem, geen oplossing: de oorzaak moet aangepakt worden.',
     dosering: { model: 'vast', hoeveelheid: 10, per: 50, eenheid: 'ml', omschrijving: '10 ml per 50 liter, bij acute nood dubbel' },
-    toepassing: 'Direct doseren, samen met een waterverversing van 30–50% en extra beluchting. Voeder 48 uur niet.',
+    toepassing: 'Direct doseren, samen met een waterverversing van 30 tot 50% en extra beluchting. Voeder 48 uur niet.',
     opvolging: [
       { na: '2 uur', actie: 'NO₂ opnieuw meten.' },
       { na: '12 uur', actie: 'NO₂ en NH₄ meten, waterverversing herhalen als de waarde nog niet daalt.' },
@@ -165,7 +165,7 @@ export const PRODUCTEN = [
       { na: '1 week', actie: 'NO₃ meten.' },
       { na: '1 maand', actie: 'NO₃ meten en het medium controleren; vervangen volgens het etiket.' },
     ],
-    waarschuwingen: ['Combineer altijd met regelmatige waterverversing; media alleen zijn niet genoeg.'],
+    waarschuwingen: ['Combineer met regelmatige waterverversing; media alleen zijn niet genoeg.'],
     profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'zee_rif', 'vijver_koi'],
   },
   {
@@ -175,7 +175,7 @@ export const PRODUCTEN = [
     verpakkingen: ['250 ml', '500 ml'],
     lost_op: ['po4'],
     richting: 'omlaag',
-    omschrijving: 'Bindt fosfaat en neemt zo de belangrijkste brandstof voor algen weg.',
+    omschrijving: 'Bindt fosfaat en neemt zo een belangrijke voedingsbron voor algen weg.',
     dosering: { model: 'vast', hoeveelheid: 50, per: 100, eenheid: 'ml', omschrijving: '50 ml per 100 liter' },
     toepassing: 'In een filterzakje in de filterstroom hangen.',
     opvolging: [
@@ -213,7 +213,7 @@ export const PRODUCTEN = [
     dosering: { model: 'vast', hoeveelheid: 5, per: 100, eenheid: 'ml', omschrijving: '5 ml per 100 liter, 2 tot 3 keer per week' },
     toepassing: 'Bij voorkeur \'s avonds doseren; ijzer wordt door fel licht snel afgebroken.',
     opvolging: [
-      { na: '24 uur', actie: 'Fe meten (streefwaarde 0,05–0,10 mg/l).' },
+      { na: '24 uur', actie: 'Fe meten (streefwaarde 0,05 tot 0,10 mg/l).' },
       { na: '2 weken', actie: 'Nieuwe bladeren beoordelen op kleur.' },
     ],
     waarschuwingen: ['Te veel ijzer voedt draadalgen.'],
@@ -234,7 +234,7 @@ export const PRODUCTEN = [
       { na: '3 dagen', actie: 'NO₃ en PO₄ meten en 30% water verversen.' },
       { na: '1 week', actie: 'Foto toevoegen in de app om het resultaat te vergelijken.' },
     ],
-    waarschuwingen: ['Niet gebruiken bij garnalen en kreeftjes zonder advies.', 'Altijd extra beluchten tijdens de kuur.'],
+    waarschuwingen: ['Niet gebruiken bij garnalen en kreeftjes zonder advies.', 'Extra beluchten tijdens de kuur.'],
     profielen: ['zoet_gezelschap', 'zoet_planten', 'vijver_koi', 'vijver_sier'],
   },
   {
@@ -297,7 +297,7 @@ export const PRODUCTEN = [
     richting: 'omhoog',
     omschrijving: 'Tweecomponentensysteem dat calcium en carbonaat in balans bijvult, met magnesium als derde component.',
     dosering: { model: 'delta', param: 'kh', hoeveelheid: 10, per: 100, effect: 0.4, eenheid: 'ml', omschrijving: '10 ml per 100 liter verhoogt de KH met ongeveer 0,4 °dH' },
-    toepassing: 'Component A en B altijd apart doseren, met minstens 30 minuten tussentijd, bij voorkeur met een doseerpomp.',
+    toepassing: 'Component A en B apart doseren, met minstens 30 minuten tussentijd, bij voorkeur met een doseerpomp.',
     opvolging: [
       { na: '4 uur', actie: 'KH meten.' },
       { na: 'dagelijks (eerste week)', actie: 'KH meten om het dagelijkse verbruik van uw bak te leren kennen.' },
@@ -371,7 +371,7 @@ export function berekenDosis(product, liters, delta) {
   if (!d || !liters) return null;
   if (d.model === 'vast') {
     const hoeveelheid = (d.hoeveelheid * liters) / d.per;
-    return { hoeveelheid: rond(hoeveelheid), eenheid: d.eenheid, tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${liters} l` };
+    return { hoeveelheid: rond(hoeveelheid), eenheid: d.eenheid, tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${liters} liter` };
   }
   if (d.model === 'delta') {
     const stappen = (delta ?? d.effect) / d.effect;
@@ -379,7 +379,7 @@ export function berekenDosis(product, liters, delta) {
     return {
       hoeveelheid: rond(hoeveelheid),
       eenheid: d.eenheid,
-      tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${liters} l (verschuiving van ${round1(delta ?? d.effect)})`,
+      tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${liters} liter (verschuiving van ${round1(delta ?? d.effect)})`,
     };
   }
   return null;

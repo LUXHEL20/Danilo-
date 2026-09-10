@@ -36,7 +36,9 @@ export async function toonBeheer() {
       ? h('img', { src: i.logo, class: 'logo-groot logo-groot--eigen', alt: 'Huidig logo' })
       : h('img', { src: 'assets/brand/LUX-AQUA-01-navy.svg', class: 'logo-groot', alt: 'LUX AQUA' }),
     h('span', { class: 'klein zacht' }, i.logo ? 'Een eigen logo is opgeladen.' : 'Het officiële LUX AQUA-logo wordt gebruikt.'));
-  const logoKiezen = () => kiesFoto({ bron: 'galerij' }).then(async ([f]) => {
+  // het logo is een bestand, geen foto: ook natief via de gewone bestandskiezer,
+  // zodat svg en een transparante png intact blijven (de camera-plugin maakt er jpeg van)
+  const logoKiezen = () => kiesFoto({ bron: 'galerij', bestand: true, accept: 'image/*,.svg' }).then(async ([f]) => {
     if (!f) return;
     try {
       // svg en kleine bestanden houden we zoals ze zijn (transparantie blijft behouden),
@@ -68,7 +70,7 @@ export async function toonBeheer() {
   const bTel = invoer({ type: 'tel', value: b.telefoon || '', placeholder: 'Telefoonnummer met landcode, bv. +32 4xx xx xx xx' });
   const bMail = invoer({ type: 'email', value: b.email || '' });
   const bWeb = invoer({ type: 'url', value: b.website || '', placeholder: 'https://' });
-  const bGebied = invoer({ value: b.werkgebied || '', placeholder: 'bv. regio Antwerpen en Kempen' });
+  const bGebied = invoer({ value: b.werkgebied || '', placeholder: 'bv. Helchteren en omgeving' });
   wrap.append(kaart('🏢 Gegevens van LUX AQUA',
     h('p', { class: 'klein zacht' }, 'Deze gegevens worden gebruikt voor de contactknoppen en om hulpvragen door te sturen.'),
     veld('Naam', bNaam), veld('Telefoon (WhatsApp)', bTel), veld('E-mail', bMail),

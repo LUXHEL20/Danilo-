@@ -9,7 +9,7 @@
  *  5. de kleur wordt in Lab-ruimte vergeleken met de kleurenkaart van de strip.
  *
  * Het resultaat is altijd een VOORSTEL: de klant bevestigt of corrigeert het.
- * De correcties worden bijgehouden zodat Lux Aqua ziet hoe betrouwbaar het lezen is.
+ * De correcties worden bijgehouden zodat LUX AQUA ziet hoe betrouwbaar het lezen is.
  */
 import { rgbToLab, deltaE2000, whiteBalance, hexToRgb } from './color.js';
 import { PARAMETERS } from './params.js';
@@ -256,9 +256,9 @@ export function matchWaarde(rgb, schaal) {
 
 /** Vertaalt de kleurafstand naar een leesbare betrouwbaarheid. */
 export function betrouwbaarheid(dE) {
-  if (dE <= 5) return { niveau: 'hoog', percent: Math.round(100 - dE * 4), tekst: 'Goede kleuroverkomst' };
-  if (dE <= 12) return { niveau: 'matig', percent: Math.round(90 - dE * 3), tekst: 'Redelijke overeenkomst — even nakijken' };
-  return { niveau: 'laag', percent: Math.max(10, Math.round(70 - dE * 2)), tekst: 'Zwakke overeenkomst — controleer de foto of vul zelf in' };
+  if (dE <= 5) return { niveau: 'hoog', percent: Math.round(100 - dE * 4), tekst: 'Goede overeenkomst' };
+  if (dE <= 12) return { niveau: 'matig', percent: Math.round(90 - dE * 3), tekst: 'Redelijke overeenkomst: even nakijken' };
+  return { niveau: 'laag', percent: Math.max(10, Math.round(70 - dE * 2)), tekst: 'Zwakke overeenkomst: controleer de foto of vul zelf in' };
 }
 
 /**

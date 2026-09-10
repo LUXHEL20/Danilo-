@@ -11,7 +11,7 @@ export const ARTIKELS = [
       { ol: [
         'Vissen, voer en plantenresten geven ammonium (NH₄) af. Bij een hoge pH wordt dat ammoniak (NH₃) en dat is zeer giftig.',
         'Een eerste groep bacteriën zet ammonium om in nitriet (NO₂). Ook giftig: het blokkeert de zuurstofopname in het bloed.',
-        'Een tweede groep zet nitriet om in nitraat (NO₃). Dat is veel minder giftig en haalt u weg met waterverversingen en planten.',
+        'Een tweede groep zet nitriet om in nitraat (NO₃). Dat is veel minder giftig; u haalt het weg met waterverversingen en planten.',
       ] },
       { h: 'Hoe pakt u het aan?' },
       { ul: [
@@ -21,7 +21,7 @@ export const ARTIKELS = [
         'Zet pas de eerste vissen bij als NO₂ én NH₄ twee metingen na elkaar 0 zijn.',
         'Zet daarna telkens een kleine groep bij, met minstens twee weken ertussen.',
       ] },
-      { let: 'Spoel uw filter nooit uit onder de kraan: chloor doodt precies de bacteriën waar u weken op gewacht hebt. Spoel filtermateriaal altijd uit in een emmer aquariumwater.' },
+      { let: 'Spoel uw filter nooit uit onder de kraan: chloor doodt precies de bacteriën waar u weken op gewacht hebt. Spoel filtermateriaal uit in een emmer aquariumwater.' },
     ],
   },
   {
@@ -56,7 +56,7 @@ export const ARTIKELS = [
   },
   {
     id: 'algen', icoon: '🟢', categorie: 'Problemen', titel: 'Algen herkennen en aanpakken',
-    kort: 'Welke alg u hebt, vertelt u wat er scheelt.',
+    kort: 'Welke alg u hebt, zegt veel over wat er scheelt.',
     inhoud: [
       { p: 'Algen zijn een symptoom, geen ziekte. Ze verschijnen wanneer licht, voedingsstoffen en CO₂ uit balans zijn. Pak eerst de oorzaak aan, gebruik een algenmiddel pas daarna.' },
       { h: 'Wie is de dader?' },
@@ -73,7 +73,7 @@ export const ARTIKELS = [
         'Beperk de verlichting tot 8 uur per dag en hou direct zonlicht weg.',
         'Voeder minder en verwijder afgestorven plantendelen.',
         'Zet sterke planten bij: die nemen de voeding weg bij de algen.',
-        'Pas dan een algenmiddel gebruiken, altijd met extra beluchting.',
+        'Pas dan een algenmiddel gebruiken, met extra beluchting.',
       ] },
     ],
   },
@@ -109,7 +109,7 @@ export const ARTIKELS = [
     id: 'ziek', icoon: '🩺', categorie: 'Vissen', titel: 'Een zieke vis herkennen',
     kort: 'Waar u op let, en wat u best fotografeert voor advies.',
     inhoud: [
-      { p: 'Bijna elke ziekte begint met slechte waterwaarden of stress. Meet daarom altijd eerst uw water vóór u naar medicatie grijpt.' },
+      { p: 'Bijna elke ziekte begint met slechte waterwaarden of stress. Meet daarom eerst uw water vóór u naar medicatie grijpt.' },
       { ul: [
         'Witte stipjes zo groot als zoutkorrels: witte stip, vaak na een temperatuurschok.',
         'Schuren tegen decoratie, geknepen vinnen: huid- of kieuwparasieten.',
@@ -151,7 +151,7 @@ export const ARTIKELS = [
         'Osmosewater is bijna volledig ontdaan van mineralen: het verlaagt GH, KH en nitraat.',
         'Gebruik osmosewater nooit puur: zonder mineralen krijgt u een instabiele pH.',
         'Meng osmosewater met leidingwater, of remineraliseer het met GH-Mineralen en KH-Buffer.',
-        'Vul verdamping altijd aan met puur osmosewater: bij verdamping verdwijnt enkel water, geen zouten.',
+        'Vul verdamping aan met puur osmosewater: bij verdamping verdwijnt enkel water, geen zouten.',
       ] },
     ],
   },
@@ -176,11 +176,11 @@ export const ARTIKELS = [
       { ul: [
         'Nieuwe bak: om de 2 à 3 dagen NO₂ en NH₄, tot beide 0 zijn.',
         'Ingedraaide bak: wekelijks tot tweewekelijks de volledige set.',
-        'Altijd meten na: nieuwe vissen, een filterbeurt, medicatie, of als er iets mis lijkt.',
+        'Meet ook na: nieuwe vissen, een filterbeurt, medicatie, of als er iets mis lijkt.',
         'Meet steeds op hetzelfde moment van de dag: pH en CO₂ schommelen doorheen de dag.',
       ] },
       { h: 'Strips of druppeltests?' },
-      { p: 'Teststrips zijn snel en perfect om de evolutie op te volgen. Voor een belangrijke beslissing, of wanneer een waarde alarmerend is, bevestigt u best met een druppeltest. De app leest uw strip in en zegt er eerlijk bij hoe zeker de kleuraflezing is.' },
+      { p: 'Teststrips zijn snel en handig om de evolutie op te volgen. Voor een belangrijke beslissing, of wanneer een waarde alarmerend is, bevestigt u best met een druppeltest. De app leest uw strip in en zegt er eerlijk bij hoe zeker de kleuraflezing is.' },
       { let: 'Bewaar strips droog en gesloten, en gebruik ze niet na de vervaldatum: vochtige strips geven verkeerde waarden.' },
     ],
   },

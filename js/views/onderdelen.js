@@ -82,7 +82,7 @@ export function bakSamenvatting(bak, meting, advies) {
       h('strong', {}, bak.naam || 'Aquarium'),
       advies ? badge(`${advies.score}/100`, soort) : badge('Geen meting')),
     h('div', { class: 'mini zacht' },
-      `${profile(bak.profiel).label} · ${bak.liters || '?'} l`,
+      `${profile(bak.profiel).label} · ${bak.liters || '?'} liter`,
       meting ? ` · laatste meting ${geleden(meting.datum)}` : ' · nog niet gemeten'));
 }
 

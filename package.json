@@ -9,9 +9,12 @@
     "sync": "npm run build && npx cap sync",
     "android": "npm run sync && npx cap open android",
     "ios": "npm run sync && npx cap open ios",
-    "apk": "npm run sync && cd android && ./gradlew assembleDebug",
-    "assets": "npx @capacitor/assets generate --assetPath resources --android --ios --iconBackgroundColor '#0B1530' --iconBackgroundColorDark '#0B1530' --splashBackgroundColor '#0D1730' --splashBackgroundColorDark '#0D1730'",
-    "test": "node test/smoke.mjs"
+    "apk": "npm run sync && node scripts/apk.mjs",
+    "assets": "npx @capacitor/assets generate --assetPath resources --android --ios --iconBackgroundColor \"#0B1530\" --iconBackgroundColorDark \"#0B1530\" --splashBackgroundColor \"#0D1730\" --splashBackgroundColorDark \"#0D1730\"",
+    "test": "node test/smoke.mjs",
+    "test:strip": "node test/strip-test.mjs",
+    "test:native": "node test/native-test.mjs",
+    "test:offline": "npm run build && node test/offline-test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",

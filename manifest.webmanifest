@@ -1,7 +1,7 @@
 {
-  "name": "Lux Aqua — waterwaarden",
-  "short_name": "Lux Aqua",
-  "description": "Waterwaarden noteren, teststrips inlezen met de camera, advies en opvolging voor je aquarium of vijver.",
+  "name": "LUX AQUA, waterwaarden en opvolging",
+  "short_name": "LUX AQUA",
+  "description": "Waterwaarden noteren, teststrips inlezen met de camera, advies en opvolging voor uw aquarium of vijver.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

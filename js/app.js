@@ -1,5 +1,5 @@
 /**
- * Lux Aqua — app-schil: opstarten, navigatie en routering.
+ * LUX AQUA, app-schil: opstarten, navigatie en routering.
  */
 import * as store from './store.js';
 import { h, leeg, melding, dialoog } from './ui.js';
@@ -96,13 +96,13 @@ export async function teken() {
 
 function tekenKop() {
   const isLux = ctx.instellingen.rol === 'luxaqua';
-  const bedrijf = ctx.instellingen.bedrijf?.naam || 'Lux Aqua';
+  const bedrijf = ctx.instellingen.bedrijf?.naam || 'LUX AQUA';
   leeg(kopbalk).append(
     logoElement(ctx.instellingen.logo),
     h('div', {},
       h('h1', {}, isLux ? `${bedrijf} · beheer` : bedrijf),
       h('span', { class: 'kopbalk__sub' },
-        isLux ? 'Overzicht van je klanten' : (ctx.bak ? `${ctx.bak.naam || 'Mijn bak'} · ${ctx.bak.liters || '?'} l` : 'Nog geen bak ingesteld'))),
+        isLux ? 'Overzicht van uw klanten' : (ctx.bak ? `${ctx.bak.naam || 'Mijn bak'} · ${ctx.bak.liters || '?'} liter` : 'Nog geen bak ingesteld'))),
     h('div', { class: 'kopbalk__acties' },
       !isLux && h('button', { class: 'icoonknop', title: 'Wissel van bak', 'aria-label': 'Wissel van bak', onclick: kiesBak }, '🐟'),
       h('button', { class: 'icoonknop', title: 'Instellingen', 'aria-label': 'Instellingen', onclick: () => ganaar('beheer') }, '⚙️')),
@@ -151,7 +151,7 @@ async function kiesBak() {
   const eigen = ctx.klant ? alle.filter((b) => b.klantId === ctx.klant.id) : alle;
   const lijst = eigen.length ? eigen : alle;
   await dialoog({
-    titel: 'Kies je bak',
+    titel: 'Kies uw bak',
     inhoud: h('div', {},
       ...lijst.map((b) => h('button', {
         class: 'klikbaar', onclick: async () => {
@@ -178,8 +178,8 @@ async function kiesBak() {
 window.addEventListener('hashchange', teken);
 store.onWijziging((soort) => { if (['instellingen', 'bakken', 'klanten'].includes(soort)) tekenKop(); });
 
-teken();
-initNative(); // terugknop, statusbalk en splashscherm in de native app; doet niets op het web
+// eerst tekenen, dan pas de splash verbergen (initNative doet niets op het web)
+teken().then(() => initNative());
 
 // In de native app staan alle bestanden lokaal: geen service worker nodig.
 if (!isNative() && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {

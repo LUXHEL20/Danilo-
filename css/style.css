@@ -1,4 +1,4 @@
-/* Lux Aqua — stijlblad. Mobile-first, werkt ook op tablet en desktop. */
+/* LUX AQUA, stijlblad. Mobile-first, werkt ook op tablet en desktop. */
 
 :root {
   /* Aquapalet van LUX AQUA (scherm): marine, aqua diep, aqua scherm. Zie BRAND.md. */
@@ -91,7 +91,8 @@ a { color: var(--aqua); }
   position: sticky; top: 0; z-index: 20;
   background: linear-gradient(135deg, var(--diep) 0%, var(--diep-2) 55%, var(--aqua) 100%);
   color: #fff;
-  padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
+  /* --safe-area-inset-top wordt door Capacitor ingespoten op Android 15+; anders env() van de browser */
+  padding: calc(var(--safe-area-inset-top, env(safe-area-inset-top)) + 12px) 16px 12px;
   display: flex; align-items: center; gap: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, .18);
 }

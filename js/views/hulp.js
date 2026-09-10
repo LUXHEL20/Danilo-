@@ -31,7 +31,7 @@ export async function toonHulp() {
 
   if (!bak) {
     wrap.append(kaart('🆘 Hulp nodig?',
-      h('p', {}, 'Maak eerst uw bak aan, dan kunnen wij meteen uw gegevens meesturen.'),
+      h('p', {}, 'Maak eerst uw bak aan, dan gaan uw gegevens meteen mee met uw hulpvraag.'),
       h('button', { class: 'knop knop--primair knop--vol', onclick: () => ganaar('bak/nieuw') }, 'Bak toevoegen')));
     return wrap;
   }

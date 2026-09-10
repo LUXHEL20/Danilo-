@@ -80,7 +80,7 @@ export const PARAMETERS = {
   cl2: {
     id: 'cl2', label: 'Chloor (Cl₂)', short: 'Cl₂', unit: 'mg/l', decimals: 1, step: 0.1, min: 0, max: 5,
     kind: 'zero', onStrip: true,
-    info: 'Chloor uit het leidingnet beschadigt kieuwen en doodt uw filterbacteriën. Altijd wegwerken vóór u water bijvult.',
+    info: 'Chloor uit het leidingnet beschadigt kieuwen en doodt uw filterbacteriën. Werk het weg vóór u water bijvult.',
     causes: ['Vers leidingwater zonder waterbereider', 'Tijdelijke chloorpiek bij werken aan de waterleiding'],
     scale: [
       { value: 0, hex: '#fdfaf0' }, { value: 0.5, hex: '#f3dbe6' }, { value: 1, hex: '#e2aecd' },

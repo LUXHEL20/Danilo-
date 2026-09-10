@@ -7,7 +7,7 @@ import * as store from './store.js';
 import { fmt, param, profile, statusOf, STATUS_LABEL } from './params.js';
 import { maakAdvies } from './advies.js';
 import { download, kopieer, melding, blobNaarDataUrl } from './ui.js';
-import { isNative, deel, bewaarEnDeelBestand } from './native.js';
+import { isNative, isAndroid, deel, bewaarEnDeelBestand } from './native.js';
 
 export const DOSSIER_VERSIE = 1;
 
@@ -111,13 +111,15 @@ export function exporteerDossier(dossier) {
 }
 
 /** Deelt via het deelmenu van het toestel, met terugval op kopiëren. */
-export async function deelDossier(dossier, { metBestand = true } = {}) {
+export async function deelDossier(dossier, { metBestand = !isAndroid() } = {}) {
+  // op Android geven WhatsApp en co enkel de bijlage door en laten ze de tekst vallen;
+  // daar delen we standaard de leesbare tekst, het json-bestand gaat via 'Als bestand bewaren'
   const tekst = dossierAlsTekst(dossier);
   const bestanden = metBestand
     ? [new File([JSON.stringify(dossier)], 'luxaqua-dossier.json', { type: 'application/json' })]
     : [];
   const r = await deel({ titel: 'LUX AQUA dossier', tekst, bestanden });
-  if (r !== 'niet-mogelijk') return r;
+  if (r !== 'niet-mogelijk') return r; // gedeeld, geannuleerd of mislukt (dan is er al een melding)
   await kopieer(tekst);
   return 'gekopieerd';
 }
@@ -170,10 +172,23 @@ export async function stuurNaarServer(dossier) {
   }
 }
 
+/** Het officiële logo als data-URL, of null als het niet opgehaald kan worden (dan blijft het relatieve pad). */
+async function standaardLogoDataUrl() {
+  try {
+    const res = await fetch(LOGO_STANDAARD);
+    if (!res.ok) return null;
+    return await blobNaarDataUrl(await res.blob());
+  } catch {
+    return null;
+  }
+}
+
+const LOGO_STANDAARD = 'assets/brand/LUX-AQUA-01-navy.svg';
+
 /** Bouwt de printbare weergave van een dossier als volledige HTML-pagina. */
 export function dossierAlsHtml(dossier, inst = {}) {
   const bedrijf = inst.bedrijf || {};
-  const logo = inst.logo || 'assets/brand/LUX-AQUA-01-navy.svg';
+  const logo = inst.logo || LOGO_STANDAARD;
   const b = dossier.bak;
   const prof = profile(b.profiel);
   const rij = (l, w) => `<tr><th>${l}</th><td>${w ?? '–'}</td></tr>`;
@@ -225,7 +240,8 @@ export function dossierAlsHtml(dossier, inst = {}) {
  */
 export async function printDossier(dossier) {
   const inst = await store.instellingen();
-  const html = dossierAlsHtml(dossier, inst);
+  // het standaardlogo inlijnen: het html-bestand moet ook los van de app (gedeeld, als pdf) zijn logo tonen
+  const html = dossierAlsHtml(dossier, { ...inst, logo: inst.logo || await standaardLogoDataUrl() });
   if (isNative()) return bewaarEnDeelBestand('luxaqua-dossier.html', html, 'text/html');
   const v = window.open('', '_blank');
   if (!v) { melding('Sta pop-ups toe om het dossier af te drukken.', 'fout'); return; }

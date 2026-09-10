@@ -9,6 +9,7 @@ export async function toonProducten() {
   const catalogus = await store.catalogus();
   const bak = ctx.bak;
   const liters = Number(bak?.liters) || 0;
+  const isLux = ctx.instellingen?.rol === 'luxaqua';
 
   const wrap = h('div', {});
   const lijstHouder = h('div', {});
@@ -67,9 +68,10 @@ export async function toonProducten() {
         ? `De doseringen worden meteen berekend voor ${liters} liter, de inhoud van ${bak.naam || 'uw bak'}.`
         : 'Vul de inhoud van uw bak in om de doseringen automatisch te laten berekenen.'),
     veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder,
-    h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
-      'De namen hieronder zijn voorlopige, functionele namen. Vervang ze in Beheer → Producten beheren ' +
-      'door de echte retailnamen en de doseringen van het etiket.')));
+    // enkel voor LUX AQUA zelf: de klant hoeft dit niet te lezen
+    isLux ? h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
+      'De namen hieronder zijn voorlopige, functionele namen. Vervang ze via Beheer, Producten beheren ' +
+      'door de echte namen en de doseringen van het etiket.') : null));
 
   tekenLijst();
   return wrap;
@@ -112,7 +114,7 @@ export async function toonProduct(p, liters, bak) {
       h('h4', {}, 'Dosering berekenen'),
       veld('Inhoud van uw bak (liter)', doseerVeld),
       deltaVeld ? veld(`Gewenste verschuiving (${param(p.dosering.param)?.unit || ''})`, deltaVeld,
-        `Standaard geeft ${p.dosering.hoeveelheid} ${p.dosering.eenheid} per ${p.dosering.per} l een verschuiving van ${p.dosering.effect}.`) : null,
+        `Standaard geeft ${p.dosering.hoeveelheid} ${p.dosering.eenheid} per ${p.dosering.per} liter een verschuiving van ${p.dosering.effect}.`) : null,
       uitkomst,
       p.dubbele_dosis ? h('p', { class: 'klein zacht' }, p.dubbele_dosis) : null,
 

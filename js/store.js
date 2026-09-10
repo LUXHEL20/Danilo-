@@ -15,7 +15,7 @@ const STANDAARD_INSTELLINGEN = {
   rol: 'klant',              // 'klant' of 'luxaqua'
   actieveKlant: null,
   actieveBak: null,
-  productenOverride: null,   // aangepaste catalogus door Lux Aqua
+  productenOverride: null,   // aangepaste catalogus door LUX AQUA
   kalibratie: {},            // per strip-preset: eigen kleurenkaart
   logo: null,                // eigen logo als data-URL (Beheer > Logo)
   bedrijf: {
@@ -27,7 +27,7 @@ const STANDAARD_INSTELLINGEN = {
     adres: 'Kazernelaan 11, 3530 Helchteren',
     onderdeelVan: 'LUX 2.0',
   },
-  koppeling: { url: '', sleutel: '' }, // optionele server-koppeling voor Lux Aqua
+  koppeling: { url: '', sleutel: '' }, // optionele server-koppeling voor LUX AQUA
   onboardingKlaar: false,
 };
 
