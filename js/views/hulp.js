@@ -190,7 +190,9 @@ async function verstuurKeuze(dossier, instellingen) {
       h('p', { class: 'klein zacht' }, 'Uw hulpvraag is bewaard in de app. Kies hieronder hoe u ze bij LUX AQUA krijgt.'),
       h('div', { class: 'kolom' },
         h('button', { class: 'knop knop--primair knop--vol', onclick: () => deelDossier(dossier) }, '📤 Delen via mijn toestel (WhatsApp, mail, …)'),
-        h('a', { class: 'knop knop--stil knop--vol', href: whatsappLink(tekst, b.telefoon || ''), target: '_blank', rel: 'noopener' }, '💬 Via WhatsApp'),
+        // b.whatsapp, niet b.telefoon: dat laatste is het vaste lijnnummer van de
+        // winkel, en wa.me verwacht een mobiel WhatsApp-nummer.
+        h('a', { class: 'knop knop--stil knop--vol', href: whatsappLink(tekst, b.whatsapp || ''), target: '_blank', rel: 'noopener' }, '💬 Via WhatsApp'),
         // geen target="_blank" op een mailto:-link: in een app op het beginscherm opent dat
         // een leeg venster in plaats van het mailprogramma (de wa.me-link is http en mag wel)
         h('a', { class: 'knop knop--stil knop--vol', href: mailLink(tekst, b.email || '') }, '✉️ Via e-mail'),

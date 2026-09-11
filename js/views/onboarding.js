@@ -1,9 +1,10 @@
 /** Eerste opstart: rol kiezen, gegevens invullen en de eerste bak aanmaken. */
-import { h, veld, invoer, keuze, tekstvak, melding } from '../ui.js';
+import { h, veld, invoer, keuze, tekstvak, melding, dialoog } from '../ui.js';
 import * as store from '../store.js';
 import { PROFILES } from '../params.js';
 import { teken, logoElement } from '../app.js';
 import { isNative } from '../native.js';
+import { servicebonAlsTekst, whatsappLink, mailLink } from '../delen.js';
 
 /**
  * Waarschuwing enkel op een iPhone in Safari, zolang de app nog niet vanaf het beginscherm draait.
@@ -190,8 +191,63 @@ export async function toonOnboarding() {
     melding(`Welkom ${klant.naam.split(' ')[0]}! Uw bak is aangemaakt.`, 'ok');
     location.hash = '#/start';
     teken();
+    await serviceberichtDialoog(klant, bak);
   }
 
   render();
   return houder;
+}
+
+/**
+ * Toont het kennismakingsbericht bovenop het (al zichtbare) startscherm.
+ *
+ * Waarom dit bestaat: de app heeft geen server, dus LUX AQUA heeft geen enkel
+ * automatisch zicht op wie de app gebruikt. Dit is de enige manier om die
+ * gegevens toch te krijgen: de klant stuurt ze zelf door, met één tik, via
+ * WhatsApp of e-mail. Meteen ook de plek om toestemming voor reclame te vragen
+ * (standaard uit: dat is de klant zijn keuze, niet de onze) en om de klant te
+ * laten vragen ons nummer op te slaan, want zonder dat komt een latere
+ * WhatsApp-mailing nooit aan.
+ */
+async function serviceberichtDialoog(klant, bak) {
+  const instellingen = await store.instellingen();
+  const b = instellingen.bedrijf || {};
+
+  const akkoord = h('input', { type: 'checkbox' });
+  const whatsappKnop = h('a', {
+    class: 'knop knop--primair knop--vol', target: '_blank', rel: 'noopener',
+  }, '💬 Stuur via WhatsApp');
+  // Geen target="_blank" op de mailto-link: in de app op het beginscherm opent
+  // dat een leeg venster in plaats van het mailprogramma.
+  const mailKnop = h('a', { class: 'knop knop--stil knop--vol' }, '✉️ Stuur via e-mail');
+
+  const bijwerken = () => {
+    const tekst = servicebonAlsTekst({ ...klant, marketingAkkoord: akkoord.checked }, bak);
+    whatsappKnop.href = whatsappLink(tekst, b.whatsapp || '');
+    mailKnop.href = mailLink(tekst, b.email || '', 'Kennismaking, LUX AQUA-app');
+  };
+  akkoord.onchange = bijwerken;
+  bijwerken();
+
+  const genoteerd = async () => {
+    await store.bewaarKlant({ ...klant, marketingAkkoord: akkoord.checked, servicebonVerstuurd: Date.now() });
+  };
+  whatsappKnop.onclick = genoteerd;
+  mailKnop.onclick = genoteerd;
+
+  await dialoog({
+    titel: 'Nog één ding',
+    breed: true,
+    inhoud: h('div', {},
+      h('p', { class: 'klein zacht' },
+        `Wij houden graag contact met u, bijvoorbeeld voor een herinnering of een tip voor ${bak.naam || 'uw bak'}. ` +
+        'Stuur ons een kort kennismakingsbericht: dat kost u één tik, en meteen weten wij dat alles werkt.'),
+      h('p', { class: 'mini zacht' },
+        `Sla ons nummer meteen op als ${instellingen.bedrijf?.naam || 'LUX AQUA'}, zo mist u nooit een bericht van ons.`),
+      h('label', { class: 'rij klein', style: { gap: '8px', margin: '12px 0' } },
+        akkoord,
+        h('span', {}, 'Ik geef LUX AQUA toestemming om mij af en toe reclame of tips te sturen via WhatsApp of e-mail.')),
+      h('div', { class: 'kolom' }, whatsappKnop, mailKnop)),
+    acties: [{ label: 'Overslaan', waarde: null }],
+  });
 }

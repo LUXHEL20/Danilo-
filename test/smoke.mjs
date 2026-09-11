@@ -40,6 +40,11 @@ await stap('bakgegevens invullen', async () => {
   if (Number(liters) < 200) throw new Error('liters niet berekend: ' + liters);
   await page.getByRole('button', { name: 'Volgende' }).click();
   await page.getByRole('button', { name: /Klaar, start de app/ }).click();
+await page.waitForTimeout(400);
+// Na de onboarding verschijnt het kennismakingsbericht vanzelf, bovenop het
+// (al zichtbare) startscherm. Sluiten via zijn eigen knop, niet forceren: het
+// forceren van een overlay in andere tests brak een bewust openblijvende dialoog.
+await page.getByRole('button', { name: 'Overslaan' }).click();
 });
 await page.waitForTimeout(500);
 await stap('startscherm', async () => {

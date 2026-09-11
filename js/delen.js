@@ -52,6 +52,34 @@ export async function maakDossier(bakId, opties = {}) {
   return dossier;
 }
 
+/**
+ * Het kennismakingsbericht dat een nieuwe klant bij het aanmaken van zijn profiel
+ * kan doorsturen. Doet twee dingen tegelijk: LUX AQUA krijgt meteen de gegevens van
+ * de klant (naam, contact, bak) zonder dat daar een server voor nodig is, en de
+ * klant slaat het nummer van LUX AQUA op in zijn contacten. Dat laatste is voor
+ * WhatsApp niet bijzaak: een bericht via een lijst of broadcast komt enkel aan bij
+ * wie het nummer al opgeslagen heeft en al eens zelf geschreven heeft.
+ */
+export function servicebonAlsTekst(klant, bak) {
+  const prof = profile(bak?.profiel);
+  const r = [
+    'Kennismaking via de LUX AQUA-app',
+    '',
+    `Naam: ${klant.naam || '–'}`,
+  ];
+  if (klant.telefoon) r.push(`Telefoon: ${klant.telefoon}`);
+  if (klant.email) r.push(`E-mail: ${klant.email}`);
+  const adres = [klant.adres, klant.gemeente].filter(Boolean).join(', ');
+  if (adres) r.push(`Adres: ${adres}`);
+  r.push('', `Bak: ${bak?.naam || 'Aquarium'}, ${prof.label}, ${bak?.liters || '?'} liter`);
+  r.push('',
+    klant.marketingAkkoord
+      ? 'De klant geeft toestemming om af en toe reclame of tips te ontvangen via WhatsApp of e-mail.'
+      : 'De klant wil geen reclame ontvangen, enkel dit kennismakingsbericht.');
+  r.push('', 'Dit is een automatisch bericht vanuit de app, om te controleren dat alles werkt.');
+  return r.join('\n');
+}
+
 /** Leesbare samenvatting in tekst (voor WhatsApp, e-mail of een telefonisch gesprek). */
 export function dossierAlsTekst(dossier) {
   const b = dossier.bak;

@@ -37,6 +37,11 @@ await nums.nth(0).fill('120'); await nums.nth(1).fill('50'); await nums.nth(2).f
 await page.waitForTimeout(150);
 await page.getByRole('button', { name: 'Volgende' }).click();
 await page.getByRole('button', { name: /Klaar, start de app/ }).click();
+await page.waitForTimeout(400);
+// Na de onboarding verschijnt het kennismakingsbericht vanzelf, bovenop het
+// (al zichtbare) startscherm. Sluiten via zijn eigen knop, niet forceren: het
+// forceren van een overlay in andere tests brak een bewust openblijvende dialoog.
+await page.getByRole('button', { name: 'Overslaan' }).click();
 await page.waitForTimeout(600);
 
 const naar = async (pad) => {
