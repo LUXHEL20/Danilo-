@@ -56,7 +56,7 @@ bij twijfel Levensstijl)*.
 **Contactgegevens**
 - E-mail: info@luxhelchteren.be
 - Telefoon: 011 91 92 91
-- Website: https://www.luxhelchteren.be
+- Website: https://luxhelchteren.be
 
 **Privacybeleid (URL)**: het gepubliceerde privacybeleid delen vanaf het deelmenu van de
 Artifact-pagina, of de meegeleverde `privacybeleid.html` hosten onder luxhelchteren.be
@@ -114,8 +114,8 @@ aquarium,vijver,waterwaarden,teststrip,vissen,koi,nitraat,ph,advies,waterkwalite
 
 **Categorie**: Lifestyle, of Utilities.
 
-**Ondersteunings-URL**: https://www.luxhelchteren.be
-**Marketing-URL** (optioneel): https://www.luxhelchteren.be
+**Ondersteunings-URL**: https://luxhelchteren.be
+**Marketing-URL** (optioneel): https://luxhelchteren.be
 **Privacybeleid-URL**: zie hierboven bij Google Play.
 
 **Beeldmateriaal**

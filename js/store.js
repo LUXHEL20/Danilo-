@@ -22,7 +22,7 @@ const STANDAARD_INSTELLINGEN = {
     naam: 'LUX AQUA',
     telefoon: '011 91 92 91',
     email: 'info@luxhelchteren.be',
-    website: 'https://www.luxhelchteren.be',
+    website: 'https://luxhelchteren.be',
     werkgebied: 'Helchteren en omgeving',
     adres: 'Kazernelaan 11, 3530 Helchteren',
     onderdeelVan: 'LUX 2.0',

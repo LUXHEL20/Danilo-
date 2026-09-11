@@ -140,9 +140,12 @@ export const PROFILES = {
   zoet_gezelschap: {
     id: 'zoet_gezelschap', label: 'Zoetwater gezelschapsbak', group: 'Aquarium',
     params: ['temp', 'ph', 'kh', 'gh', 'no2', 'no3', 'nh4', 'cl2', 'po4'],
+    // De ideale zones volgen de groene zone van de Zeven Weken Strategie op
+    // luxhelchteren.be/lux-aqua/eerste-aquarium. App en website moeten dezelfde
+    // grenzen tonen, anders spreken ze elkaar tegen aan de toonbank.
     targets: {
-      temp: { ideal: [23, 26], ok: [22, 28] },
-      ph: { ideal: [6.5, 7.5], ok: [6.0, 8.2] },
+      temp: { ideal: [23, 27], ok: [22, 28] },
+      ph: { ideal: [6.5, 7.8], ok: [6.0, 8.2] },
       kh: { ideal: [4, 8], ok: [3, 14] },
       gh: { ideal: [6, 14], ok: [4, 20] },
       no2: { ideal: [0, 0], ok: [0, 0.1] },
