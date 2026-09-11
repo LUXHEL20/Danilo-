@@ -1,5 +1,6 @@
 /** Beheer en instellingen: rol, bedrijfsgegevens, producten, ijking en back-ups. */
-import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, download, datum } from '../ui.js';
+import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, download, datum, kopieer } from '../ui.js';
+import * as sp from '../spaarkaart.js';
 import { ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import * as db from '../db.js';
@@ -134,6 +135,9 @@ export async function toonBeheer() {
       }, 'Bewaren')));
   }
 
+  /* --- spaarkaart --- */
+  wrap.append(await spaarkaartBlok(isLux));
+
   /* --- gegevens --- */
   wrap.append(kaart('💾 Gegevens en back-up',
     h('p', { class: 'klein zacht' }, 'Alles staat op dit toestel. Maak regelmatig een back-up, zeker vóór u van toestel verandert.'),
@@ -172,6 +176,118 @@ export async function toonBeheer() {
  * uploaden naar de host: is het antwoord nee, dan is de service worker niet geregistreerd
  * (geen https, of een bestand uit de precache-lijst ontbreekt op de server).
  */
+/* ------------------------------------------------------------------ spaarkaart */
+
+/**
+ * De winkelzijde van de spaarkaart. LUX AQUA ziet hier de code van vandaag om
+ * aan de toonbank te tonen, en stelt hier de trap in. De klant ziet enkel een
+ * verwijzing naar zijn eigen kaart.
+ */
+async function spaarkaartBlok(isLux) {
+  const s = await sp.spaarInstellingen();
+
+  if (!isLux) {
+    const k = await sp.haalKaart();
+    return kaart('🎟️ Spaarkaart',
+      h('p', { class: 'klein zacht' }, s.aan
+        ? `U staat op ${k.tokens} ${k.tokens === 1 ? 'token' : 'tokens'}. Vraag de winkelcode aan de toonbank om er een bij te sparen.`
+        : 'De spaarkaart is op dit moment niet in gebruik.'),
+      s.aan ? h('button', { class: 'knop knop--stil', onclick: () => ganaar('spaar') }, 'Mijn spaarkaart openen') : null);
+  }
+
+  /* De codes worden uit de datum berekend, dus ze veranderen vanzelf om
+     middernacht. Er is niets te bewaren en niets te verzenden. */
+  const winkel = sp.winkelcode();
+  const beheer = sp.beheercode();
+  const codeEl = h('p', { class: 'winkelcode' }, winkel);
+
+  const rijen = s.trap.map((t) => ({
+    tokens: invoer({ type: 'number', min: '1', max: '9999', value: String(t.tokens) }),
+    procent: invoer({ type: 'number', min: '1', max: '90', value: String(t.procent) }),
+  }));
+  const geldig = invoer({ type: 'number', min: '1', max: '60', value: String(s.geldigDagen) });
+  const verval = invoer({ type: 'number', min: '1', max: '60', value: String(s.vervalMaanden) });
+  const plafond = invoer({ type: 'number', min: '0', max: '500', value: String(s.maxKortingEuro || 0) });
+  const waarop = tekstvak({ rows: 2, value: s.waarop || '' });
+
+  const trapTabel = h('div', { class: 'spaartrap-bewerk' },
+    ...rijen.map((r, n) => h('div', { class: 'rij', style: { gap: '8px', marginBottom: '6px' } },
+      h('span', { class: 'mini zacht', style: { width: '22px' } }, `${n + 1}.`),
+      r.tokens, h('span', { class: 'mini zacht' }, 'tokens ='), r.procent, h('span', { class: 'mini zacht' }, '%'))));
+
+  const bewaar = async (trapOverschrijving) => {
+    const trap = trapOverschrijving || rijen
+      .map((r) => ({ tokens: Number(r.tokens.value), procent: Number(r.procent.value) }))
+      .filter((t) => t.tokens > 0 && t.procent > 0);
+    if (!trap.length) { melding('Vul minstens één trede in.', 'fout'); return; }
+    await sp.bewaarSpaarInstellingen({
+      trap,
+      geldigDagen: Math.max(1, Number(geldig.value) || 7),
+      vervalMaanden: Math.max(1, Number(verval.value) || 12),
+      maxKortingEuro: Math.max(0, Number(plafond.value) || 0),
+      waarop: waarop.value.trim(),
+    });
+    melding('Spaarkaart bewaard.', 'ok');
+    teken();
+  };
+
+  return kaart('🎟️ Spaarkaart',
+    h('p', { class: 'klein zacht' },
+      'Toon de code van vandaag aan de toonbank. De klant tikt ze in zijn app in en krijgt één token. ' +
+      'De code verandert elke nacht vanzelf, dus een foto ervan is morgen waardeloos.'),
+    codeEl,
+    h('p', { class: 'mini zacht midden' }, `Winkelcode van ${datum(Date.now(), false)}`),
+    h('div', { class: 'knoprij' },
+      h('button', { class: 'knop knop--stil', onclick: () => kopieer(winkel).then(() => melding('Code gekopieerd.', 'ok')) }, '📋 Kopiëren'),
+      h('button', {
+        class: 'knop knop--stil',
+        onclick: () => dialoog({
+          titel: 'Beheerscode van vandaag',
+          inhoud: h('div', {},
+            h('p', { class: 'beheercode' }, beheer),
+            h('p', { class: 'klein zacht' },
+              'Hiermee zet u op het toestel van een klant zijn kaart terug op nul, of schrijft u een vergeten bezoek bij. ' +
+              'De klant vindt de knop onder Sparen, bij Medewerker LUX AQUA.'),
+            h('p', { class: 'klein zacht' }, 'Toon deze code niet aan klanten. Ook zij verandert elke nacht.')),
+          acties: [{ label: 'Sluiten', waarde: null }],
+        }),
+      }, '🔑 Beheerscode'),
+      h('button', {
+        class: `knop ${s.aan ? 'knop--stil' : 'knop--primair'}`,
+        onclick: async () => {
+          await sp.bewaarSpaarInstellingen({ aan: !s.aan });
+          melding(s.aan ? 'Spaarkaart uitgezet.' : 'Spaarkaart aangezet.', 'ok');
+          teken();
+        },
+      }, s.aan ? 'Spaarkaart uitzetten' : 'Spaarkaart aanzetten')),
+
+    h('hr', { class: 'scheiding' }),
+    h('h4', { style: { margin: '0 0 8px' } }, 'De trap'),
+    h('p', { class: 'mini zacht' },
+      'Hoeveel tokens er nodig zijn voor welke korting. De klant kiest zelf of hij omzet of verder spaart.'),
+    trapTabel,
+    h('div', { class: 'knoprij' },
+      h('button', {
+        class: 'knop knop--stil',
+        onclick: () => bewaar(sp.TRAP_STANDAARD),
+      }, 'Standaard (10 = 5%)'),
+      h('button', {
+        class: 'knop knop--stil',
+        onclick: () => bewaar(sp.TRAP_TRAAG),
+      }, 'Rustig tempo (50 = 5%)')),
+    h('p', { class: 'mini zacht' },
+      'Standaard: de eerste korting na tien bezoeken, daarna elke vijftien bezoeken vijf procent extra. ' +
+      'Bij het rustige tempo is 50 tokens vijftig aparte bezoeken: voor een klant die twee keer per maand langskomt, ' +
+      'is dat ruim twee jaar tot de eerste korting.'),
+
+    h('hr', { class: 'scheiding' }),
+    veld('Korting blijft geldig (dagen)', geldig),
+    veld('Tokens vervallen na (maanden zonder bezoek)', verval),
+    veld('Hoogste korting in euro per keer', plafond, 'Zet 0 als u geen plafond wil. Beschermt de grote aankoop.'),
+    veld('Waarop de korting geldt', waarop, 'Deze zin ziet de klant op zijn kaart en op zijn bon.'),
+    h('button', { class: 'knop knop--primair knop--vol', onclick: () => bewaar() }, 'Spaarkaart bewaren'));
+}
+
 function offlineRegel() {
   if (isNative()) return h('li', {}, 'Offline klaar: ja. In de app staan alle bestanden op het toestel zelf.');
   const aan = !!navigator.serviceWorker?.controller;

@@ -28,6 +28,7 @@ const STANDAARD_INSTELLINGEN = {
     onderdeelVan: 'LUX 2.0',
   },
   koppeling: { url: '', sleutel: '' }, // optionele server-koppeling voor LUX AQUA
+  spaarkaart: null,          // instellingen van de spaarkaart, zie js/spaarkaart.js
   onboardingKlaar: false,
 };
 

@@ -3,9 +3,9 @@
  * en zonder buildstap te installeren zijn.
  */
 const DB_NAAM = 'luxaqua';
-const DB_VERSIE = 1;
+const DB_VERSIE = 2;
 
-export const STORES = ['klanten', 'bakken', 'vissen', 'metingen', 'fotos', 'hulpvragen', 'taken', 'instellingen', 'logboek'];
+export const STORES = ['klanten', 'bakken', 'vissen', 'metingen', 'fotos', 'hulpvragen', 'taken', 'instellingen', 'logboek', 'spaarkaart'];
 
 let dbPromise = null;
 

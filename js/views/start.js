@@ -6,6 +6,7 @@ import { maakAdvies } from '../advies.js';
 import { scoreRing, lijnGrafiek } from '../charts.js';
 import { waardeTegels, adviesKaart, takenLijst } from './onderdelen.js';
 import { profile } from '../params.js';
+import { spaarBlokVoorStart } from './spaar.js';
 
 export async function toonStart() {
   const wrap = h('div', {});
@@ -52,6 +53,10 @@ export async function toonStart() {
       h('p', { class: 'klein zacht' }, `Uw laatste meting is van ${Math.round(dagenGeleden)} dagen geleden. Met een wekelijkse meting bent u problemen vóór.`),
       h('button', { class: 'knop knop--primair knop--vol', onclick: () => ganaar('meten') }, 'Nu meten')));
   }
+
+  /* --- spaarkaart, enkel als er iets te melden valt --- */
+  const spaarBlok = await spaarBlokVoorStart();
+  if (spaarBlok) wrap.append(spaarBlok);
 
   /* --- snelknoppen --- */
   wrap.append(h('div', { class: 'knoprij', style: { marginBottom: '14px' } },

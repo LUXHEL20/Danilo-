@@ -17,7 +17,8 @@
     "test": "node test/smoke.mjs",
     "test:strip": "node test/strip-test.mjs",
     "test:native": "node test/native-test.mjs",
-    "test:offline": "npm run build && node test/offline-test.mjs"
+    "test:offline": "npm run build && node test/offline-test.mjs",
+    "test:spaar": "node test/spaar-test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",

@@ -360,6 +360,76 @@ main {
 .opsomming { margin: 0; padding-left: 18px; }
 .opsomming li { margin-bottom: 4px; }
 
+/* ------------------------------------------------------------------ spaarkaart */
+/* Zes tabbladen passen nog net op een smal scherm, zolang het langste label mag
+   krimpen in plaats van de balk uit elkaar te duwen. */
+.navigatie a { min-width: 0; padding-inline: 2px; }
+.navigatie a span:last-child {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+@media (max-width: 400px) { .navigatie a { font-size: .62rem; } }
+
+.spaarstand__cijfer {
+  flex: 0 0 auto; width: 74px; height: 74px; border-radius: 50%;
+  background: var(--aqua-zacht); color: var(--aqua);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+}
+.spaarstand__cijfer strong { font-size: 1.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.spaarstand__cijfer span { font-size: .64rem; text-transform: uppercase; letter-spacing: .08em; }
+
+.spaarbalk { height: 8px; background: var(--rand); border-radius: 4px; overflow: hidden; margin-top: 14px; }
+.spaarbalk__vulling { height: 100%; background: var(--aqua); border-radius: 4px; transition: width .4s ease; }
+@media (prefers-reduced-motion: reduce) { .spaarbalk__vulling { transition: none; } }
+
+.spaarkeuze__procent {
+  flex: 0 0 auto; min-width: 52px; text-align: center;
+  font-size: 1.15rem; font-weight: 700; color: var(--aqua);
+  font-variant-numeric: tabular-nums;
+}
+
+.spaartrap { display: flex; gap: 6px; margin-bottom: 12px; }
+.spaartrap__trede {
+  flex: 1; min-width: 0; text-align: center; padding: 9px 2px;
+  border: 1px solid var(--rand); border-radius: var(--radius-klein);
+  background: var(--vlak-2);
+}
+.spaartrap__trede.is-behaald { background: var(--aqua-zacht); border-color: var(--aqua); }
+.spaartrap__tokens {
+  display: block; font-size: .68rem; color: var(--tekst-zacht);
+  font-variant-numeric: tabular-nums;
+}
+.spaartrap__procent { display: block; font-weight: 700; font-size: .95rem; }
+.spaartrap__trede.is-behaald .spaartrap__procent { color: var(--aqua); }
+
+.spaarbon { text-align: center; }
+.spaarbon__label {
+  margin: 0; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--tekst-zacht);
+}
+.spaarbon__procent {
+  margin: 2px 0 0; font-size: 3.1rem; font-weight: 800; line-height: 1; color: var(--goed);
+  font-variant-numeric: tabular-nums;
+}
+.spaarbon__bon {
+  margin: 6px 0 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.05rem; letter-spacing: .12em;
+}
+
+.klikbaar-kaart { cursor: pointer; }
+.klikbaar-kaart:hover { border-color: var(--aqua); }
+
+.lijst--plat li { display: flex; gap: 10px; align-items: baseline; }
+
+/* De winkelcode zoals LUX AQUA ze aan de toonbank toont: van op armlengte leesbaar. */
+.winkelcode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(2rem, 13vw, 3.4rem); font-weight: 700; letter-spacing: .14em;
+  text-align: center; margin: 6px 0; color: var(--aqua); word-break: break-all;
+}
+.beheercode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.5rem; font-weight: 700; letter-spacing: .16em; text-align: center; margin: 4px 0;
+}
+
 @media print {
   .kopbalk, .navigatie, .knoprij, #meldingen { display: none !important; }
   main { padding: 0; max-width: none; }

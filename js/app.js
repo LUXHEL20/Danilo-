@@ -15,6 +15,7 @@ import { toonHulp } from './views/hulp.js';
 import { toonKlanten, toonKlant, toonHulpvragen } from './views/luxaqua.js';
 import { toonBeheer } from './views/beheer.js';
 import { toonKennis } from './views/kennis.js';
+import { toonSpaar } from './views/spaar.js';
 
 const scherm = document.getElementById('scherm');
 const kopbalk = document.getElementById('kopbalk');
@@ -47,6 +48,7 @@ const ROUTES = {
   'producten': toonProducten,
   'kennis': toonKennis,
   'hulp': toonHulp,
+  'spaar': toonSpaar,
   'beheer': toonBeheer,
   'klanten': toonKlanten,
   'klant': toonKlant,
@@ -137,6 +139,7 @@ function tekenNav(actief) {
       { pad: 'meten', icoon: '🧪', label: 'Meten' },
       { pad: 'bak', icoon: '🐠', label: 'Mijn bak' },
       { pad: 'producten', icoon: '🧴', label: 'Producten' },
+      { pad: 'spaar', icoon: '🎟️', label: 'Sparen' },
       { pad: 'hulp', icoon: '🆘', label: 'Hulp' },
     ];
   leeg(navigatie).append(...items.map((i) =>
