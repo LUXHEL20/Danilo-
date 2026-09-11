@@ -2,7 +2,7 @@
 import { h, kaart, badge, invoer, veld, dialoog, melding, kopieer } from '../ui.js';
 import { ctx } from '../app.js';
 import * as store from '../store.js';
-import { CATEGORIEEN, berekenDosis } from '../products.js';
+import { CATEGORIEEN, berekenDosis, alleDoseringen, VERS_DEEL } from '../products.js';
 import { PARAMETERS, param, profile } from '../params.js';
 
 export async function toonProducten() {
@@ -51,7 +51,7 @@ export async function toonProducten() {
   }
 
   function productRij(p, liters) {
-    const dosis = berekenDosis(p, liters);
+    const [dosis] = alleDoseringen(p, liters);
     return h('button', { class: 'klikbaar', onclick: () => toonProduct(p, liters, bak) },
       h('span', { style: { fontSize: '22px' } }, icoonVoor(p.categorie)),
       h('span', { class: 'groei' },
@@ -70,8 +70,8 @@ export async function toonProducten() {
     veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder,
     // enkel voor LUX AQUA zelf: de klant hoeft dit niet te lezen
     isLux ? h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
-      'De namen hieronder zijn voorlopige, functionele namen. Vervang ze via Beheer, Producten beheren ' +
-      'door de echte namen en de doseringen van het etiket.') : null));
+      'De doseringen komen van de etiketten van uw eigen assortiment. Kijk in Beheer, Producten, ' +
+      'welke adviezen nog zonder product staan.') : null));
 
   tekenLijst();
   return wrap;
@@ -87,19 +87,32 @@ export async function toonProduct(p, liters, bak) {
   const deltaVeld = p.dosering?.model === 'delta'
     ? invoer({ type: 'number', inputmode: 'decimal', step: 0.1, value: p.dosering.effect })
     : null;
-  const uitkomst = h('div', { class: 'kaart kaart--vlak', style: { marginTop: '8px' } });
+
+  /* Doseert dit product (deels) op vers water, dan is de inhoud van de bak niet
+     het juiste getal. De klant vult hier in hoeveel liter hij ververst; de app
+     begint bij 30 procent, wat een gewone wekelijkse verversing is. */
+  const opVersWater = [p.dosering, ...(p.extraDoseringen || [])].some((d) => d?.basis === 'versWater');
+  const versVeld = opVersWater
+    ? invoer({ type: 'number', inputmode: 'decimal', min: 1, value: Math.round((liters || 0) * VERS_DEEL) || '' })
+    : null;
+
+  const uitkomst = h('div', {});
 
   const herbereken = () => {
     const l = Number(doseerVeld.value) || 0;
     const d = deltaVeld ? Number(deltaVeld.value) : undefined;
-    const r = berekenDosis(p, l, d);
-    uitkomst.replaceChildren(
-      h('div', { class: 'rij rij--tussen' },
-        h('span', { class: 'zacht klein' }, 'Uw dosering'),
-        h('strong', { style: { fontSize: '1.3rem' } }, r ? `${r.hoeveelheid} ${r.eenheid}` : '–')),
-      h('p', { class: 'mini zacht', style: { margin: '4px 0 0' } }, p.dosering?.omschrijving || ''));
+    const versLiters = versVeld ? (Number(versVeld.value) || undefined) : undefined;
+    const rijen = alleDoseringen(p, l, d, { versLiters });
+    uitkomst.replaceChildren(...(rijen.length
+      ? rijen.map((r) => h('div', { class: 'kaart kaart--vlak', style: { marginTop: '8px' } },
+        h('div', { class: 'rij rij--tussen' },
+          h('span', { class: 'zacht klein' }, r.label),
+          h('strong', { style: { fontSize: '1.3rem' } }, `${r.hoeveelheid} ${r.eenheid}`)),
+        h('p', { class: 'mini zacht', style: { margin: '4px 0 0' } },
+          `${r.omschrijving}${r.omschrijving ? ' · ' : ''}berekend voor ${r.basis === 'versWater' ? `${r.liters} liter vers water` : `${r.liters} liter bakinhoud`}`)))
+      : [h('p', { class: 'klein zacht' }, 'Voor dit product staat er nog geen dosering in de app.')]));
   };
-  [doseerVeld, deltaVeld].filter(Boolean).forEach((v) => v.addEventListener('input', herbereken));
+  [doseerVeld, deltaVeld, versVeld].filter(Boolean).forEach((v) => v.addEventListener('input', herbereken));
   herbereken();
 
   await dialoog({
@@ -113,10 +126,14 @@ export async function toonProduct(p, liters, bak) {
 
       h('h4', {}, 'Dosering berekenen'),
       veld('Inhoud van uw bak (liter)', doseerVeld),
+      versVeld ? veld('Hoeveel liter ververst u? (liter vers water)', versVeld,
+        'Dit middel doseert u op het verse water, niet op de volledige bak. Standaard rekent de app met 30 procent.') : null,
       deltaVeld ? veld(`Gewenste verschuiving (${param(p.dosering.param)?.unit || ''})`, deltaVeld,
         `Standaard geeft ${p.dosering.hoeveelheid} ${p.dosering.eenheid} per ${p.dosering.per} liter een verschuiving van ${p.dosering.effect}.`) : null,
       uitkomst,
       p.dubbele_dosis ? h('p', { class: 'klein zacht' }, p.dubbele_dosis) : null,
+      p.routine ? h('p', { class: 'klein zacht' },
+        `Terugkerend: ${p.routine.tekst.toLowerCase()}, om de ${p.routine.elke} dagen.`) : null,
 
       h('h4', { style: { marginTop: '14px' } }, 'Hoe toepassen?'),
       h('p', {}, p.toepassing),
@@ -131,15 +148,21 @@ export async function toonProduct(p, liters, bak) {
     acties: [
       {
         label: '📋 Dosering kopiëren', actie: async () => {
-          const r = berekenDosis(p, Number(doseerVeld.value) || 0, deltaVeld ? Number(deltaVeld.value) : undefined);
-          await kopieer(`${p.naam}: ${r ? r.tekst : p.dosering?.omschrijving}`);
+          const rijen = alleDoseringen(p, Number(doseerVeld.value) || 0,
+            deltaVeld ? Number(deltaVeld.value) : undefined,
+            { versLiters: versVeld ? (Number(versVeld.value) || undefined) : undefined });
+          await kopieer(rijen.length
+            ? `${p.naam}\n${rijen.map((r) => `${r.label}: ${r.hoeveelheid} ${r.eenheid}`).join('\n')}`
+            : `${p.naam}: nog geen dosering ingevuld`);
           return false;
         },
       },
       {
         label: '📓 In logboek zetten', stijl: 'knop--primair', actie: async () => {
           if (!bak) { melding('Geen bak geselecteerd.', 'fout'); return false; }
-          const r = berekenDosis(p, Number(doseerVeld.value) || 0, deltaVeld ? Number(deltaVeld.value) : undefined);
+          const [r] = alleDoseringen(p, Number(doseerVeld.value) || 0,
+            deltaVeld ? Number(deltaVeld.value) : undefined,
+            { versLiters: versVeld ? (Number(versVeld.value) || undefined) : undefined });
           await store.logboek(bak.id, `${p.naam} gedoseerd${r ? `: ${r.hoeveelheid} ${r.eenheid}` : ''}`, 'product');
           const taken = (p.opvolging || []).map((o, i) => ({
             id: `taak-${p.id}-${i}-${Date.now()}`, omschrijving: o.actie, termijn: o.na, product: p.naam,

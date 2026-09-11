@@ -451,6 +451,10 @@ main {
 }
 .assortimentrij:first-of-type { border-top: 0; }
 
+.doseerregel {
+  display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-top: 6px;
+}
+
 @media print {
   .kopbalk, .navigatie, .knoprij, #meldingen { display: none !important; }
   main { padding: 0; max-width: none; }

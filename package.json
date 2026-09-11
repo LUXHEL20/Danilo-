@@ -21,7 +21,8 @@
     "test:spaar": "node test/spaar-test.mjs",
     "test:auth": "node test/auth-test.mjs",
     "test:kweek": "node test/kweek-test.mjs",
-    "test:alles": "node test/smoke.mjs && node test/auth-test.mjs && node test/spaar-test.mjs && node test/kweek-test.mjs"
+    "test:alles": "node test/dosering-test.mjs && node test/smoke.mjs && node test/auth-test.mjs && node test/spaar-test.mjs && node test/kweek-test.mjs",
+    "test:dosering": "node test/dosering-test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",

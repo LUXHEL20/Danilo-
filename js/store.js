@@ -22,7 +22,7 @@ const STANDAARD_INSTELLINGEN = {
     naam: 'LUX AQUA',
     telefoon: '011 91 92 91',
     email: 'info@luxhelchteren.be',
-    whatsapp: '',            // gsm-nummer voor WhatsApp, met landcode: 32470123456
+    whatsapp: '3211919291',  // WhatsApp Business, 0032 11 91 92 91 zonder plus en zonder nul
     website: 'https://luxhelchteren.be',
     werkgebied: 'Helchteren en omgeving',
     adres: 'Kazernelaan 11, 3530 Helchteren',

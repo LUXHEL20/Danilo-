@@ -116,7 +116,7 @@ export async function toonBeheer() {
   wrap.append(kaart('🧴 Producten',
     h('p', { class: 'klein zacht' },
       `${catalogus.length} producten. ` +
-      (i.productenOverride ? 'U gebruikt een aangepaste catalogus.' : 'U gebruikt de standaardcatalogus. Pas namen, doseringen en verpakkingen aan naar uw echte assortiment.')),
+      (i.productenOverride ? 'U gebruikt een aangepaste catalogus.' : 'Dit is uw eigen assortiment, met de doseringen van het etiket. Vul aan waar een advies nog zonder product staat.')),
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: () => beheerProducten() }, '✎ Producten beheren'),
       h('button', {
@@ -247,8 +247,8 @@ async function toonAssortimentControle(catalogus) {
           : h('p', { class: 'mini', style: { color: 'var(--letop)' } },
             'Vul hier het product in dat u hiervoor verkoopt, met de dosering van het etiket.'))),
       h('p', { class: 'mini zacht' },
-        'De doseringen in de startcatalogus volgen de gangbare normen voor aquariumproducten. ' +
-        'Vervang ze door wat er op uw eigen etiket staat: dat is de enige dosering waar u achter kan staan.')),
+        'De doseringen komen van de etiketten van uw eigen assortiment. Komt er een product bij, ' +
+        'vul dan ook in of het op de inhoud van de bak of op het verse water doseert: dat scheelt een factor drie.')),
     acties: [
       { label: 'Sluiten', waarde: null },
       { label: 'Producten beheren', stijl: 'knop--primair', actie: async () => { beheerProducten(); return true; } },

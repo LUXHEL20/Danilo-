@@ -42,8 +42,17 @@ export function adviesKaart(actie, { open = false } = {}) {
         h('h4', { style: { marginTop: '12px' } }, 'Aanbevolen producten'),
         ...actie.producten.map((p) => h('div', { class: 'kaart kaart--vlak', style: { padding: '11px', marginBottom: '8px' } },
           h('strong', {}, p.naam),
-          p.dosis ? h('div', { class: 'badge badge--info', style: { marginLeft: '6px' } }, p.dosis.tekst) : null,
-          h('p', { class: 'klein zacht', style: { margin: '6px 0 0' } }, p.omschrijving)))) : null,
+          /* Een product met twee doseringen (opstart en onderhoud) toont ze allebei
+             met hun eigen moment erbij. Anders doseert de klant de opstartdosis
+             elke week, of omgekeerd. */
+          ...((p.doseringen?.length ? p.doseringen : (p.dosis ? [p.dosis] : [])).map((d) =>
+            h('div', { class: 'doseerregel' },
+              h('span', { class: 'badge badge--info' }, `${d.hoeveelheid} ${d.eenheid}`),
+              h('span', { class: 'mini zacht' }, d.label ? `${d.label.toLowerCase()}, voor ${d.basis === 'versWater' ? `${d.liters} liter vers water` : `${d.liters} liter`}` : d.tekst)))),
+          h('p', { class: 'klein zacht', style: { margin: '6px 0 0' } }, p.omschrijving),
+          p.waarschuwingen?.length
+            ? h('p', { class: 'mini', style: { margin: '6px 0 0', color: 'var(--letop)' } }, p.waarschuwingen.join(' '))
+            : null))) : null,
       actie.oorzaken?.length ? h('details', { class: 'uitklap', style: { marginTop: '10px' } },
         h('summary', {}, 'Mogelijke oorzaken'),
         h('div', { class: 'uitklap__inhoud' },

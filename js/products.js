@@ -27,362 +27,344 @@ export const CATEGORIEEN = [
   { id: 'zorg', label: 'Visverzorging' },
 ];
 
+/**
+ * Het echte assortiment zoals het in de winkel staat, met de doseringen van het
+ * etiket. Aangeleverd door LUX AQUA (tabel "Alle doseringen op een rij").
+ *
+ * Twee dingen die bij het doseren vaak misgaan en die hier daarom apart staan:
+ *
+ * 1. Sommige middelen doseert u op de INHOUD VAN DE BAK, andere op het VERSE
+ *    WATER dat u erin giet. Dat scheelt een factor drie tot vijf. Het veld
+ *    `basis` zegt welk van de twee het is, en de app rekent daarop.
+ * 2. Sommige middelen hebben een andere dosis bij de opstart dan bij het
+ *    onderhoud. Die tweede dosis staat in `extraDoseringen`, zodat de klant
+ *    beide getallen voor zijn eigen bak te zien krijgt en niet moet kiezen.
+ */
 export const PRODUCTEN = [
+  /* =========================================================== waterbereiding */
   {
-    id: 'water-safe',
-    naam: 'Waterbereider',
+    id: 'aqua-start',
+    naam: 'Aqua Start',
     categorie: 'waterbereiding',
-    verpakkingen: ['250 ml', '500 ml', '1 l'],
+    verpakkingen: [],
     lost_op: ['cl2', 'cu'],
     richting: 'neutraliseert',
-    omschrijving: 'Waterbereider die chloor, chlooramine en zware metalen uit leidingwater onschadelijk maakt en het slijmvlies van uw vissen beschermt. Gebruik dit bij elke waterverversing en bij elk bijvullen.',
-    dosering: { model: 'vast', hoeveelheid: 5, per: 50, eenheid: 'ml', omschrijving: '5 ml per 50 liter vers water' },
-    dubbele_dosis: 'Bij een chloorpiek of na werken aan de waterleiding mag u dubbel doseren.',
-    toepassing: 'Voeg het middel toe aan het verse water vóór u het in de bak giet, of giet het meteen bij het bijvullen in de stroom van de filteruitloop.',
+    omschrijving: 'Bindt chloor en zware metalen uit leidingwater. Gebruik dit bij het vullen van een nieuwe bak en op het verse water bij elke waterverversing.',
+    dosering: {
+      model: 'vast', hoeveelheid: 4, per: 10, eenheid: 'ml', basis: 'versWater',
+      label: 'Bij het vullen en bij elke waterverversing',
+      omschrijving: '4 ml per 10 liter vers water',
+    },
+    toepassing: 'Doe het middel bij het verse water vóór u het in de bak giet, of giet het mee in de stroom van de filteruitloop terwijl u bijvult.',
     opvolging: [
-      { na: 'direct', actie: 'Chloor opnieuw meten met de teststrip: die moet 0 mg/l aangeven.' },
-      { na: '24 uur', actie: 'Gedrag van de vissen controleren (ademhaling, kleur, zwemgedrag).' },
+      { na: 'direct', actie: 'Chloor meten met de teststrip: die moet 0 mg per liter aangeven.' },
+      { na: '24 uur', actie: 'Ademhaling, kleur en zwemgedrag van de vissen nakijken.' },
     ],
-    waarschuwingen: ['Niet overdoseren in een bak met weinig zuurstof: waterbereiders verbruiken zelf wat zuurstof.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'vijver_koi', 'vijver_sier'],
+    waarschuwingen: [],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
+  },
+  {
+    id: 'fresh-bacto',
+    naam: 'Fresh Bacto',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
+    lost_op: ['no2', 'nh4'],
+    richting: 'omlaag',
+    omschrijving: 'Levende filterbacteriën die ammonium en nitriet afbreken. Bij de opstart doseert u op de volledige inhoud van de bak, daarna telkens op het verse water dat u erin giet.',
+    dosering: {
+      model: 'vast', hoeveelheid: 10, per: 10, eenheid: 'ml', basis: 'bak',
+      label: 'Bij de opstart, op het volledige volume',
+      omschrijving: '10 ml per 10 liter bakinhoud',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 5, per: 10, eenheid: 'ml', basis: 'versWater',
+        label: 'Later, telkens op het verse water',
+        omschrijving: '5 ml per 10 liter vers water',
+      },
+    ],
+    toepassing: 'Rechtstreeks in de filterstroom doseren. Laat de filter minstens 24 uur draaien zonder UV-C en zonder actieve kool.',
+    opvolging: [
+      { na: '24 uur', actie: 'Nitriet en ammonium meten.' },
+      { na: '7 dagen', actie: 'Opnieuw meten. Zet pas vissen bij wanneer nitriet en ammonium twee metingen na elkaar op 0 staan.' },
+      { na: '4 weken', actie: 'Controlemeting van de volledige set waarden.' },
+    ],
+    waarschuwingen: [
+      'Zet UV-C en ozon uit tijdens de kuur.',
+      'Geen actieve kool in de filter tijdens de opstart.',
+    ],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
   },
   {
     id: 'bacto-start',
-    naam: 'Filterstarter',
+    naam: 'Bacto Start',
     categorie: 'waterbereiding',
-    verpakkingen: ['250 ml', '500 ml'],
+    verpakkingen: [],
     lost_op: ['no2', 'nh4'],
     richting: 'omlaag',
-    omschrijving: 'Levende filterbacteriën die ammonium en nitriet afbreken. Aangewezen bij het opstarten van een nieuwe bak, na een filterreiniging of na een antibioticakuur.',
-    dosering: { model: 'vast', hoeveelheid: 10, per: 50, eenheid: 'ml', omschrijving: '10 ml per 50 liter' },
-    toepassing: 'Rechtstreeks in de filterstroom doseren. Filter minstens 24 uur laten draaien zonder UV-C en zonder actieve kool.',
-    opvolging: [
-      { na: '24 uur', actie: 'NO₂ en NH₄ meten.' },
-      { na: '7 dagen', actie: 'Dosis herhalen en opnieuw meten; pas vissen bijzetten als NO₂ en NH₄ twee metingen na elkaar 0 zijn.' },
-      { na: '4 weken', actie: 'Controlemeting van de volledige set waarden.' },
+    omschrijving: 'Bacteriën voor de filter. Bij een nieuwe bak op het volledige volume, en telkens opnieuw na een schoonmaakbeurt van de filter: daarbij verliest u altijd een deel van uw bacteriën.',
+    dosering: {
+      model: 'vast', hoeveelheid: 10, per: 10, eenheid: 'ml', basis: 'bak',
+      label: 'Bij een nieuwe bak',
+      omschrijving: '10 ml per 10 liter bakinhoud',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 5, per: 10, eenheid: 'ml', basis: 'bak',
+        label: 'Na elke schoonmaakbeurt van de filter',
+        omschrijving: '5 ml per 10 liter bakinhoud',
+      },
     ],
-    waarschuwingen: ['UV-C en ozon uitschakelen tijdens de kuur.', 'Geen actieve kool in de filter tijdens de opstart.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'zee_rif', 'vijver_koi', 'vijver_sier'],
+    toepassing: 'In de filterstroom doseren, zodat de bacteriën meteen in het filtermateriaal terechtkomen.',
+    opvolging: [
+      { na: '24 uur', actie: 'Nitriet en ammonium meten.' },
+      { na: '7 dagen', actie: 'Opnieuw meten voor u iets bijzet.' },
+    ],
+    waarschuwingen: [
+      'Zet UV-C uit tijdens de kuur.',
+      'Spoel uw filtermateriaal met bakwater, nooit met leidingwater: chloor doodt precies deze bacteriën.',
+    ],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
   },
   {
-    id: 'kh-plus',
-    naam: 'KH-Buffer',
-    categorie: 'buffer',
-    verpakkingen: ['250 g', '1 kg'],
-    lost_op: ['kh', 'ph'],
+    id: 'bacto-care',
+    naam: 'Bacto Care',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
+    lost_op: [],
+    richting: 'neutraliseert',
+    omschrijving: 'Filter- en reinigingsbacteriën voor het gewone onderhoud. Houdt de filter en de bodem schoon in plaats van een probleem achteraf op te lossen.',
+    dosering: {
+      model: 'vast', hoeveelheid: 2, per: 10, eenheid: 'ml', basis: 'bak',
+      label: 'Eerste 5 dagen dagelijks, daarna wekelijks',
+      omschrijving: '2 ml per 10 liter bakinhoud',
+    },
+    routine: { elke: 7, tekst: 'Bacto Care doseren' },
+    toepassing: 'De eerste vijf dagen elke dag doseren, daarna één keer per week op een vast moment.',
+    opvolging: [
+      { na: '5 dagen', actie: 'Overschakelen naar één keer per week.' },
+    ],
+    waarschuwingen: [],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
+  },
+  {
+    id: 'probiplus-kp',
+    naam: 'ProbiPlus K.P.',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
+    lost_op: [],
+    richting: 'neutraliseert',
+    omschrijving: 'Probiotica tegen slib en biofilm. Werkt op het vuil dat u niet ziet: de laag op de bodem, in de slangen en in het filtermateriaal.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 100, eenheid: 'ml', basis: 'bak',
+      label: 'Bij de opstart en daarna wekelijks',
+      omschrijving: '1 ml per 100 liter bakinhoud',
+    },
+    routine: { elke: 7, tekst: 'ProbiPlus K.P. doseren' },
+    toepassing: 'Bij de opstart één keer doseren, daarna elke week op een vast moment.',
+    opvolging: [],
+    waarschuwingen: [],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
+  },
+  {
+    id: 'aqua-care',
+    naam: 'Aqua Care',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
+    lost_op: [],
+    richting: 'neutraliseert',
+    omschrijving: 'Onderhoudsmiddel dat de biologische afbraak op gang houdt. Dit werkt alleen bij vast gebruik: één keer doseren wanneer het al misgaat, helpt niet.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 5, eenheid: 'ml', basis: 'bak',
+      label: 'Wekelijks',
+      omschrijving: '1 ml per 5 liter bakinhoud',
+    },
+    routine: { elke: 7, tekst: 'Aqua Care doseren' },
+    toepassing: 'Elke week op een vast moment doseren, bijvoorbeeld meteen na de waterverversing.',
+    opvolging: [],
+    waarschuwingen: ['Werkt alleen bij vast wekelijks gebruik.'],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
+  },
+  {
+    id: 'aqua-salt',
+    naam: 'Aqua Salt',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
+    lost_op: [],
     richting: 'omhoog',
-    omschrijving: 'Carbonaatbuffer die de KH verhoogt en zo de pH stabiel houdt. Dit is doorgaans de eerste correctie: zonder buffer blijft elke pH-correctie tijdelijk.',
-    dosering: { model: 'delta', param: 'kh', hoeveelheid: 5, per: 100, effect: 1, eenheid: 'g', omschrijving: '5 g per 100 liter verhoogt de KH met ongeveer 1 °dH' },
-    toepassing: 'Oplossen in een emmer aquariumwater en verdeeld over de dag toevoegen. Verhoog nooit meer dan 2 °dH per dag.',
+    omschrijving: 'Mineraalrijk zeezout. Bij het vullen op het volledige volume, daarna enkel nog op het verse water dat u bij een verversing toevoegt.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 1, eenheid: 'g', basis: 'versWater',
+      label: 'Bij het vullen en op vers water',
+      omschrijving: '1 gram per liter vers water',
+    },
+    toepassing: 'Los het zout op in het verse water vóór u het in de bak giet. Nooit rechtstreeks in de bak strooien.',
     opvolging: [
-      { na: '6 uur', actie: 'KH en pH opnieuw meten.' },
-      { na: '48 uur', actie: 'Controleren of de KH stabiel blijft; zo niet, in kleine stappen bijsturen.' },
-      { na: '1 week', actie: 'KH meten om te weten hoe snel uw bak de buffer verbruikt.' },
+      { na: '24 uur', actie: 'GH meten met de teststrip.' },
     ],
-    waarschuwingen: ['Nooit in één keer meer dan 2 °dH verhogen: dat geeft een pH-sprong en stress bij de vissen.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'vijver_koi', 'vijver_sier'],
+    waarschuwingen: [
+      'Zout verdampt niet mee. Doseer dus enkel op vers water bij een verversing, niet bij het bijvullen van verdampt water.',
+    ],
+    profielen: ['zoet_gezelschap', 'zoet_malawi'],
   },
   {
-    id: 'gh-mineral',
-    naam: 'GH-Mineralen',
-    categorie: 'buffer',
-    verpakkingen: ['250 g', '1 kg'],
-    lost_op: ['gh'],
-    richting: 'omhoog',
-    omschrijving: 'Mineralenmengsel met calcium en magnesium om osmose- of regenwater terug op te bouwen, of om een te zachte bak aan te vullen. Belangrijk voor garnalen, slakken en vissen in de groei.',
-    dosering: { model: 'delta', param: 'gh', hoeveelheid: 6, per: 100, effect: 1, eenheid: 'g', omschrijving: '6 g per 100 liter verhoogt de GH met ongeveer 1 °dH' },
-    toepassing: 'Bij voorkeur vooraf oplossen in het verse verversingswater, zo krijgt u geen schommelingen in de bak.',
+    id: 'black-water',
+    naam: 'Black Water',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
+    lost_op: [],
+    richting: 'neutraliseert',
+    omschrijving: 'Tannines voor natuurlijk zwartwater. Geeft het water de lichte theekleur van een tropische beek en is wat de meeste zachtwatervissen en garnalen gewend zijn.',
+    dosering: {
+      model: 'vast', hoeveelheid: 2.5, per: 10, eenheid: 'ml', basis: 'bak',
+      label: 'Na elke waterverversing',
+      omschrijving: '2,5 ml per 10 liter bakinhoud',
+    },
+    toepassing: 'Doseren na elke waterverversing, rechtstreeks in de bak.',
     opvolging: [
-      { na: '6 uur', actie: 'GH meten.' },
-      { na: '1 week', actie: 'GH en KH samen meten; ze horen in verhouding te blijven (GH doorgaans hoger dan KH).' },
+      { na: '24 uur', actie: 'pH nakijken: tannines duwen de pH lichtjes omlaag.' },
     ],
-    waarschuwingen: ['Bij garnalen maximaal 1 °dH per dag verhogen.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'garnalen', 'zoet_malawi', 'vijver_koi'],
-  },
-  {
-    id: 'ph-minus',
-    naam: 'pH-Min',
-    categorie: 'buffer',
-    verpakkingen: ['250 ml', '500 ml'],
-    lost_op: ['ph'],
-    richting: 'omlaag',
-    omschrijving: 'Verlaagt de pH op een gecontroleerde manier. Alleen gebruiken als de KH al goed zit: bij een lage KH kan u met dit product een pH-crash veroorzaken.',
-    dosering: { model: 'delta', param: 'ph', hoeveelheid: 10, per: 100, effect: 0.2, eenheid: 'ml', omschrijving: '10 ml per 100 liter verlaagt de pH met ongeveer 0,2 (afhankelijk van de KH)' },
-    toepassing: 'Verdund toevoegen bij de filteruitloop, in stappen van maximaal 0,2 pH per dag.',
-    opvolging: [
-      { na: '1 uur', actie: 'pH meten.' },
-      { na: '24 uur', actie: 'pH én KH meten: zakt de KH mee weg, dan eerst bufferen met de KH-Buffer.' },
-    ],
-    waarschuwingen: ['Nooit gebruiken bij KH lager dan 3 °dH.', 'Maximaal 0,2 pH per dag corrigeren.'],
+    waarschuwingen: ['Niet gebruiken bij Malawi- en Tanganyikacichliden: die willen net hard water met een hoge pH.'],
     profielen: ['zoet_gezelschap', 'zoet_planten', 'garnalen'],
   },
   {
-    id: 'ph-plus',
-    naam: 'pH-Plus',
-    categorie: 'buffer',
-    verpakkingen: ['250 ml', '500 ml'],
-    lost_op: ['ph'],
-    richting: 'omhoog',
-    omschrijving: 'Verhoogt de pH geleidelijk, bijvoorbeeld voor cichlidenbakken of vijvers die verzuren.',
-    dosering: { model: 'delta', param: 'ph', hoeveelheid: 10, per: 100, effect: 0.2, eenheid: 'ml', omschrijving: '10 ml per 100 liter verhoogt de pH met ongeveer 0,2' },
-    toepassing: 'Verdeeld over de dag toevoegen bij de filteruitloop.',
-    opvolging: [
-      { na: '1 uur', actie: 'pH meten.' },
-      { na: '24 uur', actie: 'pH en KH meten; is de KH te laag, gebruik dan de KH-Buffer als basis.' },
-    ],
-    waarschuwingen: ['Maximaal 0,2 pH per dag corrigeren.'],
-    profielen: ['zoet_gezelschap', 'zoet_malawi', 'vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'nitrite-rescue',
-    naam: 'Nitrietbinder',
-    categorie: 'noodhulp',
-    verpakkingen: ['250 ml', '500 ml'],
-    lost_op: ['no2', 'nh4'],
-    richting: 'neutraliseert',
-    omschrijving: 'Noodmiddel dat nitriet en ammoniak tijdelijk bindt zodat uw vissen weer zuurstof kunnen opnemen. Dit is een noodrem, geen oplossing: de oorzaak moet aangepakt worden.',
-    dosering: { model: 'vast', hoeveelheid: 10, per: 50, eenheid: 'ml', omschrijving: '10 ml per 50 liter, bij acute nood dubbel' },
-    toepassing: 'Direct doseren, samen met een waterverversing van 30 tot 50% en extra beluchting. Voeder 48 uur niet.',
-    opvolging: [
-      { na: '2 uur', actie: 'NO₂ opnieuw meten.' },
-      { na: '12 uur', actie: 'NO₂ en NH₄ meten, waterverversing herhalen als de waarde nog niet daalt.' },
-      { na: 'dagelijks tot 0', actie: 'Dagelijks meten tot NO₂ twee dagen na elkaar op 0 staat.' },
-    ],
-    waarschuwingen: ['Bij zichtbaar naar adem happende vissen: onmiddellijk beluchten en hulp vragen via de knop in de app.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'nitrate-control',
-    naam: 'Nitraatverlager',
-    categorie: 'filter',
-    verpakkingen: ['500 ml', '1 l'],
-    lost_op: ['no3'],
-    richting: 'omlaag',
-    omschrijving: 'Filtermedium met bacteriën die nitraat afbreken. Werkt traag maar structureel, in combinatie met waterverversingen.',
-    dosering: { model: 'vast', hoeveelheid: 100, per: 100, eenheid: 'ml', omschrijving: '100 ml medium per 100 liter bakinhoud' },
-    toepassing: 'In de laatste filterkamer plaatsen, met trage doorstroming.',
-    opvolging: [
-      { na: '1 week', actie: 'NO₃ meten.' },
-      { na: '1 maand', actie: 'NO₃ meten en het medium controleren; vervangen volgens het etiket.' },
-    ],
-    waarschuwingen: ['Combineer met regelmatige waterverversing; media alleen zijn niet genoeg.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'zee_rif', 'vijver_koi'],
-  },
-  {
-    id: 'phosphate-control',
-    naam: 'Fosfaatbinder',
-    categorie: 'algen',
-    verpakkingen: ['250 ml', '500 ml'],
-    lost_op: ['po4'],
-    richting: 'omlaag',
-    omschrijving: 'Bindt fosfaat en neemt zo een belangrijke voedingsbron voor algen weg.',
-    dosering: { model: 'vast', hoeveelheid: 50, per: 100, eenheid: 'ml', omschrijving: '50 ml per 100 liter' },
-    toepassing: 'In een filterzakje in de filterstroom hangen.',
-    opvolging: [
-      { na: '48 uur', actie: 'PO₄ meten.' },
-      { na: '2 weken', actie: 'PO₄ meten en het zakje vervangen als de waarde weer stijgt.' },
-    ],
-    waarschuwingen: ['In een beplante bak niet tot 0 werken: planten hebben een klein beetje fosfaat nodig.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zee_rif', 'vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'plant-complete',
-    naam: 'Plantenvoeding compleet',
-    categorie: 'voeding',
-    verpakkingen: ['250 ml', '500 ml'],
-    lost_op: ['no3', 'po4', 'fe'],
-    richting: 'omhoog',
-    omschrijving: 'Complete plantenvoeding met stikstof, fosfor, kalium en sporenelementen. Sterke planten zijn een krachtige, natuurlijke algenbestrijding.',
-    dosering: { model: 'vast', hoeveelheid: 5, per: 50, eenheid: 'ml', omschrijving: '5 ml per 50 liter, wekelijks (of 1 ml per 50 liter per dag)' },
-    toepassing: 'Doseren na de waterverversing, bij het aangaan van de verlichting.',
-    opvolging: [
-      { na: '1 week', actie: 'NO₃, PO₄ en Fe meten en de dosis bijsturen.' },
-      { na: '1 maand', actie: 'Groei en bladkleur beoordelen; foto toevoegen in de app.' },
-    ],
-    waarschuwingen: ['Niet doseren bij een algenbloei zonder eerst NO₃ en PO₄ te meten.'],
-    profielen: ['zoet_planten', 'zoet_gezelschap'],
-  },
-  {
-    id: 'iron-plus',
-    naam: 'IJzervoeding',
-    categorie: 'voeding',
-    verpakkingen: ['250 ml'],
-    lost_op: ['fe'],
-    richting: 'omhoog',
-    omschrijving: 'Vloeibaar ijzer voor bleke of doorschijnende jonge bladeren. Geeft rode planten opnieuw kleur.',
-    dosering: { model: 'vast', hoeveelheid: 5, per: 100, eenheid: 'ml', omschrijving: '5 ml per 100 liter, 2 tot 3 keer per week' },
-    toepassing: 'Bij voorkeur \'s avonds doseren; ijzer wordt door fel licht snel afgebroken.',
-    opvolging: [
-      { na: '24 uur', actie: 'Fe meten (streefwaarde 0,05 tot 0,10 mg/l).' },
-      { na: '2 weken', actie: 'Nieuwe bladeren beoordelen op kleur.' },
-    ],
-    waarschuwingen: ['Te veel ijzer voedt draadalgen.'],
-    profielen: ['zoet_planten', 'zoet_gezelschap'],
-  },
-  {
-    id: 'algae-stop',
-    naam: 'Algenmiddel',
-    categorie: 'algen',
-    verpakkingen: ['250 ml', '500 ml'],
+    id: 'catappa-xl',
+    naam: 'Catappa XL',
+    categorie: 'waterbereiding',
+    verpakkingen: [],
     lost_op: [],
     richting: 'neutraliseert',
-    omschrijving: 'Bestrijdt draad- en zweefalgen. Alleen inzetten nadat de oorzaak (licht, nitraat, fosfaat, voederen) is aangepakt, anders komen de algen terug.',
-    dosering: { model: 'vast', hoeveelheid: 10, per: 100, eenheid: 'ml', omschrijving: '10 ml per 100 liter' },
-    toepassing: 'Doseren met extra beluchting: afstervende algen verbruiken veel zuurstof. Afgestorven algen zo snel mogelijk wegnemen.',
+    omschrijving: 'Natuurlijke waterconditioner in bladvorm. Geeft langzaam tannines af en is tegelijk een graasplek voor garnalen en jonge vis.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 50, eenheid: 'blad', basis: 'bak',
+      label: 'Eén blad per 50 liter',
+      omschrijving: '1 blad per 50 liter bakinhoud',
+    },
+    routine: { elke: 21, tekst: 'Catappa-blad vervangen' },
+    toepassing: 'Leg het blad in de bak. Het zinkt na een dag of twee vanzelf. Laat het liggen tot het afgebroken is.',
     opvolging: [
-      { na: '24 uur', actie: 'Zuurstof en het gedrag van de vissen controleren, afgestorven algen verwijderen.' },
-      { na: '3 dagen', actie: 'NO₃ en PO₄ meten en 30% water verversen.' },
-      { na: '1 week', actie: 'Foto toevoegen in de app om het resultaat te vergelijken.' },
-    ],
-    waarschuwingen: ['Niet gebruiken bij garnalen en kreeftjes zonder advies.', 'Extra beluchten tijdens de kuur.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'water-clear',
-    naam: 'Waterhelder (vlokmiddel)',
-    categorie: 'algen',
-    verpakkingen: ['250 ml', '500 ml'],
-    lost_op: [],
-    richting: 'neutraliseert',
-    omschrijving: 'Vlokmiddel dat zwevende deeltjes samenklit zodat uw filter ze kan opvangen. Voor troebel of melkachtig water.',
-    dosering: { model: 'vast', hoeveelheid: 10, per: 100, eenheid: 'ml', omschrijving: '10 ml per 100 liter' },
-    toepassing: 'Doseren met de filter op volle kracht; filtervlies of watten na 24 uur uitspoelen of vervangen.',
-    opvolging: [
-      { na: '24 uur', actie: 'Filtermateriaal controleren en uitspoelen in aquariumwater.' },
-      { na: '3 dagen', actie: 'Nog troebel? Dan is de oorzaak biologisch: NO₂/NH₄ meten en de hulpknop gebruiken.' },
-    ],
-    waarschuwingen: ['Niet gebruiken bij een verstopte filter.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'filter-boost',
-    naam: 'Biologisch filtermedium',
-    categorie: 'filter',
-    verpakkingen: ['1 l', '5 l'],
-    lost_op: ['no2', 'nh4', 'no3'],
-    richting: 'omlaag',
-    omschrijving: 'Poreus biologisch filtermateriaal met een zeer groot oppervlak voor filterbacteriën. Vergroot de biologische capaciteit van uw filter.',
-    dosering: { model: 'vast', hoeveelheid: 500, per: 100, eenheid: 'ml', omschrijving: '500 ml media per 100 liter bakinhoud' },
-    toepassing: 'In de biologische kamer plaatsen. Enkel uitspoelen in aquariumwater, nooit onder de kraan.',
-    opvolging: [
-      { na: '2 weken', actie: 'NO₂ en NH₄ meten.' },
-      { na: '6 maanden', actie: 'Media beoordelen, maximaal de helft tegelijk vervangen.' },
-    ],
-    waarschuwingen: ['Nooit alle media tegelijk vervangen: u verliest dan al uw filterbacteriën.'],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'zee_rif', 'vijver_koi'],
-  },
-  {
-    id: 'sea-salt',
-    naam: 'Zeezout',
-    categorie: 'zeewater',
-    verpakkingen: ['4 kg', '20 kg'],
-    lost_op: ['dichtheid', 'ca', 'mg', 'kh'],
-    richting: 'omhoog',
-    omschrijving: 'Zeezout met een uitgebalanceerde verhouding calcium, magnesium en carbonaat voor rifaquaria.',
-    dosering: { model: 'vast', hoeveelheid: 35, per: 1, eenheid: 'g', omschrijving: 'ongeveer 35 g per liter osmosewater voor een dichtheid van 1,025' },
-    toepassing: 'Oplossen in osmosewater met een pomp, minstens 12 uur laten mengen en op temperatuur brengen vóór gebruik.',
-    opvolging: [
-      { na: '12 uur', actie: 'Dichtheid en temperatuur van het mengwater controleren.' },
-      { na: 'na de wissel', actie: 'KH, Ca en Mg meten.' },
-    ],
-    waarschuwingen: ['Nooit zout rechtstreeks in de bak oplossen.'],
-    profielen: ['zee_rif'],
-  },
-  {
-    id: 'reef-balance',
-    naam: 'Balansset Ca / KH / Mg',
-    categorie: 'zeewater',
-    verpakkingen: ['2 x 1 l', '2 x 5 l'],
-    lost_op: ['ca', 'kh', 'mg'],
-    richting: 'omhoog',
-    omschrijving: 'Tweecomponentensysteem dat calcium en carbonaat in balans bijvult, met magnesium als derde component.',
-    dosering: { model: 'delta', param: 'kh', hoeveelheid: 10, per: 100, effect: 0.4, eenheid: 'ml', omschrijving: '10 ml per 100 liter verhoogt de KH met ongeveer 0,4 °dH' },
-    toepassing: 'Component A en B apart doseren, met minstens 30 minuten tussentijd, bij voorkeur met een doseerpomp.',
-    opvolging: [
-      { na: '4 uur', actie: 'KH meten.' },
-      { na: 'dagelijks (eerste week)', actie: 'KH meten om het dagelijkse verbruik van uw bak te leren kennen.' },
-      { na: 'wekelijks', actie: 'Ca, KH en Mg samen meten.' },
-    ],
-    waarschuwingen: ['A en B nooit tegelijk of onverdund doseren: dan slaat het neer als kalk.'],
-    profielen: ['zee_rif'],
-  },
-  {
-    id: 'pond-oxy',
-    naam: 'Zuurstofpoeder vijver',
-    categorie: 'vijver',
-    verpakkingen: ['1 kg', '5 kg'],
-    lost_op: ['o2'],
-    richting: 'omhoog',
-    omschrijving: 'Zuurstofafgevend poeder voor acute zuurstofnood in de vijver: bij warm weer, na een algenkuur of bij vissen die aan het oppervlak happen.',
-    dosering: { model: 'vast', hoeveelheid: 20, per: 1000, eenheid: 'g', omschrijving: '20 g per 1000 liter' },
-    toepassing: 'Verspreid over het wateroppervlak strooien, bij voorkeur bij de uitloop van de pomp.',
-    opvolging: [
-      { na: '1 uur', actie: 'Gedrag van de vissen controleren, O₂ meten indien mogelijk.' },
-      { na: '24 uur', actie: 'Oorzaak aanpakken: beluchting, slib, temperatuur, bezetting.' },
-    ],
-    waarschuwingen: ['Bij vissen die happen aan het oppervlak: dit is een noodgeval, gebruik meteen de hulpknop.'],
-    profielen: ['vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'pond-sludge',
-    naam: 'Slibafbraak vijver',
-    categorie: 'vijver',
-    verpakkingen: ['1 l', '2,5 l'],
-    lost_op: ['no3', 'po4'],
-    richting: 'omlaag',
-    omschrijving: 'Bacteriën en enzymen die bladslib en organisch afval op de bodem afbreken. Minder slib betekent minder nitraat, minder fosfaat en minder algen.',
-    dosering: { model: 'vast', hoeveelheid: 100, per: 1000, eenheid: 'ml', omschrijving: '100 ml per 1000 liter, maandelijks van maart tot oktober' },
-    toepassing: 'Doseren bij een watertemperatuur boven 12 °C, verspreid over de vijver.',
-    opvolging: [
-      { na: '2 weken', actie: 'Sliblaag en NO₃/PO₄ controleren.' },
-      { na: 'maandelijks', actie: 'Herhalen tijdens het seizoen.' },
-    ],
-    waarschuwingen: ['Werkt niet bij koud water (< 12 °C).'],
-    profielen: ['vijver_koi', 'vijver_sier'],
-  },
-  {
-    id: 'vital-care',
-    naam: 'Vitaminen & slijmvliesbescherming',
-    categorie: 'zorg',
-    verpakkingen: ['100 ml', '250 ml'],
-    lost_op: [],
-    richting: 'neutraliseert',
-    omschrijving: 'Vitaminen en slijmvliesbescherming voor vissen die onder stress staan: na transport, na een behandeling of na een grote waterwissel.',
-    dosering: { model: 'vast', hoeveelheid: 5, per: 50, eenheid: 'ml', omschrijving: '5 ml per 50 liter' },
-    toepassing: 'Doseren bij het bijzetten van nieuwe vissen en na elke behandeling.',
-    opvolging: [
-      { na: '3 dagen', actie: 'Vissen observeren: vinnen, huid, ademhaling, eetlust.' },
-      { na: '1 week', actie: 'Foto toevoegen in de app als er iets zichtbaar is.' },
+      { na: '3 weken', actie: 'Blad vervangen: na ongeveer drie weken is het uitgewerkt.' },
     ],
     waarschuwingen: [],
-    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen', 'zee_rif', 'vijver_koi'],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'garnalen'],
+  },
+
+  /* ================================================================== hardheid */
+  {
+    id: 'gh-plus',
+    naam: 'GH+',
+    categorie: 'buffer',
+    verpakkingen: [],
+    lost_op: ['gh'],
+    richting: 'omhoog',
+    omschrijving: 'Verhoogt de totale hardheid. Nodig bij osmosewater, bij zeer zacht leidingwater en bij levendbarenden en garnalen die mineralen nodig hebben voor hun schild.',
+    dosering: {
+      model: 'delta', param: 'gh', hoeveelheid: 1, per: 5, eenheid: 'ml', effect: 2, basis: 'bak',
+      label: 'Per verschuiving van de GH',
+      omschrijving: '1 ml per 5 liter verhoogt de GH met 2 graden',
+    },
+    toepassing: 'Verdeel de dosis over de dag en giet ze in de filterstroom. Meet daarna opnieuw voor u verder gaat.',
+    opvolging: [
+      { na: '6 uur', actie: 'GH opnieuw meten.' },
+      { na: '24 uur', actie: 'GH en KH meten en pas dan verder bijsturen.' },
+    ],
+    waarschuwingen: [
+      'Verhoog de GH nooit met meer dan 2 graden per dag. Een snelle sprong is voor vissen en garnalen zwaarder dan een waarde die een paar dagen te laag staat.',
+    ],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
+  },
+
+  /* ======================================================== algen en helder water */
+  {
+    id: 'fresh-psb',
+    naam: 'Fresh PSB',
+    categorie: 'algen',
+    verpakkingen: [],
+    lost_op: [],
+    richting: 'omlaag',
+    omschrijving: 'Breekt organisch vuil af. Voor troebel water en voor bakken met een hoge belasting: veel vissen, veel voer, of een bak die net een piek achter de rug heeft.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 1, eenheid: 'ml', basis: 'bak',
+      label: 'Bij troebel water of hoge belasting',
+      omschrijving: '1 ml per liter bakinhoud',
+    },
+    toepassing: 'Doseren in de filterstroom. Zet de UV-C uit zolang de kuur loopt.',
+    opvolging: [
+      { na: '48 uur', actie: 'Kijken of het water opgeklaard is en of de vissen rustig ademen.' },
+      { na: '7 dagen', actie: 'Volledige set waarden opnieuw meten.' },
+    ],
+    waarschuwingen: [
+      'Zorg voor extra beluchting: de afbraak van organisch vuil verbruikt zuurstof.',
+    ],
+    profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi', 'garnalen'],
   },
 ];
+
+/** Standaarddeel van de bakinhoud dat bij een gewone waterverversing vervangen wordt. */
+export const VERS_DEEL = 0.3;
+
+/**
+ * Hoeveel liter er voor deze dosering gerekend moet worden.
+ *
+ * Dit is de stille valkuil van het hele doseren. "4 ml per 10 liter" betekent
+ * bij de ene fles de inhoud van de bak en bij de andere het verse water dat u
+ * erin giet. Bij een bak van 200 liter en een verversing van 30 procent scheelt
+ * dat 80 ml tegenover 24 ml. Daarom staat het in de catalogus, en raadt de app
+ * het niet.
+ */
+export function doseerLiters(dosering, bakLiters, versLiters) {
+  if (dosering?.basis !== 'versWater') return bakLiters;
+  return versLiters ?? Math.round(bakLiters * VERS_DEEL);
+}
 
 /**
  * Berekent de concrete dosis voor een bak.
  * @param {object} product
- * @param {number} liters netto waterinhoud
+ * @param {number} liters netto waterinhoud van de bak
  * @param {number} [delta] gewenste verschuiving (enkel bij model 'delta')
- * @returns {{hoeveelheid:number, eenheid:string, tekst:string}|null}
+ * @param {object} [opties]
+ * @param {number} [opties.versLiters] liter vers water, voor doseringen op basis versWater
+ * @param {object} [opties.dosering] een andere dosering van hetzelfde product (uit extraDoseringen)
+ * @returns {{hoeveelheid:number, eenheid:string, tekst:string, basis:string, liters:number}|null}
  */
-export function berekenDosis(product, liters, delta) {
-  const d = product?.dosering;
+export function berekenDosis(product, liters, delta, opties = {}) {
+  const d = opties.dosering || product?.dosering;
   if (!d || !liters) return null;
+  const volume = doseerLiters(d, liters, opties.versLiters);
+  if (!volume) return null;
+  const waarop = d.basis === 'versWater' ? `${volume} liter vers water` : `${volume} liter`;
+
   if (d.model === 'vast') {
-    const hoeveelheid = (d.hoeveelheid * liters) / d.per;
-    return { hoeveelheid: rond(hoeveelheid), eenheid: d.eenheid, tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${liters} liter` };
+    const hoeveelheid = (d.hoeveelheid * volume) / d.per;
+    return {
+      hoeveelheid: rond(hoeveelheid), eenheid: d.eenheid, basis: d.basis || 'bak', liters: volume,
+      tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${waarop}`,
+    };
   }
   if (d.model === 'delta') {
     const stappen = (delta ?? d.effect) / d.effect;
-    const hoeveelheid = (d.hoeveelheid * liters * stappen) / d.per;
+    const hoeveelheid = (d.hoeveelheid * volume * stappen) / d.per;
     return {
-      hoeveelheid: rond(hoeveelheid),
-      eenheid: d.eenheid,
-      tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${liters} liter (verschuiving van ${round1(delta ?? d.effect)})`,
+      hoeveelheid: rond(hoeveelheid), eenheid: d.eenheid, basis: d.basis || 'bak', liters: volume,
+      tekst: `${rond(hoeveelheid)} ${d.eenheid} voor ${waarop} (verschuiving van ${round1(delta ?? d.effect)})`,
     };
   }
   return null;
+}
+
+/**
+ * Alle doseringen van een product met hun label, zodat de klant de opstartdosis
+ * en de onderhoudsdosis naast elkaar ziet in plaats van te moeten kiezen.
+ */
+export function alleDoseringen(product, liters, delta, opties = {}) {
+  const uit = [];
+  const eerste = berekenDosis(product, liters, delta, opties);
+  if (eerste) uit.push({ label: product.dosering?.label || 'Dosering', omschrijving: product.dosering?.omschrijving || '', ...eerste });
+  for (const d of product?.extraDoseringen || []) {
+    const r = berekenDosis(product, liters, delta, { ...opties, dosering: d });
+    if (r) uit.push({ label: d.label || 'Ook', omschrijving: d.omschrijving || '', ...r });
+  }
+  return uit;
 }
 
 const rond = (n) => (n >= 100 ? Math.round(n) : n >= 10 ? Math.round(n * 10) / 10 : Math.round(n * 100) / 100);

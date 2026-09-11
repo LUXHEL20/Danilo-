@@ -3,7 +3,7 @@
  * productvoorstellen met berekende dosering en opvolgtaken.
  */
 import { PARAMETERS, profile, statusOf, fmt, param } from './params.js';
-import { PRODUCTEN, berekenDosis, productenVoor } from './products.js';
+import { PRODUCTEN, berekenDosis, alleDoseringen, productenVoor } from './products.js';
 
 const URGENTIE = { kritiek: 3, 'let-op': 2, info: 1 };
 
@@ -64,8 +64,11 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
       const delta = prod.dosering?.model === 'delta' && prod.dosering.param === paramId
         ? Math.abs((teHoog ? t.ideal[1] : t.ideal[0]) - v)
         : undefined;
-      const dosis = berekenDosis(prod, liters, delta);
-      actie.producten.push({ id: prod.id, naam: prod.naam, dosis, omschrijving: prod.omschrijving, opvolging: prod.opvolging });
+      const doseringen = alleDoseringen(prod, liters, delta);
+      actie.producten.push({
+        id: prod.id, naam: prod.naam, dosis: doseringen[0] || null, doseringen,
+        omschrijving: prod.omschrijving, waarschuwingen: prod.waarschuwingen, opvolging: prod.opvolging,
+      });
       if (prod.opvolging) {
         for (const o of prod.opvolging) actie.opvolging.push({ ...o, product: prod.naam });
       }
@@ -193,11 +196,14 @@ function productenMetDosis(ids, liters, catalogus, delta) {
   return ids
     .map((id) => catalogus.find((p) => p.id === id))
     .filter(Boolean)
-    .map((prod) => ({
-      id: prod.id, naam: prod.naam, omschrijving: prod.omschrijving,
-      dosis: berekenDosis(prod, liters, prod.dosering?.model === 'delta' ? delta : undefined),
-      opvolging: prod.opvolging,
-    }));
+    .map((prod) => {
+      const doseringen = alleDoseringen(prod, liters, prod.dosering?.model === 'delta' ? delta : undefined);
+      return {
+        id: prod.id, naam: prod.naam, omschrijving: prod.omschrijving,
+        dosis: doseringen[0] || null, doseringen,
+        waarschuwingen: prod.waarschuwingen, opvolging: prod.opvolging,
+      };
+    });
 }
 
 /** Parameterspecifieke stappen. Elke functie geeft een gedeeltelijk actie-object terug. */

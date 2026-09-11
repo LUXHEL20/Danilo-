@@ -86,11 +86,25 @@ await stap('producten met dosering', async () => {
   await page.goto(`${BASIS}#/producten`);
   await page.waitForTimeout(500);
   const tekst = await page.locator('#scherm').innerText();
-  if (!/KH-Buffer/.test(tekst)) throw new Error('catalogus leeg');
-  await page.locator('.klikbaar', { hasText: 'KH-Buffer' }).first().click();
+  if (!/Aqua Start/.test(tekst)) throw new Error('catalogus leeg');
+
+  /* Aqua Start doseert op VERS water, niet op de bakinhoud. Ziet de klant hier
+     de liters van zijn hele bak, dan overdoseert hij drie keer. */
+  await page.locator('.klikbaar', { hasText: 'Aqua Start' }).first().click();
   await page.waitForSelector('.dialoog');
   const dosis = await page.locator('.dialoog').innerText();
-  if (!/g\b/.test(dosis)) throw new Error('geen dosering berekend');
+  if (!/ml/.test(dosis)) throw new Error('geen dosering berekend');
+  if (!/liter vers water/.test(dosis)) throw new Error('de dosering rekent niet op vers water');
+  await page.locator('.dialoog .icoonknop').click();
+
+  /* Fresh Bacto heeft twee doseringen: opstart en onderhoud. Allebei tonen, of
+     de klant doseert de opstartdosis elke week. */
+  await page.locator('.klikbaar', { hasText: 'Fresh Bacto' }).first().click();
+  await page.waitForSelector('.dialoog');
+  const twee = await page.locator('.dialoog').innerText();
+  if (!/opstart/i.test(twee) || !/verse water/i.test(twee)) {
+    throw new Error('de tweede dosering ontbreekt: ' + twee.slice(0, 200));
+  }
   await page.locator('.dialoog .icoonknop').click();
 });
 await stap('hulpvraag aanmaken', async () => {
