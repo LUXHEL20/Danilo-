@@ -27,6 +27,7 @@ export async function toonProducten() {
           categorie = c.id;
           [...chips.children].forEach((k) => k.classList.remove('is-actief'));
           e.currentTarget.classList.add('is-actief');
+          plantenfrigo.hidden = !(categorie === 'alles' || categorie === 'voeding');
           tekenLijst();
         },
       }, c.label)));
@@ -37,6 +38,19 @@ export async function toonProducten() {
       onchange: (e) => { enkelVoorMijnBak = e.target.checked; tekenLijst(); },
     }),
     h('span', {}, `Alleen tonen wat past bij ${profile(bak.profiel).label.toLowerCase()}`)) : null;
+
+  /* Levende planten staan niet in de doseercatalogus: het aanbod wisselt
+     wekelijks en er valt niets uit te rekenen. Ze verdienen wel een plek naast
+     de plantenvoeding, want wie voeding koopt, overweegt vaak ook planten. */
+  const plantenfrigo = h('section', { class: 'kaart kaart--vlak' },
+    h('div', { class: 'rij' },
+      h('span', { style: { fontSize: '26px' } }, '🌿'),
+      h('div', { class: 'groei' },
+        h('strong', {}, 'Levende planten uit de plantenfrigo'),
+        h('p', { class: 'klein zacht', style: { margin: '4px 0 0' } },
+          'Een wisselend aanbod verse waterplanten, koel bewaard: stengelplanten, bodembedekkers, moswortels en meer. ' +
+          'Het aanbod verandert met elke levering, dus vraag in de winkel wat er deze week vers binnen is.'))));
+  plantenfrigo.hidden = !(categorie === 'alles' || categorie === 'voeding');
 
   function tekenLijst() {
     const lijst = catalogus.filter((p) => {
@@ -69,7 +83,7 @@ export async function toonProducten() {
       liters
         ? `Zij worden meteen berekend voor ${liters} liter, de inhoud van ${bak.naam || 'uw bak'}.`
         : 'Vul de inhoud van uw bak in om de doseringen automatisch te laten berekenen.'),
-    veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder,
+    veld('Zoeken', zoekveld), chips, filterKnop, plantenfrigo, lijstHouder,
     // enkel voor LUX AQUA zelf: de klant hoeft dit niet te lezen
     isLux ? h('p', { class: 'mini zacht', style: { marginTop: '10px' } },
       'De doseringen komen van de etiketten van uw eigen assortiment. Kijk in Beheer, Producten, ' +
