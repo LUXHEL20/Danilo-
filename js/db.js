@@ -3,9 +3,9 @@
  * en zonder buildstap te installeren zijn.
  */
 const DB_NAAM = 'luxaqua';
-const DB_VERSIE = 2;
+const DB_VERSIE = 3;
 
-export const STORES = ['klanten', 'bakken', 'vissen', 'metingen', 'fotos', 'hulpvragen', 'taken', 'instellingen', 'logboek', 'spaarkaart'];
+export const STORES = ['klanten', 'bakken', 'vissen', 'metingen', 'fotos', 'hulpvragen', 'taken', 'instellingen', 'logboek', 'spaarkaart', 'kweekkoppels', 'legsels', 'aanbod'];
 
 let dbPromise = null;
 
@@ -19,6 +19,8 @@ export function open() {
         if (db.objectStoreNames.contains(naam)) continue;
         const store = db.createObjectStore(naam, { keyPath: 'id' });
         if (naam === 'bakken' || naam === 'hulpvragen') store.createIndex('klantId', 'klantId');
+        if (naam === 'legsels' || naam === 'aanbod') store.createIndex('koppelId', 'koppelId');
+        if (naam === 'kweekkoppels') store.createIndex('bakId', 'bakId');
         if (['vissen', 'metingen', 'fotos', 'taken'].includes(naam)) store.createIndex('bakId', 'bakId');
         if (naam === 'metingen') store.createIndex('datum', 'datum');
       }

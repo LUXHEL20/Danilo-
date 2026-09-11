@@ -2,6 +2,7 @@
 import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, download, datum, kopieer } from '../ui.js';
 import * as sp from '../spaarkaart.js';
 import { meldAf, wijzigWachtwoord, beheerderEmail } from '../auth.js';
+import { koppels as kweekKoppels } from '../kweek.js';
 import { ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import * as db from '../db.js';
@@ -139,6 +140,29 @@ export async function toonBeheer() {
         },
       }, 'Bewaren')));
   }
+
+  /* --- kweekdossier --- */
+  const aantalKoppels = (await kweekKoppels()).length;
+  wrap.append(kaart('🐣 Kweekdossier',
+    h('p', { class: 'klein zacht' }, i.kweker
+      ? `Het kweekdossier staat aan en vervangt Producten in de balk onderaan. ${aantalKoppels ? `U hebt ${aantalKoppels} ${aantalKoppels === 1 ? 'koppel' : 'koppels'} staan.` : 'U hebt nog geen koppels aangelegd.'}`
+      : 'Kweekt u zelf vissen of garnalen? Zet dit aan en houd uw koppels, legsels en jongen bij. ' +
+        'De app rekent uit wanneer de eieren horen uit te komen en wanneer de jongen vrij zwemmen, ' +
+        'en u kan uw eigen kweek met foto\'s te koop aanbieden aan LUX AQUA.'),
+    i.kweker
+      ? h('p', { class: 'mini zacht' }, 'Zet u het weer uit, dan blijven uw koppels en legsels gewoon bewaard.')
+      : null,
+    h('div', { class: 'knoprij' },
+      h('button', {
+        class: `knop ${i.kweker ? 'knop--stil' : 'knop--primair'}`,
+        onclick: async () => {
+          await store.zetInstelling({ kweker: !i.kweker });
+          melding(i.kweker ? 'Kweekdossier uitgezet.' : 'Kweekdossier aangezet.', 'ok');
+          if (!i.kweker) ganaar('kweek');
+          teken();
+        },
+      }, i.kweker ? 'Kweekdossier uitzetten' : 'Kweekdossier aanzetten'),
+      i.kweker ? h('button', { class: 'knop knop--stil', onclick: () => ganaar('kweek') }, 'Naar het kweekdossier') : null)));
 
   /* --- spaarkaart --- */
   wrap.append(await spaarkaartBlok(isLux));

@@ -7,6 +7,7 @@ import { scoreRing, lijnGrafiek } from '../charts.js';
 import { waardeTegels, adviesKaart, takenLijst } from './onderdelen.js';
 import { profile } from '../params.js';
 import { spaarBlokVoorStart } from './spaar.js';
+import { watVraagtAandacht, koppelNaam } from '../kweek.js';
 
 export async function toonStart() {
   const wrap = h('div', {});
@@ -52,6 +53,21 @@ export async function toonStart() {
       h('h3', {}, '⏰ Tijd voor een nieuwe meting'),
       h('p', { class: 'klein zacht' }, `Uw laatste meting is van ${Math.round(dagenGeleden)} dagen geleden. Met een wekelijkse meting bent u problemen vóór.`),
       h('button', { class: 'knop knop--primair knop--vol', onclick: () => ganaar('meten') }, 'Nu meten')));
+  }
+
+  /* --- kweek: legsels die vandaag iets vragen --- */
+  if (ctx.instellingen.kweker) {
+    const aandacht = await watVraagtAandacht();
+    if (aandacht.length) {
+      wrap.append(h('section', { class: 'kaart kaart--aandacht klikbaar-kaart', onclick: () => ganaar('kweek') },
+        h('div', { class: 'rij' },
+          h('span', { style: { fontSize: '30px' } }, '🐣'),
+          h('div', { class: 'groei' },
+            h('strong', {}, aandacht.length === 1 ? 'Eén legsel vraagt aandacht' : `${aandacht.length} legsels vragen aandacht`),
+            h('br'),
+            h('span', { class: 'klein zacht' }, `${koppelNaam(aandacht[0].koppel)}: ${aandacht[0].tekst}`)),
+          h('span', { class: 'pijl' }, '›'))));
+    }
   }
 
   /* --- spaarkaart, enkel als er iets te melden valt --- */

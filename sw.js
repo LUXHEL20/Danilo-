@@ -1,6 +1,6 @@
 /* Service worker: de app blijft werken zonder internet. */
 /* Verhoog CACHE bij elke wijziging aan de lijst hieronder; oude caches worden dan opgeruimd. */
-const CACHE = 'luxaqua-v6';
+const CACHE = 'luxaqua-v7';
 const BESTANDEN = [
   './', './index.html', './manifest.webmanifest',
   './css/style.css',
@@ -9,11 +9,11 @@ const BESTANDEN = [
   './assets/brand/LUX-AQUA-01-navy.svg', './assets/brand/LUX-AQUA-03-wit.svg', './assets/brand/LUX-AQUA-06-app-icoon-navy.png',
   './js/app.js', './js/ui.js', './js/db.js', './js/store.js', './js/params.js',
   './js/products.js', './js/advies.js', './js/strip.js', './js/color.js',
-  './js/charts.js', './js/delen.js', './js/native.js', './js/spaarkaart.js', './js/auth.js',
+  './js/charts.js', './js/delen.js', './js/native.js', './js/spaarkaart.js', './js/auth.js', './js/kweek.js', './js/kweeksoorten.js',
   './js/views/onboarding.js', './js/views/start.js', './js/views/meten.js',
   './js/views/bak.js', './js/views/historiek.js', './js/views/producten.js',
   './js/views/hulp.js', './js/views/kennis.js', './js/views/luxaqua.js',
-  './js/views/spaar.js', './js/views/aanmelden.js',
+  './js/views/spaar.js', './js/views/aanmelden.js', './js/views/kweek.js',
   './js/views/beheer.js', './js/views/onderdelen.js',
 ];
 

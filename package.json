@@ -19,7 +19,9 @@
     "test:native": "node test/native-test.mjs",
     "test:offline": "npm run build && node test/offline-test.mjs",
     "test:spaar": "node test/spaar-test.mjs",
-    "test:auth": "node test/auth-test.mjs"
+    "test:auth": "node test/auth-test.mjs",
+    "test:kweek": "node test/kweek-test.mjs",
+    "test:alles": "node test/smoke.mjs && node test/auth-test.mjs && node test/spaar-test.mjs && node test/kweek-test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",

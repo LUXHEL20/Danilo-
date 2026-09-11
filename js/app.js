@@ -17,6 +17,7 @@ import { toonBeheer } from './views/beheer.js';
 import { toonKennis } from './views/kennis.js';
 import { toonSpaar } from './views/spaar.js';
 import { toonAanmelden } from './views/aanmelden.js';
+import { toonKweek } from './views/kweek.js';
 import { isAangemeld } from './auth.js';
 
 const scherm = document.getElementById('scherm');
@@ -54,6 +55,7 @@ const ROUTES = {
   'kennis': toonKennis,
   'hulp': toonHulp,
   'spaar': toonSpaar,
+  'kweek': toonKweek,
   'beheer': toonBeheer,
   'klanten': toonKlanten,
   'klant': toonKlant,
@@ -159,7 +161,12 @@ function tekenNav(actief) {
       { pad: 'start', icoon: '🏠', label: 'Start' },
       { pad: 'meten', icoon: '🧪', label: 'Meten' },
       { pad: 'bak', icoon: '🐠', label: 'Mijn bak' },
-      { pad: 'producten', icoon: '🧴', label: 'Producten' },
+      /* Een kweker opent het kweekdossier dagelijks en de productenlijst zelden.
+         Daarom neemt Kweek die plaats in zodra hij aangezet is; de producten
+         blijven bereikbaar vanaf het startscherm en vanuit elk advies. */
+      ctx.instellingen.kweker
+        ? { pad: 'kweek', icoon: '🐣', label: 'Kweek' }
+        : { pad: 'producten', icoon: '🧴', label: 'Producten' },
       { pad: 'spaar', icoon: '🎟️', label: 'Sparen' },
       { pad: 'hulp', icoon: '🆘', label: 'Hulp' },
     ];

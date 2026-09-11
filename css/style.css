@@ -430,6 +430,22 @@ main {
   font-size: 1.5rem; font-weight: 700; letter-spacing: .16em; text-align: center; margin: 4px 0;
 }
 
+/* --------------------------------------------------------------- kweekdossier */
+.kweekcijfers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (min-width: 520px) { .kweekcijfers { grid-template-columns: repeat(4, 1fr); } }
+.kweekcijfer {
+  background: var(--vlak-2); border: 1px solid var(--rand); border-radius: var(--radius-klein);
+  padding: 11px 8px; text-align: center; min-width: 0;
+}
+.kweekcijfer strong {
+  display: block; font-size: 1.4rem; line-height: 1.1; color: var(--aqua);
+  font-variant-numeric: tabular-nums;
+}
+.kweekcijfer span {
+  display: block; font-size: .68rem; color: var(--tekst-zacht); margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
 @media print {
   .kopbalk, .navigatie, .knoprij, #meldingen { display: none !important; }
   main { padding: 0; max-width: none; }

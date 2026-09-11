@@ -22,6 +22,7 @@ const STANDAARD_INSTELLINGEN = {
     naam: 'LUX AQUA',
     telefoon: '011 91 92 91',
     email: 'info@luxhelchteren.be',
+    whatsapp: '',            // gsm-nummer voor WhatsApp, met landcode: 32470123456
     website: 'https://luxhelchteren.be',
     werkgebied: 'Helchteren en omgeving',
     adres: 'Kazernelaan 11, 3530 Helchteren',
@@ -29,6 +30,7 @@ const STANDAARD_INSTELLINGEN = {
   },
   koppeling: { url: '', sleutel: '' }, // optionele server-koppeling voor LUX AQUA
   spaarkaart: null,          // instellingen van de spaarkaart, zie js/spaarkaart.js
+  kweker: false,             // toont het kweekdossier in de navigatie
   onboardingKlaar: false,
 };
 
