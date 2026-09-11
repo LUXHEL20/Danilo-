@@ -112,11 +112,14 @@ await stap('kennisbank', async () => {
   await page.waitForSelector('.dialoog');
   await page.locator('.dialoog .icoonknop').click();
 });
-await stap('beheer + wissel naar LUX AQUA-modus', async () => {
+await stap('beheer + aanmelden als LUX AQUA', async () => {
   await page.goto(`${BASIS}#/beheer`);
   await page.waitForTimeout(500);
-  await page.getByRole('button', { name: /LUX AQUA-modus/ }).click();
-  await page.waitForTimeout(800);
+  await page.getByRole('button', { name: 'Aanmelden' }).click();
+  await page.waitForTimeout(600);
+  await page.locator('input[type="password"]').fill('Beau*1412');
+  await page.getByRole('button', { name: 'Aanmelden' }).click();
+  await page.waitForTimeout(1600);
   const tekst = await page.locator('#scherm').innerText();
   if (!/Klanten/.test(tekst)) throw new Error('klantenscherm niet geladen');
   if (!/Test Klant/.test(tekst)) throw new Error('klant niet zichtbaar in beheer');

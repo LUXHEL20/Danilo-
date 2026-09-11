@@ -1,6 +1,7 @@
 /** Beheer en instellingen: rol, bedrijfsgegevens, producten, ijking en back-ups. */
 import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, download, datum, kopieer } from '../ui.js';
 import * as sp from '../spaarkaart.js';
+import { meldAf, wijzigWachtwoord, beheerderEmail } from '../auth.js';
 import { ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import * as db from '../db.js';
@@ -16,20 +17,24 @@ export async function toonBeheer() {
   const wrap = h('div', {});
   const isLux = i.rol === 'luxaqua';
 
-  /* --- rol --- */
-  wrap.append(kaart('👤 Modus',
-    h('p', { class: 'klein zacht' }, isLux
-      ? 'U zit in de beheerdersmodus van LUX AQUA: u ziet alle klanten en hun hulpvragen.'
-      : 'U zit in de klantmodus: u volgt uw eigen bak op.'),
-    h('div', { class: 'knoprij' },
-      h('button', {
-        class: `knop ${isLux ? 'knop--stil' : 'knop--primair'}`,
-        onclick: async () => { await store.zetInstelling({ rol: 'klant' }); ganaar('start'); teken(); },
-      }, '🏠 Klantmodus'),
-      h('button', {
-        class: `knop ${isLux ? 'knop--primair' : 'knop--stil'}`,
-        onclick: async () => { await store.zetInstelling({ rol: 'luxaqua' }); ganaar('klanten'); teken(); },
-      }, '🛠️ LUX AQUA-modus'))));
+  /* --- aanmelding --- */
+  wrap.append(isLux
+    ? kaart('🛠️ LUX AQUA',
+      h('p', { class: 'klein zacht' },
+        `U bent aangemeld als ${await beheerderEmail()}. U ziet uw klanten, hun hulpvragen en de codes van de spaarkaart.`),
+      h('p', { class: 'mini zacht' },
+        'De aanmelding vervalt vanzelf na twaalf uur. Meldt u af wanneer u de app aan iemand anders geeft.'),
+      h('div', { class: 'knoprij' },
+        h('button', {
+          class: 'knop knop--stil',
+          onclick: async () => { await meldAf(); ganaar('start'); teken(); },
+        }, '🏠 Afmelden'),
+        h('button', { class: 'knop knop--stil', onclick: () => wachtwoordDialoog() }, '🔑 Wachtwoord wijzigen')))
+    : kaart('🛠️ Bent u van LUX AQUA?',
+      h('p', { class: 'klein zacht' },
+        'Meld u aan om uw klanten, hun hulpvragen en de codes van de spaarkaart te zien. ' +
+        'Als klant hebt u dit niet nodig.'),
+      h('button', { class: 'knop knop--stil', onclick: () => ganaar('aanmelden') }, 'Aanmelden')));
 
   /* --- logo --- */
   const logoVoorbeeld = h('div', { class: 'rij', style: { marginBottom: '10px' } },
@@ -176,6 +181,38 @@ export async function toonBeheer() {
  * uploaden naar de host: is het antwoord nee, dan is de service worker niet geregistreerd
  * (geen https, of een bestand uit de precache-lijst ontbreekt op de server).
  */
+/** Een eigen wachtwoord instellen op dit toestel. */
+async function wachtwoordDialoog() {
+  const huidig = invoer({ type: 'password', autocomplete: 'current-password' });
+  const nieuw = invoer({ type: 'password', autocomplete: 'new-password' });
+  const herhaal = invoer({ type: 'password', autocomplete: 'new-password' });
+  const fout = h('p', { class: 'klein', style: { color: 'var(--kritiek)', minHeight: '1.2em' } }, '');
+
+  await dialoog({
+    titel: 'Wachtwoord wijzigen',
+    inhoud: h('div', {},
+      veld('Huidig wachtwoord', huidig),
+      veld('Nieuw wachtwoord', nieuw, 'Minstens tien tekens. Een zin van vier woorden is sterker en makkelijker te onthouden dan een kort woord met tekens erin.'),
+      veld('Nieuw wachtwoord herhalen', herhaal),
+      h('p', { class: 'mini zacht' },
+        'Dit geldt enkel op dit toestel. Op andere toestellen blijft het ingebouwde wachtwoord werken tot de app daar vernieuwd wordt.'),
+      fout),
+    acties: [
+      { label: 'Annuleren', waarde: null },
+      {
+        label: 'Wijzigen', stijl: 'knop--primair',
+        actie: async () => {
+          if (nieuw.value !== herhaal.value) { fout.textContent = 'De twee nieuwe wachtwoorden zijn niet gelijk.'; return false; }
+          const r = await wijzigWachtwoord(huidig.value, nieuw.value);
+          if (!r.ok) { fout.textContent = r.reden; return false; }
+          melding(r.reden, 'ok');
+          return true;
+        },
+      },
+    ],
+  });
+}
+
 /* ------------------------------------------------------------------ spaarkaart */
 
 /**

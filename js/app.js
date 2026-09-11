@@ -16,6 +16,8 @@ import { toonKlanten, toonKlant, toonHulpvragen } from './views/luxaqua.js';
 import { toonBeheer } from './views/beheer.js';
 import { toonKennis } from './views/kennis.js';
 import { toonSpaar } from './views/spaar.js';
+import { toonAanmelden } from './views/aanmelden.js';
+import { isAangemeld } from './auth.js';
 
 const scherm = document.getElementById('scherm');
 const kopbalk = document.getElementById('kopbalk');
@@ -27,6 +29,9 @@ export const ctx = {
   bak: null,      // actieve bak (klantmodus)
   klant: null,    // actieve klant (klantmodus = de gebruiker zelf)
   async herlaad() {
+    /* Zet een verlopen aanmelding terug op klantmodus vóór de instellingen
+       gelezen worden, anders toont het scherm nog even de beheerderskant. */
+    await isAangemeld();
     this.instellingen = await store.instellingen();
     this.klant = this.instellingen.actieveKlant ? await store.klant(this.instellingen.actieveKlant) : null;
     this.bak = this.instellingen.actieveBak ? await store.bak(this.instellingen.actieveBak) : null;
@@ -53,7 +58,11 @@ const ROUTES = {
   'klanten': toonKlanten,
   'klant': toonKlant,
   'hulpvragen': toonHulpvragen,
+  'aanmelden': toonAanmelden,
 };
+
+/* Schermen die enkel voor de aangemelde beheerder zijn. */
+const BEHEERDERSROUTES = ['klanten', 'klant', 'hulpvragen'];
 
 export function ganaar(pad) {
   location.hash = pad.startsWith('#') ? pad : `#/${pad.replace(/^\//, '')}`;
@@ -76,8 +85,20 @@ export async function teken() {
       scherm.append(await toonOnboarding());
       return;
     }
-    kopbalk.hidden = false; navigatie.hidden = false;
     const { naam, arg } = huidigeRoute();
+
+    if (naam === 'aanmelden') {
+      leeg(scherm);
+      kopbalk.hidden = true; navigatie.hidden = true;
+      scherm.append(await toonAanmelden());
+      return;
+    }
+    if (BEHEERDERSROUTES.includes(naam) && ctx.instellingen.rol !== 'luxaqua') {
+      ganaar('aanmelden');
+      return;
+    }
+
+    kopbalk.hidden = false; navigatie.hidden = false;
     const view = ROUTES[naam] || toonStart;
     tekenKop();
     tekenNav(naam);

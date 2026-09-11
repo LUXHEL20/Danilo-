@@ -191,12 +191,15 @@ await stap('vervallen tokens verdwijnen na de vervaltermijn', async () => {
 });
 
 await stap('winkelcode staat in de beheerstab van LUX AQUA', async () => {
-  await page.evaluate(async () => {
-    const s = await import('./js/store.js');
-    await s.zetInstelling({ rol: 'luxaqua' });
-    location.hash = '#/beheer';
+  /* Aanmelden zoals de winkel het doet: rol rechtstreeks zetten werkt niet meer,
+     want een aanmelding zonder geldigheidsduur valt vanzelf terug op klantmodus. */
+  const aan = await page.evaluate(async () => {
+    const a = await import('./js/auth.js');
+    return a.meldAan('luxhelchteren@gmail.com', 'Beau*1412');
   });
-  await page.waitForTimeout(700);
+  if (!aan.ok) throw new Error('aanmelden mislukte: ' + aan.reden);
+  await page.evaluate(() => { location.hash = '#/beheer'; });
+  await page.waitForTimeout(900);
   const code = await page.locator('.winkelcode').innerText();
   if (code.trim() !== codes.winkel) throw new Error(`beheerstab toont ${code.trim()}, verwacht ${codes.winkel}`);
 });
