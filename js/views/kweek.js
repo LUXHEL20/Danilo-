@@ -6,7 +6,7 @@ import {
 import { ctx, ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import * as kw from '../kweek.js';
-import { KWEEKSOORTEN, KWEEKGROEPEN, kweeksoort, nestOordeel } from '../kweeksoorten.js';
+import { KWEEKSOORTEN, kweeksoort, nestOordeel } from '../kweeksoorten.js';
 import { kiesFoto, deel } from '../native.js';
 import { comprimeer, thumbnail } from '../strip.js';
 import { mailLink, whatsappLink } from '../delen.js';
@@ -200,8 +200,7 @@ async function koppelFormulier(bestaand = null) {
   const naam = invoer({ value: bestaand?.naam || '', placeholder: 'Bijvoorbeeld: koppel rood, bak 3' });
   const soort = keuze([
     { value: '', label: 'Kies een soort' },
-    ...KWEEKGROEPEN.flatMap((g) => KWEEKSOORTEN.filter((s) => s.wijze === g.id)
-      .map((s) => ({ value: s.id, label: `${g.label}: ${s.naam}`, selected: bestaand?.soortId === s.id }))),
+    ...KWEEKSOORTEN.map((s) => ({ value: s.id, label: s.naam, groep: s.groep, selected: bestaand?.soortId === s.id })),
     { value: 'anders', label: 'Andere soort', selected: bestaand && !bestaand.soortId },
   ]);
   const eigenSoort = invoer({ value: bestaand?.eigenSoort || '', placeholder: 'Naam van de soort' });
@@ -374,7 +373,7 @@ async function aanbodFormulier(k = null, bestaand = null) {
   const soort = keuze([
     { value: '', label: 'Kies een soort' },
     ...KWEEKSOORTEN.map((s) => ({
-      value: s.id, label: s.naam,
+      value: s.id, label: s.naam, groep: s.groep,
       selected: (bestaand?.soortId || koppelRec?.soortId) === s.id,
     })),
     { value: 'anders', label: 'Andere soort', selected: !!bestaand && !bestaand.soortId },

@@ -105,9 +105,21 @@ export function veld(label, invoer, hint) {
 export function invoer(props = {}) { return h('input', { class: 'invoer', ...props }); }
 export function tekstvak(props = {}) { return h('textarea', { class: 'invoer invoer--tekst', rows: 3, ...props }); }
 
+/** Bouwt een <select>. Opties met een gelijke `groep` komen samen in een <optgroup>. */
 export function keuze(opties, props = {}) {
-  return h('select', { class: 'invoer', ...props },
-    ...opties.map((o) => h('option', { value: o.value, selected: o.selected }, o.label)));
+  const kinderen = [];
+  const groepen = new Map();
+  for (const o of opties) {
+    const optie = h('option', { value: o.value, selected: o.selected }, o.label);
+    if (o.groep) {
+      let g = groepen.get(o.groep);
+      if (!g) { g = h('optgroup', { label: o.groep }); groepen.set(o.groep, g); kinderen.push(g); }
+      g.append(optie);
+    } else {
+      kinderen.push(optie);
+    }
+  }
+  return h('select', { class: 'invoer', ...props }, ...kinderen);
 }
 
 export const knop = (label, props = {}) => h('button', { class: `knop ${props.stijl || 'knop--primair'}`, type: 'button', ...props }, label);

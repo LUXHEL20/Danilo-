@@ -75,7 +75,7 @@ await stap('koppel toevoegen', async () => {
   await page.getByRole('button', { name: 'Koppel toevoegen' }).click();
   await page.waitForTimeout(350);
   await page.locator('.dialoog input').first().fill('Koppel rood');
-  await page.locator('.dialoog select').first().selectOption('ancistrus');
+  await page.locator('.dialoog select').first().selectOption('ancistrus-cf-cirrhosus');
   await page.getByRole('button', { name: 'Bewaren' }).click();
   await page.waitForTimeout(900);
   const tekst = await page.locator('#scherm').innerText();
@@ -86,13 +86,13 @@ await stap('koppelscherm toont wat de soort vraagt', async () => {
   await page.getByRole('button', { name: /Koppel rood/ }).click();
   await page.waitForTimeout(800);
   const tekst = await page.locator('#scherm').innerText();
-  if (!/Kweektemperatuur 24 tot 27 graden/.test(tekst)) throw new Error('kweekgegevens van de soort ontbreken');
+  if (!/Kweektemperatuur 24 tot 28 graden/.test(tekst)) throw new Error('kweekgegevens van de soort ontbreken');
   if (!/kweekbuis/.test(tekst)) throw new Error('de tip bij de soort ontbreekt');
 });
 
-await stap('legsel noteren met een datum van vijf dagen geleden', async () => {
+await stap('legsel noteren met een datum van acht dagen geleden', async () => {
   const geleden = await page.evaluate(() => {
-    const d = new Date(Date.now() - 5 * 86400e3);
+    const d = new Date(Date.now() - 8 * 86400e3);
     return d.toISOString().slice(0, 10);
   });
   await page.getByRole('button', { name: '+ Legsel noteren' }).click();
@@ -109,7 +109,7 @@ await stap('legsel noteren met een datum van vijf dagen geleden', async () => {
 await stap('een afwijkend aantal wordt gemeld', async () => {
   const r = await page.evaluate(async () => {
     const m = await import('./js/kweeksoorten.js');
-    return { laag: m.nestOordeel('ancistrus', 5), gewoon: m.nestOordeel('ancistrus', 60), hoog: m.nestOordeel('ancistrus', 400) };
+    return { laag: m.nestOordeel('ancistrus-cf-cirrhosus', 5), gewoon: m.nestOordeel('ancistrus-cf-cirrhosus', 60), hoog: m.nestOordeel('ancistrus-cf-cirrhosus', 400) };
   });
   if (r.laag.soort !== 'laag' || r.gewoon.soort !== 'gewoon' || r.hoog.soort !== 'hoog') {
     throw new Error('oordeel klopt niet: ' + JSON.stringify(r));
@@ -141,14 +141,14 @@ await stap('aanbod klaarzetten', async () => {
   await naar('kweek');
   await page.getByRole('button', { name: '+ Aanbod klaarzetten' }).click();
   await page.waitForTimeout(400);
-  await page.locator('.dialoog select').first().selectOption('ancistrus');
+  await page.locator('.dialoog select').first().selectOption('ancistrus-cf-cirrhosus');
   await page.locator('.dialoog input[type="number"]').first().fill('25');
   const tekstvelden = page.locator('.dialoog input[type="text"], .dialoog input:not([type])');
   await tekstvelden.nth(0).fill('3 tot 4 cm');
   await page.getByRole('button', { name: 'Bewaren' }).click();
   await page.waitForTimeout(900);
   const tekst = await page.locator('#scherm').innerText();
-  if (!/25 × Blauwe antennemeerval/.test(tekst)) throw new Error('aanbod niet zichtbaar: ' + tekst.slice(0, 120));
+  if (!/25 × Gewone antennemeerval/.test(tekst)) throw new Error('aanbod niet zichtbaar: ' + tekst.slice(0, 120));
 });
 
 await stap('het bericht naar LUX AQUA bevat soort, aantal en de gegevens van de kweker', async () => {
@@ -160,7 +160,7 @@ await stap('het bericht naar LUX AQUA bevat soort, aantal en de gegevens van de 
     const klant = inst.actieveKlant ? await s.klant(inst.actieveKlant) : null;
     return kw.aanbodAlsTekst(a, klant);
   });
-  for (const nodig of ['Blauwe antennemeerval', 'Ancistrus', '25', 'Test Kweker']) {
+  for (const nodig of ['Gewone antennemeerval', 'Ancistrus', '25', 'Test Kweker']) {
     if (!tekst.includes(nodig)) throw new Error(`"${nodig}" ontbreekt in het bericht:\n${tekst}`);
   }
 });
@@ -169,7 +169,7 @@ await stap('een dracht bij levendbarenden rekent de werpdatum uit', async () => 
   const r = await page.evaluate(async () => {
     const m = await import('./js/kweeksoorten.js');
     const start = Date.parse('2026-01-01T12:00:00Z');
-    const d = m.verwachteData('guppy', start);
+    const d = m.verwachteData('poecilia-reticulata', start);
     return Math.round((d.werpen - start) / 86400e3);
   });
   if (r !== 28) throw new Error('draagtijd guppy moet 28 dagen zijn, kreeg ' + r);
@@ -182,7 +182,7 @@ await stap('koppel verwijderen ruimt de legsels en het eigen aanbod op', async (
   const r = await page.evaluate(async () => {
     const kw = await import('./js/kweek.js');
     const [k] = await kw.koppels();
-    await kw.bewaarAanbod({ koppelId: k.id, soortId: 'ancistrus', aantal: 10, fotos: [] });
+    await kw.bewaarAanbod({ koppelId: k.id, soortId: 'ancistrus-cf-cirrhosus', aantal: 10, fotos: [] });
     const voor = (await kw.alleAanbod()).length;
     await kw.verwijderKoppel(k.id);
     return {
