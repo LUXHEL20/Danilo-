@@ -24,12 +24,12 @@ export async function toonBeheer() {
       h('p', { class: 'klein zacht' },
         `U bent aangemeld als ${await beheerderEmail()}. U ziet uw klanten, hun hulpvragen en de codes van de spaarkaart.`),
       h('p', { class: 'mini zacht' },
-        'De aanmelding vervalt vanzelf na twaalf uur. Meldt u af wanneer u de app aan iemand anders geeft.'),
+        'De aanmelding vervalt vanzelf na twaalf uur, of eerder als u hier op de knop hieronder drukt.'),
       h('div', { class: 'knoprij' },
         h('button', {
           class: 'knop knop--stil',
           onclick: async () => { await meldAf(); ganaar('start'); teken(); },
-        }, '🏠 Afmelden'),
+        }, '🏠 Terug naar klantweergave'),
         h('button', { class: 'knop knop--stil', onclick: () => wachtwoordDialoog() }, '🔑 Wachtwoord wijzigen')))
     : kaart('🛠️ Bent u van LUX AQUA?',
       h('p', { class: 'klein zacht' },

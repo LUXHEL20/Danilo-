@@ -58,11 +58,28 @@ function lees(pad) {
   catch { stop(`module niet gevonden: ${kort(pad)}`); }
 
   const invoer = [];      // { pad, naamruimte }
+  const aliassen = [];    // { lokaal, oorspronkelijk } — named imports met "as"
   for (const m of bron.matchAll(IMPORT_RE)) {
     const clausule = m[1].trim();
     const doelPad = resolve(dirname(pad), m[2]);
     const naamruimte = clausule.match(/^\*\s+as\s+([A-Za-z0-9_$]+)$/);
     invoer.push({ pad: doelPad, naamruimte: naamruimte ? naamruimte[1] : null });
+
+    // "import { a, b as c } from '...'": na het schrappen van de importregel bestaat
+    // in de samengevoegde tekst enkel nog "a" en "b" (de eigen declaraties van de
+    // bronmodule). De lokale naam "c" wordt anders in geen enkele regel meer
+    // aangemaakt en blijft ongedefinieerd — precies de fout die dit oploste.
+    if (!naamruimte) {
+      const lijst = clausule.match(/^\{([\s\S]*)\}$/);
+      if (lijst) {
+        for (const stuk of lijst[1].split(',')) {
+          const naam = stuk.trim();
+          if (!naam) continue;
+          const alias = naam.match(/^([A-Za-z0-9_$]+)\s+as\s+([A-Za-z0-9_$]+)$/);
+          if (alias) aliassen.push({ oorspronkelijk: alias[1], lokaal: alias[2] });
+        }
+      }
+    }
   }
   for (const m of bron.matchAll(IMPORT_KAAL_RE)) {
     invoer.push({ pad: resolve(dirname(pad), m[1]), naamruimte: null });
@@ -81,7 +98,7 @@ function lees(pad) {
 
   const declaraties = [...bron.matchAll(DECL_RE)].map((m) => m[1]);
 
-  const mod = { pad, bron, invoer, uitvoer, declaraties };
+  const mod = { pad, bron, invoer, uitvoer, declaraties, aliassen };
   modules.set(pad, mod);
   for (const i of invoer) lees(i.pad);
   return mod;
@@ -136,6 +153,13 @@ for (const pad of rangschikking) {
     if (vorige) botsingen.push(`"${naam}" staat zowel in ${vorige} als in ${kort(pad)}`);
     else eigenaar.set(naam, kort(pad));
   }
+  // Een alias ("a as b") krijgt straks een eigen "const b = a;"-regel (zie schoon()),
+  // dus die naam telt hier evengoed mee als een nieuwe moduleniveau-declaratie.
+  for (const { lokaal } of modules.get(pad).aliassen) {
+    const vorige = eigenaar.get(lokaal);
+    if (vorige) botsingen.push(`"${lokaal}" (alias in ${kort(pad)}) botst met een naam in ${vorige}`);
+    else eigenaar.set(lokaal, `de alias in ${kort(pad)}`);
+  }
 }
 for (const [pad, naam] of naamruimten) {
   const vorige = eigenaar.get(naam);
@@ -169,13 +193,22 @@ const merkUrls = new Map([...merkPaden].map((p) => [p, dataUrl(p)]));
 
 /* ------------------------------------------------------------ modules samenvoegen */
 
-const schoon = (mod) => mod.bron
-  .replace(IMPORT_RE, '')
-  .replace(IMPORT_KAAL_RE, '')
-  .replace(EXPORT_LIJST_RE, '')
-  .replace(/^export\s+(?=(?:async\s+)?(?:function|const|let|var|class)\b)/gm, '')
-  .replace(/\n{3,}/g, '\n\n')
-  .trim();
+function schoon(mod) {
+  const kern = mod.bron
+    .replace(IMPORT_RE, '')
+    .replace(IMPORT_KAAL_RE, '')
+    .replace(EXPORT_LIJST_RE, '')
+    .replace(/^export\s+(?=(?:async\s+)?(?:function|const|let|var|class)\b)/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  // Aliassen bovenaan de module herstellen: de importregel zelf is net weggehaald,
+  // dus zonder deze regels bestaat de lokale naam nergens meer in de samengevoegde
+  // tekst (de bronmodule kent immers enkel haar eigen, oorspronkelijke naam).
+  if (!mod.aliassen.length) return kern;
+  const aliasRegels = mod.aliassen.map(({ lokaal, oorspronkelijk }) => `const ${lokaal} = ${oorspronkelijk};`);
+  return `${aliasRegels.join('\n')}\n${kern}`;
+}
 
 const stukken = [];
 for (const pad of rangschikking) {

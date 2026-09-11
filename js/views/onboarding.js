@@ -64,7 +64,21 @@ export async function toonOnboarding() {
   }
 
   function rolKeuze() {
-    const kies = async (rol) => { gegevens.rol = rol; if (rol === 'luxaqua') await afronden(); else volgende(); };
+    const kies = async (rol) => {
+      if (rol === 'luxaqua') {
+        // Rechtstreeks beheerdersmodus toekennen kan niet meer sinds er een echte
+        // aanmelding bestaat: dat zou het wachtwoord omzeilen. Dit toestel wordt
+        // gewoon een (voorlopig lege) klantinstallatie, en de medewerker meldt zich
+        // aan via het echte inlogscherm, met e-mailadres en wachtwoord.
+        await store.zetInstelling({ onboardingKlaar: true });
+        melding('Meld u aan met uw e-mailadres en wachtwoord.', 'info');
+        location.hash = '#/aanmelden';
+        teken();
+        return;
+      }
+      gegevens.rol = rol;
+      volgende();
+    };
     return h('div', { class: 'kaart' },
       h('h2', {}, 'Wie bent u?'),
       h('button', { class: 'klikbaar', onclick: () => kies('klant') },
@@ -167,13 +181,9 @@ export async function toonOnboarding() {
   }
 
   async function afronden() {
-    if (gegevens.rol === 'luxaqua') {
-      await store.zetInstelling({ rol: 'luxaqua', onboardingKlaar: true });
-      melding('Beheerdersmodus actief.', 'ok');
-      location.hash = '#/klanten';
-      teken();
-      return;
-    }
+    // De keuze "Ik werk bij LUX AQUA" verlaat deze functie al veel eerder (zie
+    // rolKeuze hierboven) en stuurt door naar de echte aanmelding. Hier komt dus
+    // enkel de klant-kant nog aan bod.
     const klant = await store.bewaarKlant(gegevens.klant);
     const bak = await store.bewaarBak({ ...gegevens.bak, klantId: klant.id });
     await store.zetInstelling({ rol: 'klant', actieveKlant: klant.id, actieveBak: bak.id, onboardingKlaar: true });
