@@ -131,10 +131,10 @@ Scan en zet LUX AQUA op uw beginscherm.
 Uw waterwaarden, uw teststrip, uw advies. Gratis.
 ```
 
-**Over de QR-code.** In `winkelmateriaal/` staan al `qr-luxaqua.png` (1200 x 1200, voor drukwerk) en
-`qr-luxaqua.svg` (vector, voor groot drukwerk). Die zijn gemaakt voor een voorlopig adres
-(`https://luxhelchteren.be/aqua/installeren.html`, **[TE BEVESTIGEN]**). Zodra de definitieve link
-vastligt, wordt de QR-code opnieuw gemaakt met dat adres:
+**Over de QR-code.** In `winkelmateriaal/` staan `qr-luxaqua.png` (1200 x 1200, voor drukwerk) en
+`qr-luxaqua.svg` (vector, voor groot drukwerk). Ze wijzen naar
+`https://luxhelchteren.be/aqua/installeren.html` en zijn nagekeken door ze terug te lezen. Wijzigt dat
+adres toch nog, dan maakt u ze opnieuw:
 
 ```
 node scripts/maak-qr.mjs https://luxhelchteren.be/aqua/installeren.html
