@@ -26,6 +26,12 @@
   --kritiek-vlak: #fdeceb;
   --info: #1668a8;
 
+  /* Welke logovariant zichtbaar is op een lichte kaart (onboarding, aanmelden).
+     Op een lichte ondergrond valt navy op; op een donkere ondergrond valt navy
+     juist weg tegen het eigen donkerblauw en moet de witte versie tonen. */
+  --logo-navy-tonen: inline-block;
+  --logo-wit-tonen: none;
+
   --radius: 16px;
   --radius-klein: 10px;
   --schaduw: 0 2px 10px rgba(6, 42, 53, .07), 0 12px 28px rgba(6, 42, 53, .06);
@@ -47,6 +53,8 @@
     --letop-vlak: #3a2c0e;
     --kritiek-vlak: #3c1a17;
     --schaduw: 0 2px 10px rgba(0, 0, 0, .3), 0 12px 28px rgba(0, 0, 0, .25);
+    --logo-navy-tonen: none;
+    --logo-wit-tonen: inline-block;
   }
 }
 
@@ -62,6 +70,8 @@
     --letop-vlak: #3a2c0e;
     --kritiek-vlak: #3c1a17;
     --schaduw: 0 2px 10px rgba(0, 0, 0, .3), 0 12px 28px rgba(0, 0, 0, .25);
+    --logo-navy-tonen: none;
+    --logo-wit-tonen: inline-block;
 }
 
 * { box-sizing: border-box; }
@@ -105,6 +115,12 @@ a { color: var(--aqua); }
 .kopbalk__logo--eigen { background: #fff; padding: 3px; border-radius: 10px; height: 40px; }
 .logo-groot { height: 84px; width: auto; max-width: 180px; object-fit: contain; }
 .logo-groot--eigen { background: #fff; padding: 6px; border-radius: 18px; box-shadow: var(--schaduw); }
+/* Logo dat zelf van kleur wisselt met het thema: navy op een lichte kaart, wit op
+   een donkere. De ene versie staat altijd op display:none, dus er wordt maar één
+   bestand echt geladen en getoond; welke dat is, bepaalt enkel de --logo-*-tonen
+   token hierboven. */
+.logo-tema__navy { display: var(--logo-navy-tonen); }
+.logo-tema__wit { display: var(--logo-wit-tonen); }
 .kopbalk__acties { margin-left: auto; display: flex; gap: 8px; }
 
 main {

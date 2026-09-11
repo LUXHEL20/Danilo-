@@ -33,7 +33,7 @@ export async function toonAanmelden() {
 
   const wrap = h('div', { class: 'aanmelden' },
     h('div', { class: 'midden', style: { marginBottom: '18px' } },
-      logoElement(null, 'logo-groot', 'navy')),
+      logoElement(null, 'logo-groot', 'auto')),
     kaart('Aanmelden als LUX AQUA',
       h('p', { class: 'klein zacht' },
         'Dit scherm is voor de verantwoordelijke van LUX AQUA. Klanten hebben het niet nodig: ' +

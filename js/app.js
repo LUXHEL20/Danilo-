@@ -141,9 +141,23 @@ export const LOGO = {
   icoon: 'assets/brand/LUX-AQUA-06-app-icoon-navy.png',
 };
 
-/** Toont het geüploade logo, of anders het officiële LUX AQUA-logo in de gevraagde variant. */
+/**
+ * Toont het geüploade logo, of anders het officiële LUX AQUA-logo.
+ *
+ * variant 'navy' of 'wit': altijd die ene kleur, voor een ondergrond die niet
+ * met het thema meewisselt (de kopbalk is bijvoorbeeld altijd donker).
+ * variant 'auto': de kleur volgt het thema van de kaart eronder. Nodig op een
+ * gewone lichte kaart die in donkere modus zelf donker wordt (onboarding,
+ * aanmeldscherm): zonder dit valt de navy-versie daar tegen haar eigen
+ * achtergrond weg. Laadt beide bestanden, toont er via CSS maar één.
+ */
 export function logoElement(logo, klasse = 'kopbalk__logo', variant = 'wit') {
   if (logo) return h('img', { src: logo, class: `${klasse} ${klasse}--eigen`, alt: 'LUX AQUA' });
+  if (variant === 'auto') {
+    return h('span', {},
+      h('img', { src: LOGO.navy, class: `${klasse} logo-tema__navy`, alt: 'LUX AQUA' }),
+      h('img', { src: LOGO.wit, class: `${klasse} logo-tema__wit`, alt: 'LUX AQUA' }));
+  }
   return h('img', { src: LOGO[variant] || LOGO.navy, class: klasse, alt: 'LUX AQUA' });
 }
 

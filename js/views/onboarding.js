@@ -47,7 +47,7 @@ export async function toonOnboarding() {
   function welkom() {
     return h('div', { class: 'kaart' },
       h('div', { class: 'midden' },
-        logoElement(null, 'logo-groot', 'navy'),
+        logoElement(null, 'logo-groot', 'auto'),
         h('h1', { style: { marginTop: '10px' } }, 'Welkom bij LUX AQUA'),
         h('p', { class: 'zacht' },
           'Met deze app houdt u uw waterwaarden bij, leest u uw teststrip in met de camera ' +
