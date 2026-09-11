@@ -720,6 +720,784 @@ export const PRODUCTEN = [
     ],
     profielen: ['zoet_gezelschap', 'zoet_planten', 'zoet_malawi'],
   },
+
+  /* ============================================================================
+   * VIJVER: het Colombo-vijverassortiment
+   *
+   * Zelfde regels als hierboven: elke dosering is LETTERLIJK overgenomen uit de
+   * officiele Colombo-gebruiksaanwijzing (PDF op colombo.nl) of, bij ontbreken
+   * daarvan, de Colombo Vijvercatalogus van Aquadistri. Het citaat staat in het
+   * veld `bron`. Een aantal producten liet zich niet in het liter-water-model
+   * persen (per m² bodem, per plant, per gram visvoer, per losse emmer om een
+   * vis in te verdoven): die krijgen `model: 'geen'` en enkel de tekst van het
+   * etiket, net als FE Tabs en Nutri Caps hierboven.
+   *
+   * KH Plus, GH Plus, pH Min en Algisin bestaan ook in de aquariumlijn hierboven
+   * met een andere dosering (vijverwater vraagt veel meer product per liter dan
+   * aquariumwater). Vandaar de toevoeging "(vijver)" in de naam en een eigen id.
+   */
+
+  /* -------------------------------------------------------------- filter, bacterien */
+  {
+    id: 'bactuur-filterstart', naam: 'Bactuur Filter Start', categorie: 'filter',
+    verpakkingen: ['500 ml, voor 2.500 liter vijverwater', '1000 ml, voor 5.000 liter vijverwater', '2500 ml, voor 12.500 liter vijverwater'],
+    lost_op: ['nh4', 'no2'], richting: 'omlaag',
+    omschrijving: 'Levende nitrificerende bacterien voor het vijverfilter, die ammonium/ammoniak en nitriet afbreken. Voor een nieuw filter, na het schoonmaken van het filter, bij de opstart in het voorjaar en bij verhoogde ammonia- of nitrietwaarden.',
+    dosering: {
+      model: 'vast', hoeveelheid: 40, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Opstarten, 5 dagen na elkaar',
+      omschrijving: '40 ml per 1.000 liter vijverwater per dag, 5 dagen na elkaar',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 20, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Onderhoud, wekelijks',
+        omschrijving: '20 ml per 1.000 liter vijverwater per week',
+      },
+    ],
+    toepassing: 'Opstarten van een nieuw of net gereinigd vijverfilter, heropstart na de winter, en bij verhoogde ammonia- of nitrietwaarden. Onder 10 graden watertemperatuur de dosering verdubbelen.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Filter Start: "Voor het opstarten of bij verhoogde ammonia en/of nitrietwaarden: 40 ml per 1.000 liter water per dag gedurende 5 dagen. Bij watertemperaturen onder de 10°C de dosering verdubbelen. Onderhoudsdosering: 20 ml per 1.000 liter water per week."',
+    opvolging: [
+      { na: '5 dagen', actie: 'Overgaan op de onderhoudsdosering van 20 ml per 1.000 liter per week.' },
+      { na: 'elke week', actie: '20 ml per 1.000 liter vijverwater doseren als onderhoud.' },
+    ],
+    waarschuwingen: [
+      'UV-C en ozon uitschakelen tijdens het doseren.',
+      'Onder 10 °C watertemperatuur de dosering verdubbelen.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'bactuur-clean', naam: 'Bactuur Clean', categorie: 'filter',
+    verpakkingen: ['500 ml, voor 2.500 liter vijverwater', '1000 ml, voor 5.000 liter vijverwater', '2500 ml, voor 12.500 liter vijverwater'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Meer dan 100 miljoen levende, slibafbrekende bacterien per ml die het slib op de vijverbodem en in het filter opruimen en daarna nieuwe slibvorming voorkomen. Ook bekend als Bactuur Clean Sludge; Bactuur Residex is de oude naam.',
+    dosering: {
+      model: 'vast', hoeveelheid: 40, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Slib opruimen, 5 dagen na elkaar',
+      omschrijving: '40 ml per 1.000 liter vijverwater per dag, 5 dagen na elkaar',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 20, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Onderhoud, wekelijks',
+        omschrijving: '20 ml per 1.000 liter vijverwater per week',
+      },
+    ],
+    toepassing: 'Slib op de vijverbodem en in het filter afbreken, en het filter en de biofilm onderhouden. Onder 10 graden watertemperatuur de dosering verdubbelen.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Clean Sludge: "Voor het opstarten (slib opruimen): 40 ml per 1.000 liter water per dag gedurende 5 dagen. Bij watertemperaturen onder de 10°C de dosering verdubbelen. Onderhoudsdosering (slibvorming voorkomen): 20 ml per 1.000 liter water per week."',
+    opvolging: [
+      { na: '5 dagen', actie: 'Overgaan op de onderhoudsdosering van 20 ml per 1.000 liter per week.' },
+    ],
+    waarschuwingen: [
+      'UV-C en ozon uitschakelen tijdens het doseren.',
+      'Onder 10 °C watertemperatuur de dosering verdubbelen.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'bactuur-activator', naam: 'Bactuur Activator', categorie: 'filter',
+    verpakkingen: ['500 ml, voor 2.500 liter vijverwater', '1000 ml, voor 5.000 liter vijverwater', '2500 ml, voor 12.500 liter vijverwater'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Plantaardige biokatalysator die de reinigingsbacterien uit Bactuur Filter Start en Bactuur Clean voedt en hun werking versterkt. Altijd samen met een van die twee gebruiken, niet als losse bacteriestarter.',
+    dosering: {
+      model: 'vast', hoeveelheid: 40, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Eerste gebruik, 5 dagen na elkaar',
+      omschrijving: '40 ml per 1.000 liter vijverwater per dag, 5 dagen na elkaar',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 20, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Onderhoud, wekelijks',
+        omschrijving: '20 ml per 1.000 liter vijverwater per week',
+      },
+    ],
+    toepassing: 'Altijd in combinatie met Bactuur Filter Start of Bactuur Clean gebruiken, voor een optimale bacteriewerking.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Activator: "Bij eerste gebruik (opstarten): 40 ml per 1.000 liter water per dag gedurende 5 dagen. Bij watertemperaturen onder de 10°C de dosering verdubbelen. Onderhoudsdosering: 20 ml per 1.000 liter water per week."',
+    opvolging: [
+      { na: '5 dagen', actie: 'Overgaan op de onderhoudsdosering van 20 ml per 1.000 liter per week, samen met Filter Start of Clean.' },
+    ],
+    waarschuwingen: [
+      'UV-C en ozon uitschakelen tijdens het doseren.',
+      'Op het icoon van de gebruiksaanwijzing staat abusievelijk "x 7 days"; de geschreven tekst in alle vier de talen zegt 5 dagen. Houd de geschreven tekst aan.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'bactuur-bio-start', naam: 'Bactuur Bio Start', categorie: 'filter',
+    verpakkingen: ['100 ml, voor 5.000 liter vijverwater'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Gevriesdroogde bacterien, 200 miljard per 100 ml, waaruit binnen 24 uur miljarden nuttige bacterien ontstaan. Voor een nieuwe vijver, in het voorjaar en na een grote schoonmaak. Op sommige webshops nog verkocht als "Bactuur P": zelfde product, zelfde dosering.',
+    dosering: {
+      model: 'vast', hoeveelheid: 10, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Nieuwe vijver',
+      omschrijving: '10 ml per 1.000 liter vijverwater, na 14 dagen herhalen',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 10, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Bestaande vijver, maandelijks',
+        omschrijving: '10 ml per 1.000 liter vijverwater per maand',
+      },
+    ],
+    toepassing: 'Nieuwe vijver, opstart in het voorjaar en na een grote schoonmaak van vijver of filter.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Bactuur Bio Start: "Dosering in nieuwe vijvers: 10 ml per 1.000 liter water, na 14 dagen dosering herhalen. Bestaande vijvers: Maandelijks 10 ml per 1.000 liter water toevoegen. Overdoseren is niet mogelijk, een hogere dosering versterkt het effect."',
+    opvolging: [
+      { na: '14 dagen', actie: 'In een nieuwe vijver de dosering van 10 ml per 1.000 liter nog eens geven.' },
+      { na: 'elke maand', actie: 'In een bestaande vijver 10 ml per 1.000 liter toevoegen als onderhoud.' },
+    ],
+    waarschuwingen: ['Overdoseren is niet mogelijk; een hogere dosering versterkt juist het effect.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'bacto-balls-vijver', naam: 'Bacto Balls', categorie: 'filter',
+    verpakkingen: ['500 ml, voor 5.000 liter vijverwater', '1000 ml, voor 10.000 liter vijverwater', '2500 ml, voor 25.000 liter vijverwater'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Ballen geimpregneerd met Colombo-bacterien voor schoon, helder water en een gezonde biologie. Breken organisch afval af en beperken zo algengroei.',
+    dosering: {
+      model: 'vast', hoeveelheid: 100, per: 1000, eenheid: 'stuks', basis: 'bak',
+      label: 'In het filter of de vijver',
+      omschrijving: '100 ballen per 1.000 liter vijverwater',
+    },
+    toepassing: 'In het vijverfilter of rechtstreeks in de vijver, eventueel in een mediazak die u ophangt. In tegenstelling tot de vloeibare Bactuur-producten hoeft de UV-apparatuur niet uit.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Bacto Balls: "Gebruik: 100 ballen per 1000 liter vijverwater. Maandelijks vervangen. Doseer de Bacto Balls in uw filter of direct in de vijver. [...] Overdosering is niet mogelijk; een hogere dosering zal zelfs de efficiëntie verhogen. UV-apparatuur hoeft niet uitgezet te worden."',
+    opvolging: [{ na: '1 maand', actie: 'De ballen vervangen door een nieuwe portie van 100 per 1.000 liter.' }],
+    waarschuwingen: ['Kan bijtend zijn voor metalen; gemorste stof opnemen.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+
+  /* ------------------------------------------------------------------ algen, helder water */
+  {
+    id: 'bactoclear', naam: 'BactoClear', categorie: 'algen',
+    verpakkingen: ['1000 ml (6x 20.000 l)', '2500 ml (6x 50.000 l)', '5000 ml (6x 100.000 l)'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Zwevend filtermateriaal van natuurlijke klei en mineralen dat organische verontreiniging en giftige stoffen opneemt, aangevuld met reinigingsbacterien. Maakt niet meteen helder zoals Algadrex, maar houdt het water gezond en remt zo draadalgroei.',
+    dosering: {
+      model: 'vast', hoeveelheid: 15, per: 2000, eenheid: 'ml', basis: 'bak',
+      label: 'Nieuwe of sterk vervuilde vijver, 5 dagen na elkaar',
+      omschrijving: '1 maatschep (15 ml) per 2.000 liter vijverwater per dag, 5 dagen na elkaar',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 15, per: 2000, eenheid: 'ml', basis: 'bak',
+        label: 'Onderhoud, wekelijks',
+        omschrijving: '1 maatschep (15 ml) per 2.000 liter vijverwater per week',
+      },
+    ],
+    toepassing: 'Alleen gebruiken bij een watertemperatuur boven 10 graden. Nooit rechtstreeks op de planten gieten. BactoClear is geen algenmiddel: voor meteen helder water gebruikt u Algadrex.',
+    bron: 'Gebruiksaanwijzing Colombo Pond BactoClear: "Eerste gebruik bij een nieuwe of sterk vervuilde vijvers, 1 maatschep (=15 ml) per 2.000 liter vijverwater gedurende 5 dagen. Daarna als onderhoudsdosering, 1 maatschep per 2.000 liter per week. [...] Gebruik BactoClear als het water warmer is als 10°C."',
+    opvolging: [{ na: '5 dagen', actie: 'Overschakelen op de wekelijkse onderhoudsdosering van 15 ml per 2.000 liter.' }],
+    waarschuwingen: [
+      'Alleen gebruiken boven 10 graden watertemperatuur.',
+      'Water kan tijdelijk (24 tot 48 uur) troebel blijven; dat is onschadelijk.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'bi-clear', naam: 'Bi-Clear', categorie: 'algen',
+    verpakkingen: ['1000 ml', '2500 ml', '5000 ml'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Combineert een zwevend filtermateriaal, dat organische verontreiniging en giftige stoffen rechtstreeks opneemt, met natuurlijke mineralen voor kristalhelder en gezond vijverwater.',
+    dosering: {
+      model: 'vast', hoeveelheid: 15, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Nieuwe of sterk vervuilde vijver, 5 dagen na elkaar',
+      omschrijving: '1 maatschep (15 ml) per 1.000 liter vijverwater per dag, 5 dagen na elkaar',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 15, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Onderhoud, wekelijks',
+        omschrijving: '1 maatschep (15 ml) per 1.000 liter vijverwater per week',
+      },
+    ],
+    toepassing: 'Nooit rechtstreeks op de planten gieten. Test minstens een keer per maand de waterkwaliteit.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Bi-Clear: "Dosering: Bij nieuwe of sterk vervuilde vijvers, 1 maatschep (=15 ml) per 1.000 liter vijverwater gedurende 5 dagen. [...] Daarna als onderhoudsdosering, 1 maatschep per 1.000 liter per week."',
+    opvolging: [{ na: '5 dagen', actie: 'Overschakelen op de wekelijkse onderhoudsdosering van 15 ml per 1.000 liter.' }],
+    waarschuwingen: ['Water kan tijdelijk (24 tot 48 uur) troebel blijven; dat is onschadelijk.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'biox', naam: 'BiOx', categorie: 'algen',
+    verpakkingen: ['1000 ml, voor eenmalig 32.000 liter', '2500 ml, voor eenmalig 80.000 liter', '5000 ml, voor eenmalig 160.000 liter'],
+    lost_op: ['o2'], richting: 'omhoog',
+    omschrijving: 'Reinigt de vijver met actieve zuurstof: breekt organische verontreiniging en slib af zodra het in het water komt, en de extra zuurstof verbetert tegelijk het biologisch filter. Geen bacterieproduct maar een natuurlijke oxidator.',
+    /* De officiele gebruiksaanwijzing toont enkel de BOOST-dosering (2x15 ml per
+       500 l). De gewone wekelijkse dosis (1x15 ml per 500 l) staat nergens
+       letterlijk voluit, maar volgt rekenkundig uit die boostzin: de bijsluiter
+       noemt de boost expliciet "dubbel", en de catalogus zegt "wekelijks
+       gebruiken". Vandaar het advies om ook het etiket op de fles na te lezen. */
+    dosering: {
+      model: 'vast', hoeveelheid: 15, per: 500, eenheid: 'ml', basis: 'bak',
+      label: 'Wekelijks',
+      omschrijving: '1 maatschep (15 ml) per 500 liter vijverwater per week',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 30, per: 500, eenheid: 'ml', basis: 'bak',
+        label: 'Boost of grote schoonmaak, max. 1x per 2 maanden',
+        omschrijving: '2x 15 ml (dubbele dosis) per 500 liter vijverwater',
+      },
+    ],
+    toepassing: 'Slib en organische vervuiling op de bodem afbreken en de vijver schoon en helder houden. Twee keer per jaar een grote schoonmaak met de dubbele dosering geven.',
+    bron: 'Gebruiksaanwijzing Colombo Pond BiOx: "BiOx boost dosering. Voor de grote schoonmaak van uw vijver, kunt u een dubbele dosering gebruiken! Dosering: 1L & 2,5L BOOST 2 x 15 ML 500 L - 5L BOOST 2 x 150 ML 5000 L. Dit mag maximaal 1 keer per 2 maanden gedaan worden." De gewone wekelijkse dosis (de helft) staat niet letterlijk in deze bijsluiter maar volgt uit deze boostzin en uit de catalogus ("gebruik BiOx wekelijks"); lees ook het etiket op de fles na.',
+    opvolging: [
+      { na: 'elke week', actie: 'De gewone dosering herhalen om de vijver schoon te houden.' },
+      { na: 'maximaal 1x per 2 maanden', actie: 'Een boost met dubbele dosering geven, niet vaker.' },
+    ],
+    waarschuwingen: [
+      'De officiele gebruiksaanwijzing bevat enkel de boost-dosering, niet de gewone wekelijkse dosis in ml; controleer het etiket op de fles.',
+      'De boost-dosering mag maximaal 1x per 2 maanden.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'algisin-vijver', naam: 'Algisin (vijver)', categorie: 'algen',
+    verpakkingen: ['1000 ml, voor 10.000 l', '2500 ml, voor 25.000 l', '5000 ml, voor 50.000 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Bestrijdt draadalgen (en baardalgen) op enzymatische wijze; de algen verdwijnen binnen enkele dagen tot twee weken. Bevat een Quicktest om eerst de waterkwaliteit te controleren, want algenproblemen komen vaak door slechte waterwaarden.',
+    dosering: {
+      model: 'vast', hoeveelheid: 15, per: 300, eenheid: 'ml', basis: 'bak',
+      label: 'Kuur van twee behandelingen',
+      omschrijving: '1 maatschep (15 ml) per 300 liter vijverwater, twee behandelingen met 14 dagen ertussen',
+    },
+    toepassing: 'Werkt het beste boven 10 graden watertemperatuur. Niet over kool of zeoliet filteren; ozon uit tijdens de behandeling, UV-C mag aan blijven. Niet gebruiken in zwemvijvers.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Algisin: "Dosering: bij 1.000 en 2.500 ml verpakkingen: 1 maatschep (15 ml) per 300 liter vijverwater; bij 5.000 ml verpakking: 1 volle maatbeker (150 ml) per 3.000 liter. Twee behandelingen zijn noodzakelijk voor het verkrijgen van het gewenste resultaat, na 14 dagen behandeling herhalen."',
+    opvolging: [
+      { na: '14 dagen', actie: 'De behandeling herhalen: twee behandelingen zijn nodig voor het resultaat.' },
+      { na: 'na de kuur', actie: 'Afgestorven draadalg met een schepnet verwijderen; wekelijks BiOx toevoegen om terugkeer te voorkomen.' },
+    ],
+    waarschuwingen: [
+      'Afgestorven draadalg moet verwijderd worden, anders kan het zuurstofgehalte te laag worden door rottende resten.',
+      'Mag niet gebruikt worden in zwemvijvers waarin mensen zwemmen.',
+      'Vermijd contact met huid en ogen; niet inademen.',
+      'Sommige vijverplanten (waterpest, fonteinkruid, waterlelie, gele plomp) kunnen tijdelijk lijden onder het middel, maar herstellen zich.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'algadrex', naam: 'Algadrex', categorie: 'algen',
+    verpakkingen: ['500 ml, voor 5.000 l', '1000 ml, voor 10.000 l', '2500 ml, voor 25.000 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Maakt troebel of groen vijverwater (zweefalgen) snel weer helder: werkt als vlokmiddel, de vervuiling klontert samen en is dan met een schepnet te verwijderen. Werkt binnen ongeveer een uur. Behandelt geen draadalgen, daarvoor is Algisin er.',
+    dosering: {
+      model: 'vast', hoeveelheid: 100, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Eenmalig',
+      omschrijving: '100 ml per 1.000 liter vijverwater',
+    },
+    toepassing: 'Voorgemengd in een gieter of emmer gelijkmatig over de vijver verdelen. Na ongeveer een uur de samengeklonterde deeltjes met een schepnet verwijderen.',
+    bron: 'Gebruiksaanwijzing Colombo Algadrex: "Dosering: 100 ml per 1.000 liter vijverwater. De benodigde hoeveelheid in een gieter of een emmer met water voormengen. Dan gelijkmatig over de vijver verdelen. De zwevende delen die zijn samengeklonterd moeten verwijderd worden met een schepnet."',
+    opvolging: [{ na: 'circa 1 uur', actie: 'Samengeklonterde deeltjes met een fijnmazig schepnet verwijderen.' }],
+    waarschuwingen: [
+      'Bij een KH onder 6 °DH kan dit een pH-schok geven; herstel de KH eerst met KH Plus.',
+      'Behandelt geen draadalgen: daarvoor is Algisin bedoeld.',
+      'Veroorzaakt ernstige oogirritatie.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'phosphate-x', naam: 'Phosphate X', categorie: 'algen',
+    verpakkingen: ['1000 ml, voor 10.000 l'],
+    lost_op: ['po4'], richting: 'omlaag',
+    omschrijving: 'Bindt fosfaat (PO4) in het vijverwater rechtstreeks af. Fosfaat is, samen met nitraat, de belangrijkste voedingsbron voor algen.',
+    dosering: {
+      model: 'delta', param: 'po4', hoeveelheid: 100, per: 1000, eenheid: 'ml', effect: 1, basis: 'bak',
+      label: 'Per verschuiving van het fosfaat, max. 1x per dag',
+      omschrijving: '100 ml per 1.000 liter vijverwater verlaagt het fosfaat met 1 mg per liter',
+    },
+    toepassing: 'Maximaal een keer per dag doseren, herhalen tot het fosfaat onder 1 mg per liter ligt. Alleen gebruiken bij een KH van minstens 6 °DH.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Phosphate X: "Gebruik: Doseer 100 ml per 1.000 liter water voor een verlaging van het fosfaatgehalte met 1 mg/l. Doseer maximaal 1x per dag en herhaal de behandeling totdat het gehalte onder 1 mg/l ligt. Colombo Phosphate X kan leiden tot een sterke pH-daling; voeg Phosphate X alleen toe bij een KH van minimaal 6°DH."',
+    opvolging: [{ na: 'elke dag (max. 1x)', actie: 'Fosfaat opnieuw meten en zo nodig herhalen tot onder 1 mg per liter.' }],
+    waarschuwingen: [
+      'Kan een sterke pH-daling geven; alleen gebruiken bij een KH van minstens 6 °DH.',
+      'Veroorzaakt ernstige oogirritatie.',
+      'Maximaal een dosis per dag.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+
+  /* -------------------------------------------------------------------- bodem, vijver */
+  {
+    id: 'natura-clean', naam: 'Natura Clean', categorie: 'filter',
+    verpakkingen: ['1000 ml, voor 15.000 liter vijverwater', '2500 ml, voor 37.500 liter vijverwater'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Reinigt de vijverbodem op natuurlijke wijze: mineralen neutraliseren de verzuring van de sliblaag en miljarden bacterien ruimen het vuil van visuitwerpselen, plantenresten en ingewaaide bladeren op. Werkt het best op een bodem van Natura Substraat.',
+    /* Het etiket geeft voor de voorjaarsdosis een marge: 2 tot 3 scheppen van
+       15 ml, dus 30 tot 45 ml per 1.000 liter. De app rekent met de onderkant
+       (30 ml) en zegt er in de toepassing bij dat 45 ml ook mag. */
+    dosering: {
+      model: 'vast', hoeveelheid: 30, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Voorjaar (maart/april)',
+      omschrijving: '2 tot 3 maatscheppen (30 tot 45 ml) per 1.000 liter, de app rekent met 30 ml als ondergrens',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 15, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Na 3 en na 6 maanden',
+        omschrijving: '1 maatschep (15 ml) per 1.000 liter, telkens na 3 maanden (juni/juli) en na 6 maanden (sept./okt.)',
+      },
+    ],
+    toepassing: 'Gelijkmatig over de bodem verdelen. De voorjaarsdosis mag tussen 30 en 45 ml per 1.000 liter liggen; 30 ml is de ondergrens die de app voorrekent.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Clean: "Doseer in het voorjaar (maart/april) 2-3 schepjes van 15 ml Colombo Natura Clean per 1.000 liter vijverwater gelijkmatig over de bodem. Doseer 1 schep per 1.000 liter vijverwater na 3 (juni/juli) en na 6 maanden (sept./okt.)"',
+    opvolging: [
+      { na: '3 maanden (juni/juli)', actie: '1 maatschep (15 ml) per 1.000 liter doseren.' },
+      { na: '6 maanden (sept./okt.)', actie: 'Opnieuw 1 maatschep (15 ml) per 1.000 liter doseren.' },
+    ],
+    waarschuwingen: [],
+    profielen: ['vijver_sier'],
+  },
+  {
+    id: 'natura-maerl', naam: 'Natura Maerl', categorie: 'buffer',
+    verpakkingen: ['1000 ml', '2500 ml', '5000 ml'],
+    lost_op: [], richting: 'omhoog',
+    omschrijving: 'Natuurlijke zeewierkalk-korrels die de KH en daarmee de pH van vijverwater stabiliseren en mineralen en sporenelementen toevoegen; bindt bovendien fosfaat, wat algengroei remt.',
+    dosering: {
+      model: 'vast', hoeveelheid: 45, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Voorjaar (maart/april), na 2 weken herhalen',
+      omschrijving: '3 maatscheppen (45 ml) per 1.000 liter water',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 30, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Maandelijks t/m oktober',
+        omschrijving: '2 maatscheppen (30 ml) per 1.000 liter water',
+      },
+    ],
+    toepassing: 'Water kan tijdelijk troebel worden na dosering; dat verdwijnt na een paar dagen vanzelf.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Maerl: "Doseer in het voorjaar (maart/april) 3 maatscheppen van 15 ml per 1.000 liter water. Herhaal dit na 2 weken. Doseer hierna maandelijks 2 maatscheppen per 1.000 ltr t/m oktober."',
+    opvolging: [{ na: '2 weken', actie: 'De voorjaarsdosis nog eens geven.' }],
+    waarschuwingen: ['Water kan na dosering tijdelijk troebel worden; dat verdwijnt vanzelf.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'natura-straw', naam: 'Natura Straw', categorie: 'filter',
+    verpakkingen: ['2500 ml, voor een vijver van 5.000 liter'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Geperste pellets van 100 procent gerstestro die het vijverwater op natuurlijke wijze helder en algenvrij houden.',
+    dosering: {
+      model: 'vast', hoeveelheid: 2500, per: 5000, eenheid: 'ml', basis: 'bak',
+      label: 'In een filternet',
+      omschrijving: 'Een verpakking van 2.500 ml volstaat voor 5.000 liter vijverwater',
+    },
+    toepassing: 'De straw in een fijn filternet doen, uitspoelen en het net in de vijver of het filter hangen, eventueel verzwaard met een steen.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Straw: "Doe de straw in een fijne filternet, sluit het net en spoel de stro uit. De verpakking van 2500 ml is voldoende voor een vijver van 5.000 liter. Hang het filternet in de vijver of filter."',
+    opvolging: [{ na: '2 tot 3 maanden', actie: 'De straw vervangen: die is dan opgelost of uitgeput.' }],
+    waarschuwingen: [],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'natura-substrate', naam: 'Natura Substraat', categorie: 'filter',
+    verpakkingen: ['10 liter', '25 liter'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Poreus, natuurlijk bodemsubstraat dat als een groot biologisch filter werkt: het open oppervlak laat miljarden bacterien groeien die het vijverwater zuiveren.',
+    /* Dosering per m² bodemoppervlak, niet per liter water: past niet in het
+       liter-watermodel van de app. Zie ook de opmerking bij FE Tabs. */
+    dosering: {
+      model: 'geen', eenheid: 'liter substraat', basis: 'bak',
+      label: 'Bij het inrichten',
+      omschrijving: 'Een zak van 10 liter bedekt circa 2 m² vijverbodem',
+    },
+    toepassing: 'De bodem gelijkmatig bedekken met een laag substraat. Voeg Bactuur Bio Start toe voor een snelle opstart van de bacterien.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Substrate: "Bedek de bodem gelijkmatig met een laag substraat. U kunt 2 m2 bodem bedekken met één zak Colombo Natura Substrate 10 liter."',
+    opvolging: [{ na: 'na het aanbrengen', actie: 'Bactuur Bio Start toevoegen voor een snelle bacteriestart.' }],
+    waarschuwingen: ['Door de poreuze structuur kunnen delen tijdelijk blijven drijven; dat is normaal.'],
+    profielen: ['vijver_sier'],
+  },
+  {
+    id: 'natura-gravel', naam: 'Natura Grind', categorie: 'vijver',
+    verpakkingen: ['10 liter/15 kg, 4-6 mm', '10 liter/15 kg, 8-12 mm'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Gewassen, schoon vijvergrind om de bodem, plantmanden of de vijverrand mee af te dekken. Voorkomt dat vissen in de bodem wroeten. Geen chemische werking.',
+    dosering: { model: 'geen', eenheid: 'liter grind', basis: 'bak', label: 'Naar smaak', omschrijving: 'Geen dosering van toepassing, decoratief/functioneel bodemgrind' },
+    toepassing: 'Verkrijgbaar in korrelgrootte 4-6 mm en 8-12 mm.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Gravel: "Colombo Natura Grind is speciaal voor de vijver geselecteerd grind wat gewassen is en vrij van vervuiling. Het kan gebruikt worden voor het afdekken van vijveraarde zodat vissen niet in de aarde kunnen wroeten."',
+    opvolging: [],
+    waarschuwingen: [],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+
+  /* --------------------------------------------------------------- plantenvoeding, vijver */
+  {
+    id: 'natura-plant-soil', naam: 'Natura Plantaarde', categorie: 'voeding',
+    verpakkingen: ['10 liter', '20 liter'],
+    lost_op: [], richting: 'omhoog',
+    omschrijving: 'Natuurlijke vijveraarde van klei en veen met alle voedingsstoffen die vijverplanten nodig hebben om te wortelen, groeien en bloeien.',
+    dosering: {
+      model: 'geen', eenheid: 'liter aarde', basis: 'bak',
+      label: 'Per plantmand',
+      omschrijving: 'Een zak van 20 liter bedekt circa 3 m² bodem',
+    },
+    toepassing: 'Een plantmand vullen tot 5 cm onder de rand, de plant erin zetten en nat maken zodat alle lucht eruit gaat, en afdekken met 2 tot 3 cm Natura Grind of Substraat zodat de aarde niet wegspoelt.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Plant Soil: "Vul een vijvermand met Colombo Natura Plant Soil tot circa 5 cm onder de rand en druk de aarde goed aan. [...] U kunt circa 3 m2 bodem bedekken met één 20 L zak."',
+    opvolging: [],
+    waarschuwingen: [],
+    profielen: ['vijver_sier'],
+  },
+  {
+    id: 'natura-lily-soil', naam: 'Natura Waterlelie-aarde', categorie: 'voeding',
+    verpakkingen: ['10 liter', '20 liter'],
+    lost_op: [], richting: 'omhoog',
+    omschrijving: 'Speciale waterlelie-aarde met extra klei, voor een goede beworteling en rijke bloei.',
+    /* De juiste zakmaat (10 of 20 liter) per plantmand staat niet met een
+       getal op het etiket, enkel "vullen tot 5 cm onder de rand": geen cijfer
+       om voor te rekenen, dus model 'geen'. */
+    dosering: {
+      model: 'geen', eenheid: 'zak', basis: 'bak',
+      label: 'Per plantmand',
+      omschrijving: 'Een ruime plantmand (groter dan 20 cm) vullen tot circa 5 cm onder de rand',
+    },
+    toepassing: 'De lelie planten en afdekken met 2 tot 3 cm Natura Grind of Substraat. Plaatsen op 40 tot 80 cm diepte, afhankelijk van de soort en de grootte.',
+    bron: 'Gebruiksaanwijzing Colombo Natura Lily Soil: "Vul een ruime vijvermand (>20 cm) met Colombo Natura Waterlelie Aarde tot circa 5 cm onder de rand en druk de aarde goed aan. [...] Plaats de lelie op een zonnige plaats in de vijver op een diepte tussen de 40 en 80 cm."',
+    opvolging: [{ na: '2 tot 3 jaar', actie: 'Jaarlijks 3 tot 4 Natura Plant Tabs toevoegen: de voedingsstoffen in de bodem nemen dan af.' }],
+    waarschuwingen: [],
+    profielen: ['vijver_sier'],
+  },
+  {
+    id: 'natura-plant-tabs', naam: 'Natura Plant Tabs', categorie: 'voeding',
+    verpakkingen: ['10 stuks'],
+    lost_op: [], richting: 'omhoog',
+    omschrijving: 'Meststoftabletten met gereguleerde afgifte die vijverplanten het hele seizoen voeden, zonder voedingsstoffen naar het water te lekken (wat algengroei zou voeden).',
+    /* Dosering per plant, niet per liter water. */
+    dosering: {
+      model: 'geen', eenheid: 'tablet', basis: 'bak',
+      label: 'Voorjaar',
+      omschrijving: '1 a 2 tabletten per plant, afhankelijk van de plantgrootte',
+    },
+    toepassing: 'De tabletten in de vijveraarde of het substraat drukken, binnen bereik van de wortels.',
+    bron: 'Gebruiksaanwijzing Colombo Plant Tabs: "Druk 1 à 2 tabletten per plant (afhankelijk van de plantgrootte) in de vijveraarde of het substraat, zorg dat de tabletten binnen het bereik van de wortels liggen."',
+    opvolging: [],
+    waarschuwingen: [],
+    profielen: ['vijver_sier'],
+  },
+
+  /* ------------------------------------------------------------------- vijver, waterbereiding */
+  {
+    id: 'kh-plus-vijver', naam: 'KH Plus (vijver)', categorie: 'buffer',
+    verpakkingen: ['1000 ml (7.000 liter, +4 °DH)', '2500 ml (17.500 liter, +4 °DH)', '5000 ml (35.000 liter, +4 °DH)', '15000 ml (105.000 liter, +4 °DH)'],
+    lost_op: ['kh', 'ph'], richting: 'omhoog',
+    omschrijving: 'Verhoogt de carbonaathardheid van vijverwater. Een KH tussen 6 en 10 °DH houdt de pH stabiel, zodat schommelingen die schadelijk zijn voor uw vissen uitblijven.',
+    dosering: {
+      model: 'delta', param: 'kh', hoeveelheid: 15, per: 200, eenheid: 'ml', effect: 2, basis: 'bak',
+      label: 'Per verschuiving van de KH',
+      omschrijving: '1 maatschep (15 ml) per 200 liter vijverwater verhoogt de KH met 2 °DH',
+    },
+    toepassing: 'Eerst verdunnen in een emmer of gieter met lauwwarm water, dan gelijkmatig over de vijver verdelen. Nooit rechtstreeks op de planten gieten. Streefwaarde: 6 tot 10 °DH.',
+    bron: 'Gebruiksaanwijzing Colombo Pond KH Plus: "Dosering: 1 maatschep (=15 ml) per 200 liter vijverwater verhoogt de KH met 2°DH. De benodigde hoeveelheid eerst verdunnen in een emmer of gieter met lauwwarm water. Nooit rechtstreeks op de planten gieten. Test minimaal 1x per maand de waterkwaliteit en corrigeer waar nodig."',
+    opvolging: [{ na: '1 maand', actie: 'KH opnieuw testen en zo nodig bijdoseren.' }],
+    waarschuwingen: ['Eerst verdunnen in lauwwarm water, nooit onverdund in de vijver of op de planten.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'gh-plus-vijver', naam: 'GH Plus (vijver)', categorie: 'buffer',
+    verpakkingen: ['1000 ml (7.000 liter, +4 °DH)', '2500 ml (17.500 liter, +4 °DH)', '5000 ml (35.000 liter, +4 °DH)', '15000 ml (105.000 liter, +4 °DH)'],
+    lost_op: ['gh'], richting: 'omhoog',
+    omschrijving: 'Verhoogt de totale hardheid van vijverwater met opgeloste mineralen, hoofdzakelijk calcium. Uw planten en vissen hebben die mineralen nodig om te groeien en gezond te blijven.',
+    dosering: {
+      model: 'delta', param: 'gh', hoeveelheid: 15, per: 200, eenheid: 'ml', effect: 2, basis: 'bak',
+      label: 'Per verschuiving van de GH',
+      omschrijving: '1 maatschep (15 ml) per 200 liter vijverwater verhoogt de GH met 2 °DH',
+    },
+    toepassing: 'Eerst verdunnen in een emmer of gieter met lauwwarm water, dan gelijkmatig over de vijver verdelen. Nooit rechtstreeks op de planten gieten. Streefwaarde: 10 tot 15 °DH.',
+    bron: 'Gebruiksaanwijzing Colombo Pond GH Plus: "Dosering: 1 maatschep (=15 ml) per 200 liter vijverwater verhoogt de GH met 2°DH. De benodigde hoeveelheid eerst verdunnen in een emmer of gieter met lauwwarm water. Nooit rechtstreeks op de planten gieten. Test 1x per maand de waterkwaliteit en corrigeer waar nodig."',
+    opvolging: [{ na: '1 maand', actie: 'GH opnieuw testen en zo nodig bijdoseren.' }],
+    waarschuwingen: ['Eerst verdunnen in lauwwarm water, nooit onverdund in de vijver of op de planten.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'ph-min-vijver', naam: 'pH Min (vijver)', categorie: 'buffer',
+    verpakkingen: ['1000 ml (verlaagt de pH met circa 2 eenheden in 5.000 liter)', '2500 ml (verlaagt de pH met circa 2 eenheden in 12.500 liter)'],
+    lost_op: ['ph'], richting: 'omlaag',
+    omschrijving: 'Verlaagt een te hoge pH in vijverwater zonder schadelijke reststoffen achter te laten. De ideale pH voor een vijver ligt tussen 7 en 8.',
+    dosering: {
+      model: 'delta', param: 'ph', hoeveelheid: 1000, per: 5000, eenheid: 'ml', effect: 2, basis: 'bak',
+      label: 'Per verschuiving van de pH, max. 1 eenheid per dag',
+      omschrijving: '1 liter per 5.000 liter vijverwater verlaagt de pH met ongeveer 2 eenheden',
+    },
+    toepassing: 'Meet eerst de KH: die mag niet lager zijn dan 6 °DH. Verdeel de dosering gelijkmatig over het wateroppervlak, of meng ze eerst met vijverwater in een emmer. Verlaag de pH met hoogstens 1 eenheid per dag.',
+    bron: 'Colombo Vijvercatalogus: "Inhoud 1 liter, verlaagt de pH met circa 2 eenheden in 5.000 liter vijverwater. [...] Verlaag de pH geleidelijk, met maximaal 1 eenheid per dag. Voor een veilig gebruik mag de KH niet lager zijn dan 6°DH."',
+    opvolging: [{ na: '1 dag', actie: 'pH en KH opnieuw meten voor u een volgende dosis geeft.' }],
+    waarschuwingen: [
+      'Verlaag de pH met hoogstens 1 eenheid per dag: grote schommelingen zijn schadelijk voor vissen.',
+      'De KH mag niet lager zijn dan 6 °DH: meet die eerst.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'fish-protect-vijver', naam: 'Fish Protect (vijver)', categorie: 'waterbereiding',
+    verpakkingen: ['1000 ml, voor 20.000 liter vijverwater', '2500 ml, voor 50.000 liter vijverwater'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Beschermt en stimuleert de slijmhuid van de vis, en bindt medicijnresten en schadelijke stoffen in het water. Vooral van belang bij een nieuwe vijver, een grote waterverversing, nieuwe vis, en na een medicijnkuur.',
+    dosering: {
+      model: 'vast', hoeveelheid: 50, per: 1000, eenheid: 'ml', basis: 'bak',
+      label: 'Normale dosering',
+      omschrijving: '50 ml per 1.000 liter vijverwater',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 100, per: 1000, eenheid: 'ml', basis: 'bak',
+        label: 'Bij zwaardere belasting',
+        omschrijving: '100 ml per 1.000 liter vijverwater (dubbele dosis)',
+      },
+    ],
+    toepassing: 'In een nieuwe vijver voor u vissen plaatst, na een grote waterverversing, bij nieuwe vis, en 48 uur na de laatste toediening van Lernex Pro of FMC-50, of 1 week na Cytofex (dan eerst het filter reinigen). Zorg voor voldoende beluchting of circulatie tijdens de behandeling.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Fish Protect: "Gebruik: 50 ml per 1.000 liter water. Indien nodig dosering verdubbelen. Zorg voldoende beluchting of circulatie tijdens de behandeling."',
+    opvolging: [],
+    waarschuwingen: ['Zorg voor voldoende beluchting of circulatie tijdens de behandeling.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+
+  /* ---------------------------------------------------------------------- zorg (Morenicol) */
+  {
+    id: 'morenicol-vita-spray', naam: 'Vita-Spray (vijver)', categorie: 'zorg',
+    verpakkingen: [],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Vitaminecomplex met sporenelementen dat u over het visvoer sprayt, om vissen te laten aansterken na ziekte, een medicijnkuur of de winter.',
+    /* Dosering op gewicht visvoer, niet op literwater: past niet in het
+       liter-watermodel. */
+    dosering: {
+      model: 'geen', eenheid: 'ml', basis: 'bak',
+      label: 'Bij het voeren',
+      omschrijving: '7x spuiten (7 ml) per 100 gram visvoer',
+    },
+    toepassing: 'De dagelijkse voerhoeveelheid afwegen, uitspreiden, besproeien, enkele uren laten indrogen en dezelfde dag voeren. Ook aan te raden na een behandeling met Lernex Pro of FMC-50, om het herstel te ondersteunen.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Vita-Spray: "Dosering: 7x spuiten (7 ml) per 100 gram visvoer."',
+    opvolging: [],
+    waarschuwingen: ['Gekoeld bewaren bevordert de houdbaarheid.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-medic-box', naam: 'Morenicol Medic Box', categorie: 'zorg',
+    verpakkingen: [],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Complete wondbehandelset voor uitwendige verwondingen en zweren bij vijvervis: Morenicol Sedation om te verdoven, Morenicol Wound Clean om te reinigen en Morenicol Propolis om af te dekken, in drie stappen.',
+    dosering: { model: 'geen', eenheid: '', basis: 'bak', label: 'Drie stappen', omschrijving: 'Zie de aparte producten Sedation, Wound Clean en Propolis voor de dosering per stap' },
+    toepassing: 'Stap 1: verdoven met Sedation. Stap 2: wond reinigen met Wound Clean. Stap 3: wond afdekken met Propolis. Geef nadien voer met Vita-Spray om het herstel te ondersteunen.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Morenicol Wound Treatment: "Een succesvolle behandeling van wonden bij vissen bestaat uit 3 stappen [...]: stap 1 is verdoving met Morenicol Sedation, stap 2 is het schoonmaken van de wond met Morenicol Wound Clean en stap 3 is het afdekken van de wond met Morenicol Propolis."',
+    opvolging: [{ na: 'wondbehandeling', actie: 'Voer met Vita-Spray geven om het herstel te ondersteunen.' }],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: bij twijfel of als de vis ondanks de behandeling achteruitgaat, eerst advies vragen.',
+      'Juiste waterwaarden tijdens de genezing: pH 7-8,5, GH 10-15 °DH, KH 6-10 °DH, ammoniak en nitriet 0 mg/l, nitraat onder 50 mg/l, fosfaat onder 1 mg/l.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-sedation', naam: 'Morenicol Sedation', categorie: 'zorg',
+    verpakkingen: [],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Verdovingsvloeistof op basis van 100 procent natuurlijke kruidnagelolie, om de vis rustig te maken voor een wondbehandeling (stap 1 van de Medic Box).',
+    /* Dosering geldt voor een APARTE emmer met water waarin de vis tijdelijk
+       gaat, niet voor de vijver of vers water bij een verversing: het gewone
+       bak/versWater-model van de app is hier niet van toepassing. */
+    dosering: {
+      model: 'geen', eenheid: 'druppel per liter', basis: 'bak',
+      label: 'In een aparte emmer',
+      omschrijving: '2 druppels per liter water in een schone emmer, niet in de vijver',
+    },
+    toepassing: 'Een schone bak of emmer vullen met vijverwater en 2 druppels per liter toevoegen. De vis er tijdelijk in plaatsen tot die voldoende verdoofd is. Bij plotselinge ademstilstand meteen terug in de vijver zetten.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Morenicol Wound Treatment: "Voeg 2 druppels per liter verdovingsvloeistof toe."',
+    opvolging: [],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: bij twijfel eerst advies vragen.',
+      'Nooit in de volledige vijver doseren: dit is een aparte emmer met een door uzelf gemeten hoeveelheid water.',
+      'Laat de vis niet te lang in de verdovingsvloeistof liggen.',
+      'Water met verdovingsvloeistof na gebruik afvoeren volgens de lokale regels.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-wound-clean', naam: 'Morenicol Wound Clean', categorie: 'zorg',
+    verpakkingen: [],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Wondreiniger op basis van een verdunde waterstofperoxide-oplossing, om een verwonding grondig schoon te maken voor die wordt afgedekt met Propolis (stap 2 van de Medic Box).',
+    dosering: { model: 'geen', eenheid: '', basis: 'bak', label: 'Uitwendig', omschrijving: 'Met een wattenstaafje op de wond aanbrengen tot die grondig gereinigd is' },
+    toepassing: 'Met een wattenstaafje gedrenkt in Wound Clean de wond aanstippen en herhalen tot de hele wond gereinigd is. Bij een vervolgbehandeling van dezelfde wond niet opnieuw gebruiken: dat vertraagt de genezing.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Morenicol Wound Treatment: "Reinig de wond grondig door met een wattenstaafje gedrenkt in wondreiniger de wond aan te stippen; herhaal dit totdat de gehele wond op deze manier grondig is gereinigd."',
+    opvolging: [],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: bij twijfel eerst advies vragen.',
+      'Bij een tweede behandeling van dezelfde wond niet opnieuw reinigen met Wound Clean.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-propolis', naam: 'Morenicol Propolis', categorie: 'zorg',
+    verpakkingen: [],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Kleverige wondspray op basis van 100 procent natuurlijke bijenpropolis; sluit een gereinigde wond af en houdt die schoon (stap 3 van de Medic Box).',
+    dosering: { model: 'geen', eenheid: '', basis: 'bak', label: 'Uitwendig', omschrijving: 'Aanbrengen op de gereinigde wond, om de dag herhalen' },
+    toepassing: 'Aanbrengen op de gereinigde wond. Om de dag opnieuw aanbrengen; reinig de wond dan niet opnieuw met Wound Clean, dat vertraagt de genezing.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Morenicol Wound Treatment: "U kunt om de dag opnieuw wondspray aanbrengen, in dit geval dient u de wond niet opnieuw met wondreiniger te behandelen. Daarmee vernietigt u de door het genezingsproces aangemaakte nieuwe cellen."',
+    opvolging: [],
+    waarschuwingen: ['Dit is een behandeling die een diagnose vraagt: bij twijfel eerst advies vragen.'],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-lernex', naam: 'Morenicol Lernex', categorie: 'zorg',
+    verpakkingen: ['250 ml, voor 5.000 l', '500 ml, voor 10.000 l', '1000 ml, voor 20.000 l', '2500 ml, voor 50.000 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Bestrijdt huidwormen, kieuwwormen en inwendige wormen, en werkt ook tegen bloedzuigers, visluizen en ankerwormen.',
+    dosering: {
+      model: 'vast', hoeveelheid: 20, per: 500, eenheid: 'gram', basis: 'bak',
+      label: 'Eerste behandeling',
+      omschrijving: '20 gram (1 maatschep) per 500 liter vijverwater',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 20, per: 500, eenheid: 'gram', basis: 'bak',
+        label: 'Zo nodig na 14 dagen',
+        omschrijving: 'Dezelfde dosis herhalen: 20 gram per 500 liter',
+      },
+    ],
+    toepassing: 'Voormengen in een emmer of gieter en gelijkmatig over de vijver verdelen. Onder 10 graden watertemperatuur neemt de parasiet Lernex onvoldoende op; verhoog zo nodig de temperatuur.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Lernex: "Dosering: 20 gr (=1 maatschep) per 500 liter vijverwater. Een maatschep is in de verpakking bijgesloten. Indien nodig kan de behandeling na 14 dagen herhaald worden."',
+    opvolging: [],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt (microscopisch onderzoek): vraag eerst advies.',
+      'Schadelijk voor zoetwaterkreeftjes, kevers, libellenlarven en slakken.',
+      'Kool en zeoliet verwijderen tijdens de kuur; UV-lampen en ozon tot 1 week na de laatste toediening uit.',
+      'Minstens 2 weken wachten tussen Lernex en Alparex.',
+      'De parasieten kunnen eerst actiever worden, waardoor vissen kunnen schieten of springen: houd ze in de gaten.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-lernex-pro', naam: 'Morenicol Lernex Pro', categorie: 'zorg',
+    verpakkingen: ['250 ml, voor 5.000 l', '500 ml, voor 10.000 l', '1000 ml, voor 20.000 l', '2500 ml, voor 50.000 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Voor resistente huid- en kieuwwormen bij siervissen. Niet werkzaam tegen ankerwormen, karperluizen of bloedzuigers.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 20, eenheid: 'ml', basis: 'bak',
+      label: 'Eerste behandeling',
+      omschrijving: '1 ml per 20 liter vijverwater',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 1, per: 20, eenheid: 'ml', basis: 'bak',
+        label: 'Zo nodig na 14 dagen',
+        omschrijving: 'Dezelfde dosis herhalen: 1 ml per 20 liter',
+      },
+    ],
+    toepassing: 'Afmeten met de bijgeleverde maatbeker en langzaam ingieten op een plek met veel stroming, bijvoorbeeld de uitstroom van pomp of filter. 48 uur na de laatste toediening Fish Protect gebruiken en Vita-Spray aan het voer toevoegen.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Lernex Pro: "Dosering: 1 ml per 20 liter vijverwater. Indien nodig kan de behandeling na 14 dagen herhaald worden."',
+    opvolging: [
+      { na: '48 uur na de laatste toediening', actie: 'Fish Protect gebruiken om de slijmhuid te beschermen en productresten te binden.' },
+      { na: 'tijdens herstel', actie: 'Vita-Spray aan het voer toevoegen om de genezing te ondersteunen.' },
+    ],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt (microscopisch onderzoek): vraag eerst advies.',
+      'Kool en zeoliet verwijderen tijdens de kuur; UV-lampen en ozon tot 1 week na de laatste toediening uit.',
+      'Minstens 2 weken wachten tussen Lernex en Alparex.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-lernex-pro-food', naam: 'Morenicol Lernex Pro Food', categorie: 'zorg',
+    verpakkingen: [],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Medicinaal visvoer tegen huid- en kieuwwormen, voor grote vijvers waar een waterbehandeling niet mogelijk of te duur is. Bevat ook beta-glucanen, pre- en probiotica voor het afweersysteem.',
+    dosering: { model: 'geen', eenheid: '', basis: 'bak', label: '2x per dag, 2 weken', omschrijving: '2 keer per dag voeren gedurende 2 weken' },
+    toepassing: 'Niet meer voeren dan de vissen binnen 5 minuten opeten; overgebleven voer verwijderen. Niet combineren met een waterbehandeling met Morenicol Lernex Pro: risico op overdosering.',
+    bron: 'Gebruiksaanwijzing Colombo Lernex Pro Food: "Dosering: Lernex-Pro voer moet 2x per dag gedurende 2 weken gevoerd worden. Voer niet meer dan de vissen in 5 min opeten. Verwijder overgebleven voer."',
+    opvolging: [],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: vraag eerst advies.',
+      'Niet combineren met een waterbehandeling met Morenicol Lernex Pro.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-alparex', naam: 'Morenicol Alparex', categorie: 'zorg',
+    verpakkingen: ['250 ml, voor 5.000 l', '500 ml, voor 10.000 l', '1000 ml, voor 20.000 l', '2500 ml, voor 50.000 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Bestrijdt microscopische parasieten die een grauwe waas over de huid geven, zoals Trichodina, Ichthyobodo en Chilodonella, en werkt ook ontsmettend tegen bijkomende bacteriele infecties.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 40, eenheid: 'ml', basis: 'bak',
+      label: 'Dag 1',
+      omschrijving: '1 ml per 40 liter vijverwater (25 ml per 1.000 liter)',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 1, per: 40, eenheid: 'ml', basis: 'bak',
+        label: 'Dag 2',
+        omschrijving: 'Dezelfde dosis nog eens: 1 ml per 40 liter',
+      },
+    ],
+    toepassing: 'Voormengen in een gieter of emmer en gelijkmatig over de vijver verdelen. De KH moet tussen 6 en 8 °DH liggen voor u begint. Bij steuren apart behandelen op de halve dosering (1 ml per 80 liter), eventueel een derde keer op dag 3.',
+    bron: 'Gebruiksaanwijzing Colombo Pond Alparex: "Dosering: Het product Alparex moet in twee stappen worden toegediend: 1e dag: 1 ml per 40 liter vijverwater oftewel 25 ml per 1000 liter vijverwater. 2e dag: nogmaals 1 ml per 40 liter vijverwater."',
+    opvolging: [
+      { na: 'jeuk blijft na de behandeling', actie: 'Na 2 weken behandelen met Morenicol Lernex of Lernex Pro.' },
+      { na: 'bijkomende bacteriele infectie', actie: 'Gerichter behandelen met Morenicol Cytofex.' },
+    ],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: vraag eerst advies.',
+      'De KH moet tussen 6 en 8 °DH liggen voor u start.',
+      'Niet combineren met Flubendazole of verwante stoffen; daarna minstens 4 weken wachten en 25 procent water verversen.',
+      'Minstens 2 weken wachten tussen Alparex en Algadrex, Lernex, Cytofex of FMC-50.',
+      'Veroorzaakt blijvende vlekken op onder meer kleding en bestrating.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-cytofex', naam: 'Morenicol Cytofex', categorie: 'zorg',
+    verpakkingen: ['250 ml, voor 2.500 l', '500 ml, voor 5.000 l', '1000 ml, voor 10.000 l', '2500 ml, voor 25.000 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Werkt tegen uitwendige bacteriele infecties zoals huidzweren, vinrot en gatenziekte, op basis van 100 procent natuurlijke grondstoffen (tea tree-olie, IJslands mos en Pau d\'Arco).',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 30, eenheid: 'ml', basis: 'bak',
+      label: 'Dag 1 van 3',
+      omschrijving: '1 ml per 30 liter vijverwater',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 1, per: 30, eenheid: 'ml', basis: 'bak',
+        label: 'Dag 2 en dag 3',
+        omschrijving: 'Dezelfde dosis herhalen: 1 ml per 30 liter, op 3 opeenvolgende dagen',
+      },
+    ],
+    toepassing: 'Voormengen in een gieter of emmer en gelijkmatig over de vijver verdelen, 3 dagen na elkaar. Tussen de toedieningen door geen water verversen. Zorg voor optimale beluchting.',
+    bron: 'Gebruiksaanwijzing Colombo Marine Cytofex: "Dosering: Cytofex dient op 3 opeenvolgende dagen gebruikt te worden. Dag 1: 1 ml per 30 liter vijverwater; Dag 2: 1 ml per 30 liter vijverwater; Dag 3: 1 ml per 30 liter vijverwater." De inhoud van deze bron spreekt overigens uitsluitend over vijverwater en vijvervis, ondanks de bestandsnaam.',
+    opvolging: [
+      { na: '1 week na de laatste toediening', actie: 'Het filter grondig reinigen en Fish Protect aan het water toevoegen.' },
+      { na: 'een dag na Fish Protect', actie: 'De biologische filtratie stimuleren met Bactuur Filter Start.' },
+    ],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: vraag eerst advies.',
+      'De afbraak van de actieve stoffen kan het zuurstofgehalte doen dalen; extra gevoelig bij bijvoorbeeld steuren.',
+      'Kool en zeoliet verwijderen tijdens de kuur; UV-lampen en ozon tot 1 week na de laatste toediening uit.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
+  {
+    id: 'morenicol-fmc-50', naam: 'Morenicol FMC-50', categorie: 'zorg',
+    verpakkingen: ['250 ml, voor 6.250 l', '500 ml, voor 12.500 l', '1000 ml, voor 25.000 l', '2500 ml, voor 62.500 l'],
+    lost_op: [], richting: 'neutraliseert',
+    omschrijving: 'Bestrijdt witte stip en schimmel (onder meer Saprolegnia) bij vijvervis.',
+    dosering: {
+      model: 'vast', hoeveelheid: 1, per: 25, eenheid: 'ml', basis: 'bak',
+      label: 'Reguliere behandeling',
+      omschrijving: '1 ml per 25 liter vijverwater',
+    },
+    extraDoseringen: [
+      {
+        model: 'vast', hoeveelheid: 1, per: 100, eenheid: 'ml', basis: 'bak',
+        label: 'Preventief, 3 dagen na elkaar',
+        omschrijving: '1 ml per 100 liter vijverwater per dag',
+      },
+    ],
+    toepassing: 'Voormengen in een gieter of emmer en gelijkmatig over de vijver verdelen. De dosering halveren bij een pH onder 7 samen met een watertemperatuur boven 15 graden, of bij gevoelige soorten zoals winde, zeelt of steur. Zo nodig na een week herhalen.',
+    bron: 'Gebruiksaanwijzing Colombo Pond FMC-50: "Dosering: 1 ml per 25 liter vijverwater. [...] De dosering moet gehalveerd worden als de pH lager dan 7 is èn tegelijkertijd de watertemperatuur boven de 15°C is, of als er gevoelige vissen zoals windes, zeelt of steuren, in de vijver zitten. Indien nodig kan de behandeling na 1 week worden herhaald. Als preventieve behandeling: Gedurende 3 dagen 1 ml per 100 liter vijverwater per dag."',
+    opvolging: [
+      { na: '48 uur na de laatste toediening', actie: 'Fish Protect toevoegen om de slijmhuid te beschermen en productresten te binden.' },
+      { na: 'tijdens herstel', actie: 'Vita-Spray aan het voer toevoegen.' },
+    ],
+    waarschuwingen: [
+      'Dit is een behandeling die een diagnose vraagt: vraag eerst advies.',
+      'Halveer de dosering bij pH onder 7 samen met temperatuur boven 15 graden, of bij winde, zeelt of steur.',
+      'Kool en zeoliet verwijderen tijdens de kuur; UV-lampen en ozon tot 1 week na de laatste toediening uit.',
+      'Minstens 2 weken wachten tussen FMC-50 en Alparex.',
+      'Veroorzaakt blijvende vlekken op onder meer kleding en bestrating.',
+    ],
+    profielen: ['vijver_koi', 'vijver_sier'],
+  },
 ];
 
 /** Eenheden die niet te halveren zijn: naar boven afronden, nooit met komma tonen. */
