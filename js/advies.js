@@ -106,7 +106,7 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
         'Zet extra beluchting bij.',
         'Verhoog de pH nu zeker niet: dat maakt de ammoniak nog giftiger.',
       ],
-      productenMetDosis(['nitrite-rescue', 'bacto-start'], liters, catalogus),
+      productenMetDosis(['bacto-start', 'fresh-bacto'], liters, catalogus),
       [{ na: '2 uur', actie: 'NH₄ en NO₂ opnieuw meten.' }, { na: 'dagelijks', actie: 'Dagelijks meten tot beide waarden 0 zijn.' }],
       true));
   }
@@ -116,12 +116,14 @@ export function maakAdvies(meting, bak, historiek = [], catalogus = PRODUCTEN) {
       'Voedingsbodem voor algen',
       `Nitraat (${fmt('no3', no3)}) én fosfaat (${fmt('po4', po4)}) zitten samen hoog. Dat is de klassieke combinatie waarbij algen binnen enkele weken de bovenhand nemen.`,
       [
+        'Zet er planten bij, en niet één of twee. Een alg is ook een plant: zij eet hetzelfde als uw waterplanten. Zet genoeg planten neer en zij eten de algen hun voedsel weg.',
+        'Voeder minder. Wat uw vissen niet opeten, wordt nitraat en fosfaat, en dat is precies waar de alg van leeft.',
         'Ververs twee weken lang wekelijks 30% van het water.',
-        'Voeder kleinere porties: alles moet binnen 2 minuten op zijn.',
         'Zuig de bodem mee af bij het verversen.',
         'Beperk de verlichting tot 8 uur per dag, zonder direct zonlicht.',
+        'Begin met snelle groeiers: hoornblad, waterpest en Vallisneria nemen het snelst voedingsstoffen op.',
       ],
-      productenMetDosis(['phosphate-control', 'nitrate-control', 'plant-complete'], liters, catalogus),
+      productenMetDosis([], liters, catalogus),
       [{ na: '1 week', actie: 'NO₃ en PO₄ opnieuw meten.' }, { na: '1 maand', actie: 'Foto toevoegen om het verschil te vergelijken.' }]));
   }
 
@@ -233,6 +235,7 @@ const regelsPer = {
     stappen: [
       `Ververs 30% water en herhaal dit wekelijks tot u onder ${fmt('no3', t.ideal[1])} zit.`,
       'Zuig bij het verversen de bodem mee af.',
+      'Zet er planten bij. Planten leven van nitraat: een goed beplante bak houdt de waarde vanzelf laag. Snelle groeiers zoals hoornblad, waterpest en Vallisneria werken het snelst.',
       'Voeder kleiner: alles moet binnen 2 minuten op zijn.',
       'Meet ook uw leidingwater: soms zit daar al 25 mg/l of meer in.',
     ],
@@ -240,16 +243,21 @@ const regelsPer = {
   ph: (v, { teHoog, t }) => ({
     stappen: teHoog
       ? ['Controleer eerst uw KH: die bepaalt hoe hard de pH vastzit.',
-         'Verlaag maximaal 0,2 pH per dag.',
+         'Stuur bij met pH Min. Verlaag maximaal 0,2 pH per dag: een snelle sprong is zwaarder voor uw vissen dan een waarde die een paar dagen te hoog staat.',
          'Kijk na of er kalksteen of koraalgruis in de bak zit dat de pH omhoog duwt.']
       : ['Controleer eerst uw KH: een lage pH komt meestal door een te lage buffer.',
+         'Verhoog eerst de KH met KH Plus. Doet u enkel iets aan de pH, dan zakt ze terug.',
          'Verhoog maximaal 0,2 pH per dag.',
          'Kijk na of hout of turf uw water aan het verzuren is.'],
   }),
   kh: (v, { teHoog }) => ({
     stappen: teHoog
-      ? ['Ververs met zachter water (osmosewater bijmengen).', 'Verlaag traag: maximaal 2 °dH per dag.']
-      : ['Verhoog de KH vóór u iets aan de pH doet.', 'Maximaal 2 °dH per dag verhogen.', 'Meet ook de KH van uw leidingwater.'],
+      ? ['Ververs met zachter water (osmosewater bijmengen).',
+         'Staat ook de pH te hoog, gebruik dan pH Min: dat verbruikt carbonaathardheid en brengt de KH mee omlaag.',
+         'Verlaag traag: maximaal 2 °dH per dag.']
+      : ['Verhoog de KH met KH Plus vóór u iets aan de pH doet. Zonder buffer zakt elke pH-correctie terug.',
+         'Maximaal 2 °dH per dag verhogen.',
+         'Meet ook de KH van uw leidingwater.'],
   }),
   gh: (v, { teHoog }) => ({
     stappen: teHoog
@@ -266,7 +274,10 @@ const regelsPer = {
   }),
   po4: (v, { teHoog }) => ({
     stappen: teHoog
-      ? ['Voeder minder en verwijder voedselresten.', 'Ververs wekelijks 30% water.', 'Meet ook uw leidingwater op fosfaat.']
+      ? ['Voeder minder en verwijder voedselresten.',
+         'Ververs wekelijks 30% water.',
+         'Zet er planten bij. Fosfaat is plantenvoeding: wat de planten opnemen, voedt de algen niet meer.',
+         'Meet ook uw leidingwater op fosfaat.']
       : ['In een beplante bak hebt u een klein beetje fosfaat nodig; doseer bij met plantenvoeding.'],
   }),
   temp: (v, { teHoog }) => ({
@@ -275,10 +286,14 @@ const regelsPer = {
       : ['Controleer of uw verwarming werkt en juist staat.', 'Verwarm geleidelijk, max. 1 °C per uur.'],
   }),
   o2: () => ({
+    urgentie: 'kritiek',
     stappen: [
-      'Zet extra beluchting of oppervlaktebeweging bij.',
-      'Verwijder rottend materiaal en slib.',
+      'Zet de sproeimond van uw filter op het waterpeil, zodat het oppervlak beweegt. Zuurstof komt binnen waar water en lucht elkaar raken, niet uit de diepte.',
+      'Zet een bruissteen bij op een luchtpomp. Dat is de snelste ingreep die u vandaag kan doen.',
+      'Zet er zuurstofplanten bij: hoornblad, waterpest, Vallisneria of waterkers geven overdag zuurstof af.',
+      'Verwijder rottend materiaal en slib: die verbruiken de zuurstof die uw vissen nodig hebben.',
       'Voeder minder tot de waarde weer goed zit.',
+      'Let op bij warm weer: hoe warmer het water, hoe minder zuurstof het kan vasthouden.',
     ],
   }),
   dichtheid: (v, { teHoog }) => ({

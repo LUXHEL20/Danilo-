@@ -28,8 +28,12 @@ export const CATEGORIEEN = [
 ];
 
 /**
- * Het echte assortiment zoals het in de winkel staat, met de doseringen van het
- * etiket. Aangeleverd door LUX AQUA (tabel "Alle doseringen op een rij").
+ * Het assortiment zoals het in de winkel staat, met de doseringen van het etiket.
+ *
+ * LUX AQUA werkt met de producten van COLOMBO. Het merk staat bewust NIET in de
+ * productnamen hieronder: de klant kent ze als Aqua Start en Bacto Start, zoals
+ * ze op het schap staan. Dat wij met Colombo werken, staat één keer bovenaan het
+ * productscherm.
  *
  * Twee dingen die bij het doseren vaak misgaan en die hier daarom apart staan:
  *

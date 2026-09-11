@@ -64,8 +64,10 @@ export async function toonProducten() {
 
   wrap.append(kaart('🧴 Producten',
     h('p', { class: 'klein zacht' },
+      'Wij werken met de producten van Colombo. De doseringen hieronder komen van het etiket.'),
+    h('p', { class: 'klein zacht' },
       liters
-        ? `De doseringen worden meteen berekend voor ${liters} liter, de inhoud van ${bak.naam || 'uw bak'}.`
+        ? `Zij worden meteen berekend voor ${liters} liter, de inhoud van ${bak.naam || 'uw bak'}.`
         : 'Vul de inhoud van uw bak in om de doseringen automatisch te laten berekenen.'),
     veld('Zoeken', zoekveld), chips, filterKnop, lijstHouder,
     // enkel voor LUX AQUA zelf: de klant hoeft dit niet te lezen
