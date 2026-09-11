@@ -1,0 +1,8 @@
+{% extends "basis.html" %}
+{% block inhoud %}
+<div class="kaart">
+  <h1>Niet gevonden</h1>
+  <p>{{ melding }}</p>
+  <p><a class="knop" href="{{ url_for('scannen') }}">Terug naar scannen</a></p>
+</div>
+{% endblock %}

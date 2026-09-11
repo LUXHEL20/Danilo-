@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titel %}Lux 2.0 pakketscanner{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='stijl.css') }}">
+</head>
+<body>
+<header class="balk">
+  <div class="merk">LUX <span>2.0</span></div>
+  <nav>
+    <a href="{{ url_for('scannen') }}" class="{{ 'actief' if request.endpoint == 'scannen' }}">Scannen</a>
+    <a href="{{ url_for('overzicht') }}" class="{{ 'actief' if request.endpoint in ('overzicht', 'pakket') }}">Pakketten</a>
+    <a href="{{ url_for('koeriers') }}" class="{{ 'actief' if request.endpoint == 'koeriers' }}">Koeriers</a>
+    <a href="{{ url_for('bestanden') }}" class="{{ 'actief' if request.endpoint == 'bestanden' }}">Excel</a>
+  </nav>
+</header>
+
+<main>
+  {% with meldingen = get_flashed_messages(with_categories=true) %}
+    {% for soort, tekst in meldingen %}
+      <div class="melding {{ 'fout' if soort == 'fout' else 'ok' }}">{{ tekst }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block inhoud %}{% endblock %}
+</main>
+
+<footer>Lux 2.0 — pakketten in- en uitscannen · Excel-lijsten worden automatisch bijgewerkt na elke scan</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,36 @@
+{% extends "basis.html" %}
+{% block titel %}Koeriers — Lux 2.0{% endblock %}
+{% block inhoud %}
+<div class="kaart">
+  <h1>De 8 koeriers</h1>
+  <p class="telling">Elke koerier heeft een eigen Excel-werklijst in <code>{{ export_map }}</code>.
+     Die lijst wordt na elke scan automatisch bijgewerkt.</p>
+  <div class="tabel-scroll">
+  <table class="tabel">
+    <thead><tr><th>#</th><th>Naam</th><th>Nog af te halen</th><th>Afgehaald</th>
+               <th>Totaal</th><th>Werklijst</th></tr></thead>
+    <tbody>
+      {% for k in koeriers %}
+      {% set s = per_koerier.get(k.id, {}) %}
+      <tr>
+        <td>{{ k.id }}</td>
+        <td>
+          <form method="post" action="{{ url_for('koerier_hernoemen', koerier_id=k.id) }}" class="inline">
+            <input name="naam" value="{{ k.naam }}">
+            <button class="knop klein">Naam opslaan</button>
+          </form>
+        </td>
+        <td><span class="badge oranje">{{ s.get('in_depot') or 0 }}</span></td>
+        <td><span class="badge groen">{{ s.get('afgehaald') or 0 }}</span></td>
+        <td>{{ s.get('totaal') or 0 }}</td>
+        <td>
+          <a class="knop klein" href="{{ url_for('download_koerier', koerier_id=k.id) }}">Excel</a>
+          <a class="knop klein stil" href="{{ url_for('overzicht', koerier=k.id) }}">Pakketten</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

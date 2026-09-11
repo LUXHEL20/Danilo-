@@ -1,0 +1,58 @@
+{% extends "basis.html" %}
+{% block titel %}Pakketten — Lux 2.0{% endblock %}
+{% block inhoud %}
+<div class="kaart">
+  <h1>Pakketten opzoeken</h1>
+  <form class="filters" method="get" action="{{ url_for('overzicht') }}">
+    <input type="search" name="zoek" value="{{ zoek }}"
+           placeholder="Barcode, ontvanger, adres, plaats, telefoon of plank">
+    <select name="koerier">
+      <option value="">Alle koeriers</option>
+      {% for k in koeriers %}
+        <option value="{{ k.id }}" {{ 'selected' if gekozen_koerier == k.id }}>{{ k.naam }}</option>
+      {% endfor %}
+    </select>
+    <select name="status">
+      <option value="">Alle statussen</option>
+      <option value="IN" {{ 'selected' if gekozen_status == 'IN' }}>In depot</option>
+      <option value="AFGEHAALD" {{ 'selected' if gekozen_status == 'AFGEHAALD' }}>Afgehaald</option>
+    </select>
+    <button class="knop">Zoeken</button>
+    <a class="knop stil" href="{{ url_for('overzicht') }}">Wissen</a>
+  </form>
+
+  <p class="telling">{{ pakketten|length }} pakket(ten) gevonden.</p>
+
+  <div class="tabel-scroll">
+  <table class="tabel">
+    <thead>
+      <tr><th>Barcode</th><th>Status</th><th>Koerier</th><th>Ontvanger</th><th>Plaats</th>
+          <th>Plank</th><th>Ingescand</th><th>Afgehaald</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for p in pakketten %}
+      <tr>
+        <td><a href="{{ url_for('pakket', code=p.code) }}"><strong>{{ p.code }}</strong></a></td>
+        <td>
+          {% if p.status == 'AFGEHAALD' %}
+            <span class="badge groen">AFGEHAALD</span>
+          {% else %}
+            <span class="badge oranje">IN DEPOT</span>
+          {% endif %}
+        </td>
+        <td>{{ p.koerier_naam or '—' }}</td>
+        <td>{{ p.ontvanger or '—' }}</td>
+        <td>{{ p.plaats or '—' }}</td>
+        <td>{{ p.plank or '—' }}</td>
+        <td>{{ p.in_op or '—' }}</td>
+        <td>{{ p.uit_op or '—' }}</td>
+        <td><a class="knop klein" href="{{ url_for('download_pakket', code=p.code) }}">Excel</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9" class="leeg">Geen pakketten gevonden.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}

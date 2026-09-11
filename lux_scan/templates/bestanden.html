@@ -1,0 +1,31 @@
+{% extends "basis.html" %}
+{% block titel %}Excel-bestanden — Lux 2.0{% endblock %}
+{% block inhoud %}
+<div class="kaart">
+  <h1>Excel-bestanden</h1>
+  <p class="telling">De app schrijft deze bestanden zelfstandig weg in <code>{{ export_map }}</code>
+     — na elke in- of uitscan opnieuw.</p>
+
+  <h2>Totaallijst</h2>
+  <p>
+    <a class="knop" href="{{ url_for('download_master') }}">{{ master.name }}</a>
+    <span class="pad">{{ master }}</span>
+    {% if not master_bestaat %}<em>(wordt aangemaakt bij de eerste scan of download)</em>{% endif %}
+  </p>
+
+  <h2>Werklijst per koerier</h2>
+  <ul class="bestandenlijst">
+    {% for item in koerierbestanden %}
+      <li>
+        <a class="knop klein" href="{{ url_for('download_koerier', koerier_id=item.koerier.id) }}">Download</a>
+        <strong>{{ item.koerier.naam }}</strong>
+        <span class="pad">{{ item.pad.name }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <form method="post" action="{{ url_for('bestanden_hernieuwen') }}">
+    <button class="knop">Alle bestanden nu opnieuw aanmaken</button>
+  </form>
+</div>
+{% endblock %}

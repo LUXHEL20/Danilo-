@@ -1,0 +1,57 @@
+{% extends "basis.html" %}
+{% block titel %}Pakket {{ pakket.code }} — Lux 2.0{% endblock %}
+{% block inhoud %}
+<div class="kaart">
+  <h1>Pakket {{ pakket.code }}</h1>
+  <p>
+    {% if pakket.status == 'AFGEHAALD' %}
+      <span class="badge groen groot">AFGEHAALD op {{ pakket.uit_op }}</span>
+    {% else %}
+      <span class="badge oranje groot">IN DEPOT sinds {{ pakket.in_op }}</span>
+    {% endif %}
+  </p>
+
+  <form method="post" action="{{ url_for('pakket_bijwerken', code=pakket.code) }}">
+    <div class="raster">
+      <label>Koerier
+        <select name="koerier_id">
+          {% for k in koeriers %}
+            <option value="{{ k.id }}" {{ 'selected' if k.id == pakket.koerier_id }}>{{ k.naam }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Ontvanger<input name="ontvanger" value="{{ pakket.ontvanger }}"></label>
+      <label>Adres<input name="adres" value="{{ pakket.adres }}"></label>
+      <label>Postcode<input name="postcode" value="{{ pakket.postcode }}"></label>
+      <label>Plaats<input name="plaats" value="{{ pakket.plaats }}"></label>
+      <label>Telefoon<input name="telefoon" value="{{ pakket.telefoon }}"></label>
+      <label>Plank/locatie<input name="plank" value="{{ pakket.plank }}"></label>
+      <label class="breed">Opmerking<input name="opmerking" value="{{ pakket.opmerking }}"></label>
+    </div>
+    <div class="knoppen">
+      <button class="knop">Opslaan</button>
+      <a class="knop stil" href="{{ url_for('download_pakket', code=pakket.code) }}">Excel van dit pakket</a>
+      <a class="knop stil" href="{{ url_for('overzicht') }}">Terug</a>
+    </div>
+  </form>
+</div>
+
+<div class="kaart">
+  <h2>Scanhistorie</h2>
+  <table class="tabel">
+    <thead><tr><th>Tijdstip</th><th>Actie</th><th>Koerier</th><th>Door</th><th>Notitie</th></tr></thead>
+    <tbody>
+      {% for s in scans %}
+      <tr>
+        <td>{{ s.tijdstip }}</td>
+        <td><span class="badge {{ 'groen' if s.actie == 'UIT' else 'oranje' }}">
+            {{ 'AFGEHAALD' if s.actie == 'UIT' else 'INGESCAND' }}</span></td>
+        <td>{{ s.koerier_naam or '—' }}</td>
+        <td>{{ s.gebruiker or '—' }}</td>
+        <td>{{ s.notitie or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
