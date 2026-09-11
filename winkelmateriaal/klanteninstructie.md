@@ -25,6 +25,10 @@ bij een algemeen bericht.
 ```
 Dag [NAAM],
 
+*Open deze link in Safari (iPhone) of Chrome (Android), niet in het venstertje van
+WhatsApp zelf. Houd de link even ingedrukt en kies Openen in Safari of Openen in
+Chrome.*
+
 Wij hebben een app voor uw aquarium of vijver: LUX AQUA.
 
 U noteert uw waterwaarden, of u fotografeert uw teststrip en de app leest ze
@@ -50,7 +54,9 @@ LUX AQUA, onderdeel van LUX 2.0
 ```
 Dag [NAAM], hier is de LUX AQUA-app voor uw waterwaarden:
 https://luxhelchteren.be/aqua/installeren.html
-Open de link op uw telefoon en zet de app op uw beginscherm.
+*Houd de link even ingedrukt en kies Openen in Safari (iPhone) of Openen in
+Chrome (Android), niet het venstertje van WhatsApp zelf.*
+Zet de app daarna op uw beginscherm.
 Gratis, zonder account. Vragen? 011 91 92 91.
 ```
 
@@ -163,7 +169,8 @@ Ja. Na de eerste keer openen werkt de app ook zonder verbinding. U kan gewoon me
 Voor het versturen van een hulpvraag of het delen van uw dossier hebt u wel verbinding nodig.
 
 **En als ik een nieuwe telefoon heb?**
-Uw gegevens verhuizen niet vanzelf mee. Maak eerst een back-up op uw oude telefoon: tik in de app
+Uw gegevens verhuizen niet vanzelf mee. De miniaturen van uw foto's gaan mee in de back-up, de
+foto's op volle grootte niet. Maak eerst een back-up op uw oude telefoon: tik in de app
 rechtsboven op het tandwiel, ga naar **Gegevens en back-up** en tik op **Back-up maken**. Bewaar dat
 bestand goed, bijvoorbeeld door het naar uzelf te mailen. Zet daarna op uw nieuwe telefoon de app op
 het beginscherm, ga opnieuw naar het tandwiel en kies **Back-up terugzetten**.
@@ -173,6 +180,13 @@ het beginscherm, ga opnieuw naar het tandwiel en kies **Back-up terugzetten**.
 ## Nog te doen, voor dit materiaal de deur uit gaat
 
 - De app op luxhelchteren.be/aqua zetten. Zolang dat niet gebeurd is, werkt de link nog niet.
+- Het adres moet **https** zijn en mag geen certificaatwaarschuwing geven. Op een gewoon http-adres
+  werkt de app wel, maar zonder offlinewerking, zonder installatieknop op Android en met delen dat
+  terugvalt op een download. Er komt daarbij geen enkele foutmelding. Kijk ook na of de host http
+  automatisch doorstuurt naar https, en stuur nooit een http-link door.
+- Eén controle op een echt toestel: link openen, app openen, toestel in vliegtuigmodus, herladen.
+  Blijft de app werken, dan staat alles goed. In de app zelf staat het ook bij het tandwiel, onder
+  **Over deze app**: de regel **Offline klaar: ja of nee**.
 - De link daarna zelf één keer testen op een Android-toestel en één keer op een iPhone, vóór u hem
   rondstuurt.
 - Wijzigt het adres toch nog, voer dan `node scripts/maak-qr.mjs <nieuw adres>` uit en controleer de

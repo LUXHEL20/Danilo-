@@ -1,6 +1,6 @@
 /* Service worker: de app blijft werken zonder internet. */
 /* Verhoog CACHE bij elke wijziging aan de lijst hieronder; oude caches worden dan opgeruimd. */
-const CACHE = 'luxaqua-v3';
+const CACHE = 'luxaqua-v4';
 const BESTANDEN = [
   './', './index.html', './manifest.webmanifest',
   './css/style.css',
@@ -16,8 +16,25 @@ const BESTANDEN = [
   './js/views/beheer.js', './js/views/onderdelen.js',
 ];
 
+/* Zonder deze vier start de app niet; de rest mag ontbreken zonder de offlinewerking te slopen. */
+const KERN = ['./', './index.html', './css/style.css', './js/app.js'];
+
+/**
+ * Vult de precache bestand per bestand. addAll is alles of niets: één ontbrekend of
+ * verkeerd gespeld bestand op de host maakte vroeger de hele service worker onbruikbaar,
+ * zonder enig signaal. Nu blijft de app offline werken en staat wat misliep in de console.
+ */
+async function vulCache() {
+  const c = await caches.open(CACHE);
+  const uitkomsten = await Promise.allSettled(BESTANDEN.map((b) => c.add(b)));
+  const mislukt = BESTANDEN.filter((_, i) => uitkomsten[i].status === 'rejected');
+  if (mislukt.length) console.warn(`[LUX AQUA] niet in de cache gekregen (${mislukt.length}): ${mislukt.join(', ')}`);
+  const kernWeg = mislukt.filter((b) => KERN.includes(b));
+  if (kernWeg.length) throw new Error(`kernbestanden ontbreken: ${kernWeg.join(', ')}`);
+}
+
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(BESTANDEN)).then(() => self.skipWaiting()));
+  e.waitUntil(vulCache().then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

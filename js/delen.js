@@ -243,8 +243,43 @@ export async function printDossier(dossier) {
   // het standaardlogo inlijnen: het html-bestand moet ook los van de app (gedeeld, als pdf) zijn logo tonen
   const html = dossierAlsHtml(dossier, { ...inst, logo: inst.logo || await standaardLogoDataUrl() });
   if (isNative()) return bewaarEnDeelBestand('luxaqua-dossier.html', html, 'text/html');
+  // eerst het verborgen kader: window.open na een await valt buiten de gebruikersactivering
+  // en wordt dan als pop-up geblokkeerd, zeker in een app op het beginscherm
+  if (printViaKader(html)) return;
   const v = window.open('', '_blank');
   if (!v) { melding('Sta pop-ups toe om het dossier af te drukken.', 'fout'); return; }
   v.document.write(html); v.document.close();
   setTimeout(() => v.print(), 400);
+}
+
+/**
+ * Print het dossier in een verborgen kader (iframe) in dezelfde pagina. Dat werkt ook
+ * wanneer de app vanaf het beginscherm draait en heeft geen apart venster nodig.
+ * De titel in de html wordt de bestandsnaam van de pdf.
+ * @param {string} html
+ * @returns {boolean} false wanneer het kader niet gemaakt raakt (dan volgt de terugval)
+ */
+function printViaKader(html) {
+  try {
+    const kader = document.createElement('iframe');
+    kader.setAttribute('aria-hidden', 'true');
+    kader.setAttribute('title', 'Dossier afdrukken');
+    kader.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0';
+    document.body.append(kader);
+    const doc = kader.contentDocument;
+    if (!doc) { kader.remove(); return false; }
+    doc.open(); doc.write(html); doc.close();
+    const afdrukken = () => {
+      try { kader.contentWindow.focus(); kader.contentWindow.print(); }
+      catch (e) { console.error(e); melding('Afdrukken lukte niet. Bewaar het dossier als bestand.', 'fout'); }
+      // pas opruimen als het afdrukvenster zeker weg is: te vroeg wissen breekt de pdf af
+      setTimeout(() => kader.remove(), 60000);
+    };
+    if (doc.readyState === 'complete') setTimeout(afdrukken, 300);
+    else kader.addEventListener('load', () => setTimeout(afdrukken, 300), { once: true });
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 }

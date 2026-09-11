@@ -137,6 +137,7 @@ export async function toonBeheer() {
   /* --- gegevens --- */
   wrap.append(kaart('💾 Gegevens en back-up',
     h('p', { class: 'klein zacht' }, 'Alles staat op dit toestel. Maak regelmatig een back-up, zeker vóór u van toestel verandert.'),
+    h('p', { class: 'klein zacht' }, 'In de back-up zitten al uw metingen, bakken en notities. De miniaturen van uw foto\'s gaan mee, de foto\'s op volle grootte niet.'),
     h('div', { class: 'knoprij' },
       h('button', { class: 'knop knop--primair', onclick: maakBackup }, '⬇️ Back-up maken'),
       h('button', { class: 'knop knop--stil', onclick: zetBackupTerug }, '📥 Back-up terugzetten'),
@@ -159,10 +160,24 @@ export async function toonBeheer() {
       h('li', {}, 'Werkt offline: u kan meten en noteren zonder internet.'),
       h('li', {}, 'Uw gegevens blijven op uw toestel tot u ze zelf deelt.'),
       h('li', {}, 'Voeg de app toe aan uw beginscherm om ze als een gewone app te gebruiken.'),
-      h('li', {}, 'De aflezing van een teststrip is een hulpmiddel: bij twijfel of bij een alarmerende waarde bevestigt u met een druppeltest.')),
+      h('li', {}, 'De aflezing van een teststrip is een hulpmiddel: bij twijfel of bij een alarmerende waarde bevestigt u met een druppeltest.'),
+      offlineRegel()),
     h('p', { class: 'mini zacht' }, `Gegevens laatst gewijzigd: ${datum(Date.now())}`)));
 
   return wrap;
+}
+
+/**
+ * Eén regel die meteen laat zien of de offlinewerking effectief aan staat. Handig na het
+ * uploaden naar de host: is het antwoord nee, dan is de service worker niet geregistreerd
+ * (geen https, of een bestand uit de precache-lijst ontbreekt op de server).
+ */
+function offlineRegel() {
+  if (isNative()) return h('li', {}, 'Offline klaar: ja. In de app staan alle bestanden op het toestel zelf.');
+  const aan = !!navigator.serviceWorker?.controller;
+  return h('li', {}, h('strong', {}, `Offline klaar: ${aan ? 'ja' : 'nee'}.`), ' ', aan
+    ? 'De app is klaar om zonder internet te werken.'
+    : 'Herlaad deze pagina één keer. Blijft het nee, dan staat de app niet op een https-adres of ontbreekt er een bestand op de server.');
 }
 
 /* ------------------------------------------------------------------- back-ups */

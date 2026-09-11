@@ -178,23 +178,29 @@ function kiesFotoWeb(bron, meerdere, accept = 'image/*') {
     inv.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';
     let klaar = false;
     let focusTimer = null;
-    const afronden = (bestanden) => {
+    // Browsers met een 'cancel'-event melden zelf netjes dat de kiezer gesloten werd
+    // (Chrome en iOS 16.4 en hoger). Dan hebben wij geen terugval op focus nodig.
+    const heeftCancel = typeof inv.oncancel !== 'undefined';
+    const afronden = (bestanden, stil = true) => {
       if (klaar) return;
       klaar = true;
       clearTimeout(focusTimer);
       window.removeEventListener('focus', opFocus);
+      // de input blijft in de DOM tot de belofte opgelost is, nooit langer
       setTimeout(() => inv.remove(), 0);
+      if (!stil) melding('Er kwam geen foto binnen. Probeer het opnieuw.', 'fout');
       resolve(bestanden);
     };
     inv.addEventListener('change', () => afronden(Array.from(inv.files || [])));
     inv.addEventListener('cancel', () => afronden([]));
-    // terugval voor browsers zonder 'cancel'-event: komt de focus terug zonder change,
-    // dan heeft de gebruiker de kiezer gesloten (afronden is idempotent, dus dit botst niet met 'cancel')
+    // Terugval enkel voor oudere browsers zonder 'cancel'-event. Ruim genomen (20 s):
+    // op een trage telefoon komt de focus bij het terugkeren uit de camera-app vaak
+    // vóór het change-event, en een te korte terugval gooit die foto dan weg.
     const opFocus = () => {
       clearTimeout(focusTimer);
-      focusTimer = setTimeout(() => { if (!inv.files?.length) afronden([]); }, 1500);
+      focusTimer = setTimeout(() => { if (!inv.files?.length) afronden([], false); }, 20000);
     };
-    window.addEventListener('focus', opFocus);
+    if (!heeftCancel) window.addEventListener('focus', opFocus);
     document.body.append(inv);
     inv.click();
   });

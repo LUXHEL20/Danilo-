@@ -3,6 +3,27 @@ import { h, veld, invoer, keuze, tekstvak, melding } from '../ui.js';
 import * as store from '../store.js';
 import { PROFILES } from '../params.js';
 import { teken, logoElement } from '../app.js';
+import { isNative } from '../native.js';
+
+/**
+ * Waarschuwing enkel op een iPhone in Safari, zolang de app nog niet vanaf het beginscherm draait.
+ * Op iOS krijgt de app op het beginscherm een eigen, lege opslag: wie eerst in de browser gegevens
+ * ingeeft en pas daarna het icoon maakt, begint opnieuw. In de Capacitor-app klopt dit niet
+ * (display-mode is daar ook standalone), vandaar de controle op isNative().
+ */
+function beginschermTip() {
+  if (isNative()) return null;
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS) return null;
+  const opBeginscherm = window.matchMedia?.('(display-mode: standalone)')?.matches === true || navigator.standalone === true;
+  if (opBeginscherm) return null;
+  return h('div', { class: 'kaart', style: { marginBottom: '12px' } },
+    h('strong', {}, '📲 Zet LUX AQUA eerst op uw beginscherm, anders begint u straks opnieuw.'),
+    h('p', { class: 'klein zacht', style: { margin: '6px 0 0' } },
+      'Tik onderaan op de deelknop, veeg naar beneden en kies Zet op beginscherm. Open de app daarna ' +
+      'via het nieuwe icoon. Wat u nu al invult, gaat anders niet mee.'));
+}
 
 export async function toonOnboarding() {
   const houder = h('div', { class: 'onboarding' });
@@ -15,11 +36,12 @@ export async function toonOnboarding() {
   function vorige() { stap = Math.max(0, stap - 1); render(); }
 
   function render() {
-    houder.replaceChildren(
+    houder.replaceChildren(...[
+      beginschermTip(),
       h('div', { class: 'voortgang', style: { margin: '0 0 16px' } },
         h('span', { style: { width: `${((stap + 1) / stappen.length) * 100}%` } })),
       stappen[stap](),
-    );
+    ].filter(Boolean));
   }
 
   function welkom() {

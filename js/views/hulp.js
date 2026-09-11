@@ -191,7 +191,9 @@ async function verstuurKeuze(dossier, instellingen) {
       h('div', { class: 'kolom' },
         h('button', { class: 'knop knop--primair knop--vol', onclick: () => deelDossier(dossier) }, '📤 Delen via mijn toestel (WhatsApp, mail, …)'),
         h('a', { class: 'knop knop--stil knop--vol', href: whatsappLink(tekst, b.telefoon || ''), target: '_blank', rel: 'noopener' }, '💬 Via WhatsApp'),
-        h('a', { class: 'knop knop--stil knop--vol', href: mailLink(tekst, b.email || ''), target: '_blank', rel: 'noopener' }, '✉️ Via e-mail'),
+        // geen target="_blank" op een mailto:-link: in een app op het beginscherm opent dat
+        // een leeg venster in plaats van het mailprogramma (de wa.me-link is http en mag wel)
+        h('a', { class: 'knop knop--stil knop--vol', href: mailLink(tekst, b.email || '') }, '✉️ Via e-mail'),
         h('button', { class: 'knop knop--stil knop--vol', onclick: () => exporteerDossier(dossier) }, '⬇️ Als bestand bewaren'),
         h('button', { class: 'knop knop--stil knop--vol', onclick: () => printDossier(dossier) },
           isNative() ? '📄 Dossier als bestand delen' : '🖨️ Afdrukken of als pdf bewaren'),

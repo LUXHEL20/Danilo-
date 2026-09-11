@@ -7,6 +7,11 @@
 <meta name="description" content="Zet de LUX AQUA-app op het beginscherm van uw telefoon en houd uw waterwaarden bij.">
 <meta name="theme-color" content="#0D1730">
 <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+<!-- Chrome vuurt beforeinstallprompt enkel af op een pagina die zelf een geldig manifest linkt.
+     start_url staat op ./index.html, dus een icoon dat hier gemaakt wordt, opent gewoon de app. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" sizes="180x180">
+<meta name="apple-mobile-web-app-title" content="LUX AQUA">
 <style>
   :root {
     --marine: #0D1730;
@@ -150,6 +155,13 @@
     </ul>
   </div>
 
+  <div class="melding melding--let-op" style="margin-top:20px">
+    <strong>Open deze link in Safari (iPhone) of Chrome (Android), niet in het venstertje van
+    WhatsApp zelf.</strong> Houd de link even ingedrukt en kies <strong>Openen in Safari</strong>
+    of <strong>Openen in Chrome</strong>. In het venstertje van WhatsApp of Facebook kan u niets
+    op uw beginscherm zetten.
+  </div>
+
   <div class="tabs" role="tablist">
     <button id="tab-android" role="tab" aria-selected="false" aria-controls="uitleg-android">Android</button>
     <button id="tab-ios" role="tab" aria-selected="false" aria-controls="uitleg-ios">iPhone</button>
@@ -183,7 +195,7 @@
     <div class="vraag"><strong>Moet ik een account maken?</strong><span>Nee. U vult gewoon uw gegevens in en u kan starten.</span></div>
     <div class="vraag"><strong>Waar staan mijn gegevens?</strong><span>Op uw eigen toestel. Er wordt niets doorgestuurd tot u zelf op delen drukt.</span></div>
     <div class="vraag"><strong>Werkt het zonder internet?</strong><span>Ja, na de eerste keer openen werkt de app ook offline.</span></div>
-    <div class="vraag"><strong>En als ik een nieuwe telefoon heb?</strong><span>Maak eerst een back-up in de app, bij Beheer. Uw gegevens verhuizen niet vanzelf mee.</span></div>
+    <div class="vraag"><strong>En als ik een nieuwe telefoon heb?</strong><span>Maak eerst een back-up in de app, bij Beheer. Uw gegevens verhuizen niet vanzelf mee. De miniaturen van uw foto's gaan mee, de foto's op volle grootte niet.</span></div>
   </div>
 
   <a class="knop knop--stil" href="./">De app openen</a>
@@ -202,7 +214,11 @@
       || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     // Browsers ín een andere app (Facebook, Instagram, WhatsApp, ...) kunnen niets
     // op het beginscherm zetten. Daar moet de bezoeker eerst naar Safari of Chrome.
-    var inAndereApp = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|LinkedInApp|Snapchat|Pinterest|TikTok/.test(ua);
+    // '; wv)' is de merker van een Android-WebView: zo opent WhatsApp, Messenger en de meeste
+    // andere apps hun eigen venstertje. Op iPhone gebruikt WhatsApp een Safari View Controller
+    // met exact dezelfde useragent als Safari: daar valt dit niet te herkennen, vandaar ook de
+    // vaste zin bovenaan de pagina.
+    var inAndereApp = /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|LinkedInApp|Snapchat|Pinterest|TikTok|; wv\)/.test(ua);
     var alGeinstalleerd = window.matchMedia('(display-mode: standalone)').matches
       || navigator.standalone === true;
 

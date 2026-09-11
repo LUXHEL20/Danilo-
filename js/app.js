@@ -184,7 +184,11 @@ teken().then(() => initNative());
 // In de native app staan alle bestanden lokaal: geen service worker nodig.
 if (!isNative() && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {/* offline werkt dan gewoon niet, geen ramp */});
+    navigator.serviceWorker.register('sw.js').catch((e) => {
+      // niet stil laten mislukken: zonder service worker werkt de app online prima,
+      // maar offline niet, en dat is precies wat u na het uploaden wil kunnen zien
+      console.warn('[LUX AQUA] service worker niet geregistreerd, de app werkt dan niet offline:', e);
+    });
   });
 }
 
