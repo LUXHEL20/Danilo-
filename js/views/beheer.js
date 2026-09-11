@@ -6,7 +6,7 @@ import { koppels as kweekKoppels } from '../kweek.js';
 import { ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import * as db from '../db.js';
-import { CATEGORIEEN } from '../products.js';
+import { CATEGORIEEN, assortimentControle } from '../products.js';
 import { PARAMETERS, STRIP_PRESETS, param } from '../params.js';
 import { laadAfbeelding, naarCanvas, leesKleurenkaart, thumbnail } from '../strip.js';
 import { rgbToCss } from '../color.js';
@@ -122,7 +122,11 @@ export async function toonBeheer() {
       h('button', {
         class: 'knop knop--stil', onclick: () => bewaarEnDeelBestand('luxaqua-producten.json', JSON.stringify(catalogus, null, 2), 'application/json'),
       }, '⬇️ Exporteren'),
-      h('button', { class: 'knop knop--stil', onclick: () => importeerProducten() }, '📥 Importeren'))));
+      h('button', { class: 'knop knop--stil', onclick: () => importeerProducten() }, '📥 Importeren')),
+    h('button', {
+      class: 'knop knop--stil knop--vol', style: { marginTop: '8px' },
+      onclick: () => toonAssortimentControle(catalogus),
+    }, '🔍 Welke adviezen hebben nog geen product?')));
 
   /* --- koppeling --- */
   if (isLux) {
@@ -205,6 +209,53 @@ export async function toonBeheer() {
  * uploaden naar de host: is het antwoord nee, dan is de service worker niet geregistreerd
  * (geen https, of een bestand uit de precache-lijst ontbreekt op de server).
  */
+/**
+ * Toont per adviesplaats welk product er antwoordt. Zo is in één scherm te zien
+ * waar het advies nog zonder product en zonder dosering blijft staan.
+ */
+async function toonAssortimentControle(catalogus) {
+  const rijen = assortimentControle(catalogus);
+  const leeg = rijen.filter((r) => !r.producten.length);
+  const zonderDosis = rijen.filter((r) => r.producten.length && r.producten.every((p) => !p.heeftDosis));
+
+  await dialoog({
+    titel: 'Uw assortiment tegenover het advies',
+    breed: true,
+    inhoud: h('div', {},
+      h('p', { class: 'klein zacht' },
+        'Bij elke meting stelt de app de handeling voor: hoeveel water verversen, niet voederen, beluchten. ' +
+        'Voor het product en de dosering kijkt zij in uw catalogus. Hieronder staat welke plekken al ingevuld zijn.'),
+      leeg.length
+        ? h('p', { class: 'klein', style: { color: 'var(--letop)' } },
+          `${leeg.length} ${leeg.length === 1 ? 'advies heeft' : 'adviezen hebben'} nog geen product. Daar toont de app enkel de handeling.`)
+        : h('p', { class: 'klein', style: { color: 'var(--goed)' } }, 'Elk advies heeft een product.'),
+      zonderDosis.length
+        ? h('p', { class: 'klein', style: { color: 'var(--letop)' } },
+          `${zonderDosis.length} ${zonderDosis.length === 1 ? 'plek heeft' : 'plekken hebben'} wel een product maar geen dosering. Daar noemt de app de naam zonder milliliters.`)
+        : null,
+      ...rijen.map((r) => h('div', { class: 'assortimentrij' },
+        h('div', { class: 'rij' },
+          h('strong', { class: 'groei' }, r.label),
+          badge(r.producten.length ? (r.producten.some((p) => p.heeftDosis) ? 'Klaar' : 'Geen dosering')
+            : 'Geen product',
+          r.producten.length ? (r.producten.some((p) => p.heeftDosis) ? 'goed' : 'let-op') : 'kritiek')),
+        h('p', { class: 'mini zacht' }, r.wanneer),
+        r.producten.length
+          ? h('ul', { class: 'opsomming mini' },
+            ...r.producten.map((p) => h('li', {},
+              p.naam, p.heeftDosis ? ` · ${p.dosistekst}` : ' · nog geen dosering ingevuld')))
+          : h('p', { class: 'mini', style: { color: 'var(--letop)' } },
+            'Vul hier het product in dat u hiervoor verkoopt, met de dosering van het etiket.'))),
+      h('p', { class: 'mini zacht' },
+        'De doseringen in de startcatalogus volgen de gangbare normen voor aquariumproducten. ' +
+        'Vervang ze door wat er op uw eigen etiket staat: dat is de enige dosering waar u achter kan staan.')),
+    acties: [
+      { label: 'Sluiten', waarde: null },
+      { label: 'Producten beheren', stijl: 'knop--primair', actie: async () => { beheerProducten(); return true; } },
+    ],
+  });
+}
+
 /** Een eigen wachtwoord instellen op dit toestel. */
 async function wachtwoordDialoog() {
   const huidig = invoer({ type: 'password', autocomplete: 'current-password' });

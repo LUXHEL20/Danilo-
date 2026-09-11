@@ -446,6 +446,11 @@ main {
   overflow-wrap: anywhere;
 }
 
+.assortimentrij {
+  border-top: 1px solid var(--rand); padding-top: 10px; margin-top: 10px;
+}
+.assortimentrij:first-of-type { border-top: 0; }
+
 @media print {
   .kopbalk, .navigatie, .knoprij, #meldingen { display: none !important; }
   main { padding: 0; max-width: none; }

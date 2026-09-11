@@ -398,3 +398,45 @@ export function productenVoor(paramId, richting, profielId, lijst = PRODUCTEN) {
     (!profielId || !p.profielen || p.profielen.includes(profielId))
   );
 }
+
+/**
+ * De plaatsen in het advies waar een product gevraagd wordt.
+ *
+ * Het advies zoekt telkens op parameter plus richting. Staat er voor zo'n plek
+ * geen product in de catalogus, dan geeft de app wel de handeling (verversen,
+ * niet voederen, beluchten) maar geen product en geen dosering. Deze lijst
+ * maakt zichtbaar welke plekken nog leeg zijn.
+ */
+export const ADVIESPLAATSEN = [
+  { param: 'cl2', richting: 'neutraliseert', label: 'Chloor in leidingwater', wanneer: 'Bij elke waterverversing en bij bijvullen.' },
+  { param: 'no2', richting: 'omlaag', label: 'Nitriet te hoog', wanneer: 'Noodsituatie: verversen, niet voederen, beluchten.' },
+  { param: 'nh4', richting: 'omlaag', label: 'Ammonium of ammoniak te hoog', wanneer: 'Noodsituatie, vaak samen met nitriet.' },
+  { param: 'no3', richting: 'omlaag', label: 'Nitraat te hoog', wanneer: 'Structureel: verversen en minder voederen.' },
+  { param: 'po4', richting: 'omlaag', label: 'Fosfaat te hoog', wanneer: 'Vaak de motor achter draadalgen.' },
+  { param: 'kh', richting: 'omhoog', label: 'KH te laag', wanneer: 'Bij een instabiele pH of een pH-val.' },
+  { param: 'kh', richting: 'omlaag', label: 'KH te hoog', wanneer: 'Bij zachtwatervissen en garnalen.' },
+  { param: 'gh', richting: 'omhoog', label: 'GH te laag', wanneer: 'Bij osmosewater en bij levendbarenden.' },
+  { param: 'gh', richting: 'omlaag', label: 'GH te hoog', wanneer: 'Bij zachtwatervissen en kweek.' },
+  { param: 'ph', richting: 'omlaag', label: 'pH te hoog', wanneer: 'Stapsgewijs, hoogstens 0,2 per dag.' },
+  { param: 'ph', richting: 'omhoog', label: 'pH te laag', wanneer: 'Eerst de KH nakijken, anders zakt ze terug.' },
+  { param: 'o2', richting: 'omhoog', label: 'Zuurstof te laag', wanneer: 'Vooral in de vijver bij warm weer.' },
+  { param: 'fe', richting: 'omhoog', label: 'IJzer te laag', wanneer: 'Bij bleke of doorschijnende plantenbladeren.' },
+];
+
+/**
+ * Kijkt per adviesplaats na welk product er antwoordt en of dat product een
+ * dosering heeft. Zonder dosering toont de app de naam wel, maar geen milliliters.
+ */
+export function assortimentControle(catalogus = PRODUCTEN) {
+  return ADVIESPLAATSEN.map((plek) => {
+    const gevonden = productenVoor(plek.param, plek.richting, null, catalogus);
+    return {
+      ...plek,
+      producten: gevonden.map((p) => ({
+        id: p.id, naam: p.naam,
+        heeftDosis: !!(p.dosering && p.dosering.hoeveelheid && p.dosering.per),
+        dosistekst: p.dosering?.omschrijving || '',
+      })),
+    };
+  });
+}
