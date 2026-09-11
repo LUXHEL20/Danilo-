@@ -112,7 +112,16 @@ export async function toonProduct(p, liters, bak) {
           h('strong', { style: { fontSize: '1.3rem' } }, `${r.hoeveelheid} ${r.eenheid}`)),
         h('p', { class: 'mini zacht', style: { margin: '4px 0 0' } },
           `${r.omschrijving}${r.omschrijving ? ' · ' : ''}berekend voor ${r.basis === 'versWater' ? `${r.liters} liter vers water` : `${r.liters} liter bakinhoud`}`)))
-      : [h('p', { class: 'klein zacht' }, 'Voor dit product staat er nog geen dosering in de app.')]));
+      : [h('div', { class: 'kaart kaart--vlak', style: { marginTop: '8px' } },
+        h('div', { class: 'rij rij--tussen' },
+          h('span', { class: 'zacht klein' }, p.dosering?.label || 'Dosering'),
+          h('strong', {}, p.dosering?.omschrijving ? '' : '–')),
+        h('p', { class: 'klein', style: { margin: '4px 0 0' } },
+          p.dosering?.omschrijving || 'Voor dit product staat er nog geen dosering in de app.'),
+        p.dosering?.model === 'geen'
+          ? h('p', { class: 'mini zacht', style: { margin: '6px 0 0' } },
+            'Dit product telt u zelf af: de app kan er geen getal van maken.')
+          : null)]));
   };
   [doseerVeld, deltaVeld, versVeld].filter(Boolean).forEach((v) => v.addEventListener('input', herbereken));
   herbereken();

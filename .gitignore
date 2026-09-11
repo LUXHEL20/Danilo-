@@ -32,3 +32,6 @@ android/app/*.keystore
 
 # Winkelscreenshots: regenereren per release met npm run screenshots
 winkelmateriaal/screenshots/
+
+# gebouwde webmap en zip voor de host
+dist/

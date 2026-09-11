@@ -102,9 +102,27 @@ await stap('producten met dosering', async () => {
   await page.locator('.klikbaar', { hasText: 'Fresh Bacto' }).first().click();
   await page.waitForSelector('.dialoog');
   const twee = await page.locator('.dialoog').innerText();
-  if (!/opstart/i.test(twee) || !/verse water/i.test(twee)) {
+  if (!/opstart/i.test(twee) || !/onderhoud/i.test(twee)) {
     throw new Error('de tweede dosering ontbreekt: ' + twee.slice(0, 200));
   }
+  await page.locator('.dialoog .icoonknop').click();
+
+  /* Black Water wisselt van basis: bij de start op de bak, daarna op vers water.
+     Beide getallen moeten naast elkaar staan, met hun eigen volume erbij. */
+  await page.locator('.klikbaar', { hasText: 'Black Water' }).first().click();
+  await page.waitForSelector('.dialoog');
+  const gemengd = await page.locator('.dialoog').innerText();
+  if (!/bakinhoud/i.test(gemengd) || !/vers water/i.test(gemengd)) {
+    throw new Error('Black Water toont de twee basissen niet: ' + gemengd.slice(0, 250));
+  }
+  await page.locator('.dialoog .icoonknop').click();
+
+  /* Filterpads gaan met sprongen en mogen nooit een kommagetal tonen. */
+  await page.locator('.klikbaar', { hasText: 'Nitro Stop' }).first().click();
+  await page.waitForSelector('.dialoog');
+  const pads = await page.locator('.dialoog').innerText();
+  if (!/\d+ pads?/.test(pads)) throw new Error('geen aantal pads: ' + pads.slice(0, 200));
+  if (/\d+[.,]\d+ pad/.test(pads)) throw new Error('halve pad in de dosering: ' + pads.slice(0, 200));
   await page.locator('.dialoog .icoonknop').click();
 });
 await stap('hulpvraag aanmaken', async () => {
