@@ -138,6 +138,44 @@ export function exporteerDossier(dossier) {
   return 'gedownload';
 }
 
+/**
+ * Bouwt een agendabestand (.ics, RFC 5545) met één herinnering erin. De agenda
+ * van het toestel zelf toont het alarm op het afgesproken moment: de app heeft
+ * daar geen server voor nodig en belooft ook niets wat ze niet kan waarmaken.
+ * ACTION:DISPLAY met TRIGGER:PT0M laat de agenda de tekst tonen op het moment
+ * van het agendapunt zelf (zie RFC 5545 §3.6.6 en RFC 9074).
+ */
+function icsDatum(ts) {
+  const d = new Date(ts);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+}
+const icsTekst = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/[,;]/g, '\\$&').replace(/\r?\n/g, '\\n');
+
+export function agendaBestand({ titel, beschrijving, datumTs }) {
+  const uid = `luxaqua-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@luxaqua`;
+  return [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LUX AQUA//NL', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${icsDatum(Date.now())}`,
+    `DTSTART:${icsDatum(datumTs)}`,
+    `SUMMARY:${icsTekst(titel)}`,
+    `DESCRIPTION:${icsTekst(beschrijving)}`,
+    'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsTekst(titel)}`, 'TRIGGER:PT0M', 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR',
+  ].join('\r\n');
+}
+
+/** Zet een herinnering in de agenda van het toestel: download op het web, deelmenu in de native app. */
+export function agendaAfspraak({ titel, beschrijving, datumTs }) {
+  const naam = `luxaqua-${titel.replace(/[^\w-]+/g, '-').toLowerCase()}.ics`;
+  const inhoud = agendaBestand({ titel, beschrijving, datumTs });
+  if (isNative()) return bewaarEnDeelBestand(naam, inhoud, 'text/calendar');
+  download(naam, inhoud, 'text/calendar');
+  return 'gedownload';
+}
+
 /** Deelt via het deelmenu van het toestel, met terugval op kopiëren. */
 export async function deelDossier(dossier, { metBestand = !isAndroid() } = {}) {
   // op Android geven WhatsApp en co enkel de bijlage door en laten ze de tekst vallen;

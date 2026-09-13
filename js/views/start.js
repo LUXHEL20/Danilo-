@@ -3,6 +3,7 @@ import { h, kaart, badge, geleden, legeStaat } from '../ui.js';
 import { ctx, ganaar, teken } from '../app.js';
 import * as store from '../store.js';
 import { maakAdvies, meetritmeDagen } from '../advies.js';
+import { agendaAfspraak } from '../delen.js';
 import { scoreRing, lijnGrafiek } from '../charts.js';
 import { waardeTegels, adviesKaart, takenLijst } from './onderdelen.js';
 import { profile } from '../params.js';
@@ -127,6 +128,7 @@ async function vandaagStrook() {
   if (!eigen.length) return null;
 
   const regels = [];
+  let volgendeMetingActief = null;
   for (const b of eigen) {
     const naam = b.naam || 'Aquarium';
     const metingen = await store.metingenVanBak(b.id);
@@ -145,6 +147,10 @@ async function vandaagStrook() {
     } else if (dagenGeleden > ritme) {
       regels.push({ prioriteit: 1, tekst: `${naam}: laatste meting ${geleden(laatste.datum)}, meet opnieuw.` });
     }
+    if (laatste && b.id === ctx.bak?.id) {
+      const doel = laatste.datum + ritme * 86400e3;
+      volgendeMetingActief = { naam, datumTs: doel > Date.now() ? doel : Date.now() + 86400e3 };
+    }
   }
   if (!regels.length) return null;
 
@@ -153,5 +159,15 @@ async function vandaagStrook() {
     h('h3', {}, '⏰ Vandaag'),
     h('ul', { class: 'opsomming klein', style: { margin: 0 } },
       ...regels.slice(0, 3).map((r) => h('li', {}, r.tekst))),
+    volgendeMetingActief ? h('button', {
+      class: 'knop knop--stil', style: { marginTop: '10px' },
+      onclick: () => {
+        agendaAfspraak({
+          titel: `LUX AQUA: meting voor ${volgendeMetingActief.naam}`,
+          beschrijving: 'Uw agenda waarschuwt u, LUX AQUA stuurt u niets. Doe uw teststrip of vul uw waarden in via de app.',
+          datumTs: volgendeMetingActief.datumTs,
+        });
+      },
+    }, '📅 Zet in mijn agenda') : null,
     h('button', { class: 'knop knop--primair knop--vol', style: { marginTop: '10px' }, onclick: () => ganaar('meten') }, 'Nu meten'));
 }
