@@ -1,0 +1,23 @@
+{
+  "name": "LUX AQUA, waterwaarden en opvolging",
+  "short_name": "LUX AQUA",
+  "description": "Waterwaarden noteren, teststrips inlezen met de camera, advies en opvolging voor uw aquarium of vijver.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1730",
+  "theme_color": "#0D1730",
+  "lang": "nl-BE",
+  "categories": ["utilities", "lifestyle"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Nieuwe meting", "url": "./index.html#/meten" },
+    { "name": "Ik heb hulp nodig", "url": "./index.html#/hulp" }
+  ]
+}

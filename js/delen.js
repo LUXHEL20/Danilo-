@@ -1,0 +1,355 @@
+/**
+ * Dossier opbouwen en delen: alles wat LUX AQUA nodig heeft om van op afstand
+ * een eerste indruk te krijgen — bakgegevens, vissenbestand, laatste metingen,
+ * advies, foto's en de hulpvraag.
+ */
+import * as store from './store.js';
+import { fmt, param, profile, statusOf, STATUS_LABEL } from './params.js';
+import { maakAdvies } from './advies.js';
+import { download, kopieer, melding, blobNaarDataUrl } from './ui.js';
+import { isNative, isAndroid, deel, bewaarEnDeelBestand } from './native.js';
+
+export const DOSSIER_VERSIE = 1;
+
+/**
+ * Bouwt een volledig dossier van één bak.
+ * @param {string} bakId
+ * @param {{fotos?:boolean, aantalMetingen?:number, hulpvraag?:object}} opties
+ */
+export async function maakDossier(bakId, opties = {}) {
+  const { fotos = true, aantalMetingen = 12, hulpvraag = null } = opties;
+  const bak = await store.bak(bakId);
+  if (!bak) throw new Error('Bak niet gevonden.');
+  const klant = bak.klantId ? await store.klant(bak.klantId) : null;
+  const vissen = await store.vissenVanBak(bakId);
+  const metingen = (await store.metingenVanBak(bakId)).slice(0, aantalMetingen);
+  const taken = (await store.takenVanBak(bakId)).filter((t) => !t.klaar);
+  const catalogus = await store.catalogus();
+  const advies = metingen[0] ? maakAdvies(metingen[0], bak, metingen.slice(1), catalogus) : null;
+
+  const dossier = {
+    versie: DOSSIER_VERSIE,
+    gegenereerd: Date.now(),
+    klant: klant ? { ...klant } : null,
+    bak: { ...bak },
+    vissen,
+    metingen: metingen.map((m) => ({ ...m, stripFotoBlob: undefined })),
+    taken,
+    advies: advies ? { score: advies.score, samenvatting: advies.samenvatting, acties: advies.acties } : null,
+    hulpvraag,
+    fotos: [],
+  };
+
+  if (fotos) {
+    const lijst = (await store.fotosVanBak(bakId)).sort((a, b) => b.datum - a.datum).slice(0, 12);
+    for (const f of lijst) {
+      dossier.fotos.push({
+        id: f.id, soort: f.soort, notitie: f.notitie, datum: f.datum,
+        thumb: f.thumb || (f.blob ? await blobNaarDataUrl(f.blob) : null),
+      });
+    }
+  }
+  return dossier;
+}
+
+/**
+ * Het kennismakingsbericht dat een nieuwe klant bij het aanmaken van zijn profiel
+ * kan doorsturen. Doet twee dingen tegelijk: LUX AQUA krijgt meteen de gegevens van
+ * de klant (naam, contact, bak) zonder dat daar een server voor nodig is, en de
+ * klant slaat het nummer van LUX AQUA op in zijn contacten. Dat laatste is voor
+ * WhatsApp niet bijzaak: een bericht via een lijst of broadcast komt enkel aan bij
+ * wie het nummer al opgeslagen heeft en al eens zelf geschreven heeft.
+ */
+export function servicebonAlsTekst(klant, bak) {
+  const prof = profile(bak?.profiel);
+  const r = [
+    'Kennismaking via de LUX AQUA-app',
+    '',
+    `Naam: ${klant.naam || '–'}`,
+  ];
+  if (klant.telefoon) r.push(`Telefoon: ${klant.telefoon}`);
+  if (klant.email) r.push(`E-mail: ${klant.email}`);
+  const adres = [klant.adres, klant.gemeente].filter(Boolean).join(', ');
+  if (adres) r.push(`Adres: ${adres}`);
+  r.push('', `Bak: ${bak?.naam || 'Aquarium'}, ${prof.label}, ${bak?.liters || '?'} liter`);
+  r.push('',
+    klant.marketingAkkoord
+      ? 'De klant geeft toestemming om af en toe reclame of tips te ontvangen via WhatsApp of e-mail.'
+      : 'De klant wil geen reclame ontvangen, enkel dit kennismakingsbericht.');
+  r.push('', 'Dit is een automatisch bericht vanuit de app, om te controleren dat alles werkt.');
+  return r.join('\n');
+}
+
+/** Leesbare samenvatting in tekst (voor WhatsApp, e-mail of een telefonisch gesprek). */
+export function dossierAlsTekst(dossier) {
+  const b = dossier.bak;
+  const prof = profile(b.profiel);
+  const r = [];
+  r.push(`*LUX AQUA: dossier ${b.naam || 'aquarium'}*`);
+  if (dossier.klant) r.push(`Klant: ${dossier.klant.naam || '–'}${dossier.klant.telefoon ? ` (${dossier.klant.telefoon})` : ''}`);
+  r.push(`Type: ${prof.label}, ${b.liters || '?'} liter`);
+  if (b.opgestart) r.push(`Opgestart: ${new Date(b.opgestart).toLocaleDateString('nl-BE')}`);
+  if (b.filter) r.push(`Filter: ${b.filter}`);
+  if (b.verlichting) r.push(`Verlichting: ${b.verlichting}`);
+
+  if (dossier.vissen?.length) {
+    r.push('', '*Vissenbestand*');
+    for (const v of dossier.vissen) r.push(`• ${v.aantal}× ${v.soort}${v.opmerking ? ` (${v.opmerking})` : ''}`);
+  }
+
+  const m = dossier.metingen?.[0];
+  if (m) {
+    r.push('', `*Laatste meting* (${new Date(m.datum).toLocaleDateString('nl-BE')})`);
+    for (const [id, waarde] of Object.entries(m.waarden || {})) {
+      if (waarde == null || waarde === '') continue;
+      const st = statusOf(id, Number(waarde), b.profiel);
+      const merk = st === 'kritiek' ? ' ‼️' : st === 'let-op' ? ' ⚠️' : '';
+      r.push(`• ${param(id)?.short || id}: ${fmt(id, Number(waarde))}${merk}`);
+    }
+    if (m.opmerking) r.push(`Opmerking: ${m.opmerking}`);
+  }
+
+  if (dossier.advies) {
+    r.push('', `*Beoordeling*: ${dossier.advies.samenvatting} (score ${dossier.advies.score}/100)`);
+    for (const a of dossier.advies.acties.slice(0, 4)) {
+      r.push(`• ${a.titel}`);
+      if (a.producten?.length) r.push(`   → ${a.producten.map((p) => `${p.naam}${p.dosis ? ` (${p.dosis.tekst})` : ''}`).join(', ')}`);
+    }
+  }
+
+  if (dossier.hulpvraag) {
+    r.push('', '*Hulpvraag*');
+    r.push(`Type: ${dossier.hulpvraag.type}`);
+    r.push(`Urgentie: ${dossier.hulpvraag.urgentie}`);
+    if (dossier.hulpvraag.omschrijving) r.push(dossier.hulpvraag.omschrijving);
+    if (dossier.hulpvraag.beschikbaarheid) r.push(`Beschikbaar: ${dossier.hulpvraag.beschikbaarheid}`);
+  }
+
+  if (dossier.fotos?.length) r.push('', `${dossier.fotos.length} foto('s) beschikbaar in het dossierbestand.`);
+  return r.join('\n');
+}
+
+/** Bewaart het dossier als bestand dat LUX AQUA kan inlezen: download op het web, deelmenu in de native app. */
+export function exporteerDossier(dossier) {
+  const naam = `luxaqua-dossier-${(dossier.bak?.naam || 'bak').replace(/[^\w-]+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.json`;
+  const inhoud = JSON.stringify(dossier, null, 2);
+  if (isNative()) return bewaarEnDeelBestand(naam, inhoud, 'application/json');
+  download(naam, inhoud);
+  return 'gedownload';
+}
+
+/**
+ * Bouwt een agendabestand (.ics, RFC 5545) met één herinnering erin. De agenda
+ * van het toestel zelf toont het alarm op het afgesproken moment: de app heeft
+ * daar geen server voor nodig en belooft ook niets wat ze niet kan waarmaken.
+ * ACTION:DISPLAY met TRIGGER:PT0M laat de agenda de tekst tonen op het moment
+ * van het agendapunt zelf (zie RFC 5545 §3.6.6 en RFC 9074).
+ */
+function icsDatum(ts) {
+  const d = new Date(ts);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+}
+const icsTekst = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/[,;]/g, '\\$&').replace(/\r?\n/g, '\\n');
+
+export function agendaBestand({ titel, beschrijving, datumTs }) {
+  const uid = `luxaqua-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@luxaqua`;
+  return [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LUX AQUA//NL', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${icsDatum(Date.now())}`,
+    `DTSTART:${icsDatum(datumTs)}`,
+    `SUMMARY:${icsTekst(titel)}`,
+    `DESCRIPTION:${icsTekst(beschrijving)}`,
+    'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsTekst(titel)}`, 'TRIGGER:PT0M', 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR',
+  ].join('\r\n');
+}
+
+/** Zet een herinnering in de agenda van het toestel: download op het web, deelmenu in de native app. */
+export function agendaAfspraak({ titel, beschrijving, datumTs }) {
+  const naam = `luxaqua-${titel.replace(/[^\w-]+/g, '-').toLowerCase()}.ics`;
+  const inhoud = agendaBestand({ titel, beschrijving, datumTs });
+  if (isNative()) return bewaarEnDeelBestand(naam, inhoud, 'text/calendar');
+  download(naam, inhoud, 'text/calendar');
+  return 'gedownload';
+}
+
+/** Deelt via het deelmenu van het toestel, met terugval op kopiëren. */
+export async function deelDossier(dossier, { metBestand = !isAndroid() } = {}) {
+  // op Android geven WhatsApp en co enkel de bijlage door en laten ze de tekst vallen;
+  // daar delen we standaard de leesbare tekst, het json-bestand gaat via 'Als bestand bewaren'
+  const tekst = dossierAlsTekst(dossier);
+  const bestanden = metBestand
+    ? [new File([JSON.stringify(dossier)], 'luxaqua-dossier.json', { type: 'application/json' })]
+    : [];
+  const r = await deel({ titel: 'LUX AQUA dossier', tekst, bestanden });
+  if (r !== 'niet-mogelijk') return r; // gedeeld, geannuleerd of mislukt (dan is er al een melding)
+  await kopieer(tekst);
+  return 'gekopieerd';
+}
+
+export const whatsappLink = (tekst, nummer = '') =>
+  `https://wa.me/${nummer.replace(/[^\d]/g, '')}?text=${encodeURIComponent(tekst)}`;
+
+export const mailLink = (tekst, adres = '', onderwerp = 'LUX AQUA: dossier en hulpvraag') =>
+  `mailto:${adres}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(tekst)}`;
+
+/** Mailto-link met een lijst adressen in BCC, voor een bericht naar meerdere klanten tegelijk. */
+export const mailBccLink = (tekst, bccLijst = [], onderwerp = 'Nieuws van LUX AQUA') =>
+  `mailto:?bcc=${encodeURIComponent(bccLijst.join(','))}&subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(tekst)}`;
+
+/** Leest een dossierbestand in bij LUX AQUA en voegt het toe aan de eigen gegevens. */
+export async function importeerDossier(json) {
+  const d = typeof json === 'string' ? JSON.parse(json) : json;
+  if (!d?.bak) throw new Error('Dit bestand bevat geen geldig dossier.');
+
+  let klantId = d.klant?.id || null;
+  if (d.klant) {
+    const bestaande = (await store.klanten()).find((k) => k.id === d.klant.id || (k.email && k.email === d.klant.email));
+    const rec = await store.bewaarKlant({ ...d.klant, id: bestaande?.id || d.klant.id, bron: 'gedeeld dossier' });
+    klantId = rec.id;
+  }
+
+  const bak = await store.bewaarBak({ ...d.bak, klantId });
+  for (const v of d.vissen || []) await store.bewaarVis({ ...v, bakId: bak.id });
+  for (const m of d.metingen || []) await store.bewaarMeting({ ...m, bakId: bak.id, klantId });
+  for (const t of d.taken || []) await store.bewaarTaken(bak.id, [t]);
+  for (const f of d.fotos || []) {
+    if (!f.thumb) continue;
+    await store.bewaarFoto({ bakId: bak.id, blob: null, thumb: f.thumb, soort: f.soort, notitie: f.notitie });
+  }
+  if (d.hulpvraag) await store.bewaarHulpvraag({ ...d.hulpvraag, klantId, bakId: bak.id, bron: 'gedeeld dossier' });
+  return { klantId, bakId: bak.id };
+}
+
+/** Optionele koppeling met een eigen server (bv. voor automatische opvolging). */
+export async function stuurNaarServer(dossier) {
+  const i = await store.instellingen();
+  if (!i.koppeling?.url) return { ok: false, reden: 'geen-koppeling' };
+  try {
+    const res = await fetch(i.koppeling.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(i.koppeling.sleutel ? { Authorization: `Bearer ${i.koppeling.sleutel}` } : {}) },
+      body: JSON.stringify(dossier),
+    });
+    if (!res.ok) throw new Error(`Server antwoordde met ${res.status}`);
+    return { ok: true };
+  } catch (e) {
+    melding(`Versturen naar de server lukte niet: ${e.message}`, 'fout');
+    return { ok: false, reden: e.message };
+  }
+}
+
+/** Het officiële logo als data-URL, of null als het niet opgehaald kan worden (dan blijft het relatieve pad). */
+async function standaardLogoDataUrl() {
+  try {
+    const res = await fetch(LOGO_STANDAARD);
+    if (!res.ok) return null;
+    return await blobNaarDataUrl(await res.blob());
+  } catch {
+    return null;
+  }
+}
+
+const LOGO_STANDAARD = 'assets/brand/LUX-AQUA-01-navy.svg';
+
+/** Bouwt de printbare weergave van een dossier als volledige HTML-pagina. */
+export function dossierAlsHtml(dossier, inst = {}) {
+  const bedrijf = inst.bedrijf || {};
+  const logo = inst.logo || LOGO_STANDAARD;
+  const b = dossier.bak;
+  const prof = profile(b.profiel);
+  const rij = (l, w) => `<tr><th>${l}</th><td>${w ?? '–'}</td></tr>`;
+  const m = dossier.metingen?.[0];
+  const html = `<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>LUX AQUA, dossier ${b.naam || 'aquarium'}</title>
+  <style>
+    body{font:14px/1.5 system-ui,sans-serif;color:#12232e;margin:32px;max-width:800px}
+    h1{color:#0b6b78;margin-bottom:4px} h2{margin-top:28px;border-bottom:2px solid #0b6b78;padding-bottom:4px;color:#0b6b78}
+    table{border-collapse:collapse;width:100%;margin:8px 0} th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #dbe6ea}
+    th{width:38%;font-weight:600;color:#3c5866} .kritiek{color:#b3261e;font-weight:700} .let-op{color:#a06400;font-weight:600}
+    ul{padding-left:18px} img{max-width:220px;border-radius:8px;margin:6px 8px 0 0}
+    .voet{margin-top:32px;font-size:12px;color:#6b7f89}
+    .kop{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+    .kop img{height:56px;width:auto;object-fit:contain}
+    .kop h1{margin:0}
+  </style></head><body>
+  <div class="kop"><img src="${logo}" alt=""><div><h1>${bedrijf.naam || 'LUX AQUA'}: dossier</h1>
+  <div style="font-size:12px;color:#6b7f89">${[bedrijf.telefoon, bedrijf.email, bedrijf.website].filter(Boolean).join(' · ')}</div></div></div>
+  <p>${b.naam || 'Aquarium'} · ${prof.label} · ${b.liters || '?'} liter · opgemaakt op ${new Date(dossier.gegenereerd).toLocaleString('nl-BE')}</p>
+  <h2>Klant</h2><table>
+    ${rij('Naam', dossier.klant?.naam)}${rij('Telefoon', dossier.klant?.telefoon)}${rij('E-mail', dossier.klant?.email)}
+    ${rij('Adres', [dossier.klant?.adres, dossier.klant?.gemeente].filter(Boolean).join(', '))}</table>
+  <h2>Installatie</h2><table>
+    ${rij('Inhoud', b.liters ? b.liters + ' liter' : null)}${rij('Afmetingen', b.afmetingen ? `${b.afmetingen.lengte} × ${b.afmetingen.breedte} × ${b.afmetingen.hoogte} cm` : null)}
+    ${rij('Opgestart', b.opgestart ? new Date(b.opgestart).toLocaleDateString('nl-BE') : null)}
+    ${rij('Filter', b.filter)}${rij('Verlichting', b.verlichting)}${rij('CO₂', b.co2)}${rij('Bodem', b.bodem)}
+    ${rij('Waterverversing', b.verversing)}${rij('Opmerkingen', b.opmerking)}</table>
+  <h2>Vissenbestand</h2>
+  ${dossier.vissen?.length ? `<ul>${dossier.vissen.map((v) => `<li>${v.aantal}× ${v.soort}${v.opmerking ? ` (${v.opmerking})` : ''}</li>`).join('')}</ul>` : '<p>Nog niet ingevuld.</p>'}
+  <h2>Laatste meting</h2>
+  ${m ? `<p>${new Date(m.datum).toLocaleString('nl-BE')}</p><table>${Object.entries(m.waarden || {}).filter(([, w]) => w !== '' && w != null)
+      .map(([id, w]) => { const st = statusOf(id, Number(w), b.profiel); return `<tr><th>${param(id)?.label || id}</th><td class="${st}">${fmt(id, Number(w))} (${STATUS_LABEL[st]})</td></tr>`; }).join('')}</table>`
+    : '<p>Nog geen meting.</p>'}
+  <h2>Advies</h2>
+  ${dossier.advies ? `<p><strong>${dossier.advies.samenvatting}</strong> (score ${dossier.advies.score}/100)</p>` +
+      dossier.advies.acties.map((a) => `<h3>${a.titel}</h3><p>${a.waarom || ''}</p><ul>${(a.stappen || []).map((s) => `<li>${s}</li>`).join('')}</ul>` +
+        (a.producten?.length ? `<p><em>Producten:</em> ${a.producten.map((p) => `${p.naam}${p.dosis ? `: ${p.dosis.tekst}` : ''}`).join('; ')}</p>` : '')).join('')
+    : '<p>Geen advies beschikbaar.</p>'}
+  ${dossier.hulpvraag ? `<h2>Hulpvraag</h2><table>${rij('Type', dossier.hulpvraag.type)}${rij('Urgentie', dossier.hulpvraag.urgentie)}${rij('Beschikbaarheid', dossier.hulpvraag.beschikbaarheid)}${rij('Omschrijving', dossier.hulpvraag.omschrijving)}</table>` : ''}
+  ${dossier.fotos?.length ? `<h2>Foto's</h2>${dossier.fotos.map((f) => `<img src="${f.thumb}" alt="${f.soort}">`).join('')}` : ''}
+  <p class="voet">Dit dossier is opgemaakt met de app van ${bedrijf.naam || 'LUX AQUA'}. De adviezen zijn een eerste inschatting op basis van de ingegeven waarden; met een huisbezoek stellen wij een probleem definitief vast. LUX AQUA is onderdeel van LUX 2.0.</p>
+  </body></html>`;
+  return html;
+}
+
+/**
+ * Printbare weergave: op het web via de printdialoog (kan als pdf bewaard worden).
+ * Een WebView kan niet afdrukken; in de native app delen we het dossier als html-bestand.
+ */
+export async function printDossier(dossier) {
+  const inst = await store.instellingen();
+  // het standaardlogo inlijnen: het html-bestand moet ook los van de app (gedeeld, als pdf) zijn logo tonen
+  const html = dossierAlsHtml(dossier, { ...inst, logo: inst.logo || await standaardLogoDataUrl() });
+  if (isNative()) return bewaarEnDeelBestand('luxaqua-dossier.html', html, 'text/html');
+  // eerst het verborgen kader: window.open na een await valt buiten de gebruikersactivering
+  // en wordt dan als pop-up geblokkeerd, zeker in een app op het beginscherm
+  if (printViaKader(html)) return;
+  const v = window.open('', '_blank');
+  if (!v) { melding('Sta pop-ups toe om het dossier af te drukken.', 'fout'); return; }
+  v.document.write(html); v.document.close();
+  setTimeout(() => v.print(), 400);
+}
+
+/**
+ * Print het dossier in een verborgen kader (iframe) in dezelfde pagina. Dat werkt ook
+ * wanneer de app vanaf het beginscherm draait en heeft geen apart venster nodig.
+ * De titel in de html wordt de bestandsnaam van de pdf.
+ * @param {string} html
+ * @returns {boolean} false wanneer het kader niet gemaakt raakt (dan volgt de terugval)
+ */
+function printViaKader(html) {
+  try {
+    const kader = document.createElement('iframe');
+    kader.setAttribute('aria-hidden', 'true');
+    kader.setAttribute('title', 'Dossier afdrukken');
+    kader.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0';
+    document.body.append(kader);
+    const doc = kader.contentDocument;
+    if (!doc) { kader.remove(); return false; }
+    doc.open(); doc.write(html); doc.close();
+    const afdrukken = () => {
+      try { kader.contentWindow.focus(); kader.contentWindow.print(); }
+      catch (e) { console.error(e); melding('Afdrukken lukte niet. Bewaar het dossier als bestand.', 'fout'); }
+      // pas opruimen als het afdrukvenster zeker weg is: te vroeg wissen breekt de pdf af
+      setTimeout(() => kader.remove(), 60000);
+    };
+    if (doc.readyState === 'complete') setTimeout(afdrukken, 300);
+    else kader.addEventListener('load', () => setTimeout(afdrukken, 300), { once: true });
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}

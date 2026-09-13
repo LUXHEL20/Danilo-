@@ -1,0 +1,23 @@
+{
+  "appId": "be.luxhelchteren.aqua",
+  "appName": "LUX AQUA",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 800,
+      "backgroundColor": "#0D1730",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0D1730"
+    }
+  }
+}
