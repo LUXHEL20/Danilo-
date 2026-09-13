@@ -223,6 +223,7 @@ async function verstuurKeuze(dossier, instellingen) {
     titel: 'Hoe stuurt u dit door?', breed: true,
     inhoud: h('div', {},
       h('p', { class: 'klein zacht' }, 'Uw hulpvraag is bewaard in de app. Kies hieronder hoe u ze bij LUX AQUA krijgt.'),
+      h('p', { class: 'mini zacht' }, 'Uw gegevens blijven op uw eigen toestel staan en gaan pas naar LUX AQUA op het moment dat u hieronder zelf een manier van doorsturen kiest.'),
       h('div', { class: 'kolom' },
         h('button', { class: 'knop knop--primair knop--vol', onclick: () => deelDossier(dossier) }, '📤 Delen via mijn toestel (WhatsApp, mail, …)'),
         // b.whatsapp, niet b.telefoon: dat laatste is het vaste lijnnummer van de

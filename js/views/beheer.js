@@ -1,5 +1,5 @@
 /** Beheer en instellingen: rol, bedrijfsgegevens, producten, ijking en back-ups. */
-import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, download, datum, kopieer } from '../ui.js';
+import { h, kaart, badge, veld, invoer, tekstvak, keuze, melding, dialoog, bevestig, download, datum, kopieer, blobNaarDataUrl, dataUrlNaarBlob } from '../ui.js';
 import * as sp from '../spaarkaart.js';
 import { meldAf, wijzigWachtwoord, beheerderEmail } from '../auth.js';
 import { koppels as kweekKoppels } from '../kweek.js';
@@ -409,23 +409,27 @@ function offlineRegel() {
 }
 
 /* ------------------------------------------------------------------- back-ups */
+/* Foto's op volle grootte gaan mee in de back-up, als data-url: dat maakt het
+   bestand groter, maar zonder is een verloren toestel ook een verloren
+   fotoalbum. Enkel de miniaturen bewaren voelt aan als een back-up tot je ze
+   nodig hebt. */
 async function maakBackup() {
-  const data = { versie: 1, gemaakt: Date.now(), stores: {} };
+  const data = { versie: 2, gemaakt: Date.now(), stores: {} };
   for (const s of db.STORES) {
     const rijen = await db.alles(s);
     data.stores[s] = await Promise.all(rijen.map(async (r) => {
-      if (r.blob instanceof Blob) return { ...r, blob: null, blobWeggelaten: true };
+      if (r.blob instanceof Blob) return { ...r, blob: await blobNaarDataUrl(r.blob), blobIsDataUrl: true };
       return r;
     }));
   }
   const naam = `luxaqua-backup-${new Date().toISOString().slice(0, 10)}.json`;
   if (isNative()) {
     const r = await bewaarEnDeelBestand(naam, JSON.stringify(data), 'application/json');
-    if (r === 'gedeeld') melding('Back-up gedeeld. (Foto\'s zitten als kleine versie in de back-up.)', 'ok');
+    if (r === 'gedeeld') melding('Back-up gedeeld, met uw foto\'s op volle grootte erin.', 'ok');
     return;
   }
   download(naam, JSON.stringify(data));
-  melding('Back-up gedownload. (Foto\'s zitten als kleine versie in de back-up.)', 'ok');
+  melding('Back-up gedownload, met uw foto\'s op volle grootte erin.', 'ok');
 }
 
 function zetBackupTerug() {
@@ -439,7 +443,13 @@ function zetBackupTerug() {
         if (!await bevestig('Terugzetten?', 'De huidige gegevens op dit toestel worden aangevuld met de back-up.', 'Terugzetten')) return;
         for (const [naam, rijen] of Object.entries(data.stores)) {
           if (!db.STORES.includes(naam)) continue;
-          await db.putVeel(naam, rijen);
+          const klaar = await Promise.all(rijen.map(async (r) => {
+            if (r.blobIsDataUrl && typeof r.blob === 'string') {
+              return { ...r, blob: await dataUrlNaarBlob(r.blob), blobIsDataUrl: false };
+            }
+            return r;
+          }));
+          await db.putVeel(naam, klaar);
         }
         melding('Back-up teruggezet.', 'ok');
         location.reload();

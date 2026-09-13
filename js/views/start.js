@@ -113,7 +113,28 @@ export async function toonStart() {
     }
   }
 
+  /* --- back-up, hoogstens twee keer per jaar --- */
+  const backupBlok = await backupHerinnering();
+  if (backupBlok) wrap.append(backupBlok);
+
   return wrap;
+}
+
+/**
+ * Zonder server staan de gegevens enkel op dit toestel: een back-up is de
+ * enige bescherming tegen een verloren of kapot toestel. Zonder deze
+ * herinnering weet de klant dat niet, want de zin staat vandaag enkel één
+ * keer in de onboarding. Hoogstens om het half jaar tonen, anders verdrinkt
+ * de rest van het startscherm erin.
+ */
+async function backupHerinnering() {
+  const laatst = ctx.instellingen.backupHerinneringGetoond || 0;
+  if (Date.now() - laatst < 182 * 86400e3) return null;
+  await store.zetInstelling({ backupHerinneringGetoond: Date.now() });
+  return h('section', { class: 'kaart' },
+    h('p', { class: 'klein zacht' },
+      '💾 Uw gegevens staan enkel op dit toestel. Maak een back-up voor u van telefoon wisselt.'),
+    h('button', { class: 'knop knop--stil', onclick: () => ganaar('beheer') }, 'Naar back-up maken'));
 }
 
 /**
