@@ -191,9 +191,61 @@ export async function zetTaakKlaar(id, klaar = true) {
   const t = await db.get('taken', id);
   if (!t) return;
   await db.put('taken', { ...t, klaar, afgerond: klaar ? Date.now() : null });
+  if (klaar && t.bron === 'routine' && t.herhaalDagen) await plantVolgendeRoutine(t, Date.now());
+  await ruimOudeTakenOp(t.bakId);
   meld('taken');
 }
 export async function verwijderTaak(id) { await db.del('taken', id); meld('taken'); }
+
+/* ------------------------------------------------------------------- routines */
+/**
+ * Een nieuwe vaste routine (bijvoorbeeld "Water verversen" om de veertien
+ * dagen). Slaat meteen de eerste taak op; het afvinken van die taak plant
+ * daarna telkens de volgende (zie zetTaakKlaar en voltooiRoutineOp).
+ */
+export async function bewaarRoutine({ bakId, omschrijving, herhaalDagen, vanaf = Date.now(), product = null }) {
+  const dagen = Math.max(1, Number(herhaalDagen) || 14);
+  const taak = {
+    id: db.nieuwId('taak'), omschrijving, herhaalDagen: dagen, product,
+    termijn: `Elke ${dagen} dagen`, vervalt: vanaf + dagen * 86400e3,
+    klaar: false, bron: 'routine',
+  };
+  await bewaarTaken(bakId, [taak]);
+  return taak;
+}
+
+async function plantVolgendeRoutine(t, vanaf) {
+  await bewaarTaken(t.bakId, [{
+    id: db.nieuwId('taak'), omschrijving: t.omschrijving, herhaalDagen: t.herhaalDagen, product: t.product || null,
+    termijn: `Elke ${t.herhaalDagen} dagen`, vervalt: vanaf + t.herhaalDagen * 86400e3, klaar: false, bron: 'routine',
+  }]);
+}
+
+/**
+ * "Ik heb dit eerder al gedaan": de klant hoeft niet te liegen tegen zijn app
+ * door op een verkeerde dag af te vinken. De volgende beurt telt vanaf de
+ * opgegeven datum, niet vanaf vandaag.
+ */
+export async function voltooiRoutineOp(id, datumTs) {
+  const t = await db.get('taken', id);
+  if (!t) return;
+  await db.put('taken', { ...t, klaar: true, afgerond: datumTs });
+  if (t.herhaalDagen) await plantVolgendeRoutine(t, datumTs);
+  meld('taken');
+}
+
+/**
+ * Ruimt afgewerkte eenmalige taken (uit een meting of een productdosering) op
+ * na zeven dagen: zonder dit blijft een lange lijst afgevinkte punten staan.
+ * Routines blijven met opzet buiten schot: hun geschiedenis is net de reden
+ * waarom de klant ze bijhoudt.
+ */
+async function ruimOudeTakenOp(bakId) {
+  if (!bakId) return;
+  const grens = Date.now() - 7 * 86400e3;
+  const oud = (await takenVanBak(bakId)).filter((t) => t.klaar && t.bron !== 'routine' && (t.afgerond || 0) < grens);
+  for (const t of oud) await db.del('taken', t.id);
+}
 
 /* --------------------------------------------------------------------- logboek */
 export async function logboek(bakId, tekst, soort = 'notitie') {

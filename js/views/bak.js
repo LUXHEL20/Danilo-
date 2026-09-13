@@ -48,6 +48,9 @@ export async function toonBak(arg) {
         'voeder heel weinig, spoel uw filter niet uit en zet pas nieuwe vissen bij als beide waarden twee metingen na elkaar 0 zijn.')));
   }
 
+  /* --- vaste opvolging: terugkerende routines --- */
+  wrap.append(await routineBlok(bak, prof));
+
   /* --- vissenbestand --- */
   const vissenBlok = kaart(
     h('span', { class: 'rij rij--tussen groei' },
@@ -263,4 +266,110 @@ async function toonFoto(f) {
     acties: [{ label: 'Sluiten', waarde: true }],
   });
   if (f.blob) URL.revokeObjectURL(bron);
+}
+
+/* -------------------------------------------------------------------- routines */
+
+/** Voorstellen per soort bak, met een gebruikelijk interval in dagen. */
+const ROUTINE_VOORSTELLEN = {
+  Vijver: [
+    { omschrijving: 'Water verversen', dagen: 30 },
+    { omschrijving: 'Filter reinigen', dagen: 30 },
+    { omschrijving: 'UV-lamp vervangen', dagen: 365 },
+  ],
+  default: [
+    { omschrijving: 'Water verversen', dagen: 14 },
+    { omschrijving: 'Filter spoelen', dagen: 30 },
+    { omschrijving: 'Bodem afzuigen', dagen: 14 },
+  ],
+};
+
+async function routineBlok(bak, prof) {
+  const taken = (await store.takenVanBak(bak.id)).filter((t) => !t.klaar && t.bron === 'routine').sort((a, b) => a.vervalt - b.vervalt);
+  const blok = kaart(
+    h('span', { class: 'rij rij--tussen groei' },
+      h('span', {}, '🔁 Vaste opvolging'),
+      h('button', { class: 'chip', onclick: () => routineFormulier(bak, prof) }, '+ Routine')));
+
+  if (!taken.length) {
+    blok.append(h('p', { class: 'klein zacht' },
+      'Nog geen vaste routines. Een routine als "water verversen om de veertien dagen" zorgt dat u het niet zelf moet onthouden.'));
+    return blok;
+  }
+
+  blok.append(h('ul', { class: 'lijst' }, ...taken.map((t) => {
+    const teLaat = t.vervalt < Date.now();
+    return h('li', {},
+      h('input', {
+        type: 'checkbox', 'aria-label': 'Routine afvinken',
+        style: { width: '22px', height: '22px', marginTop: '2px', flex: 'none' },
+        onchange: async (e) => { if (e.target.checked) { await store.zetTaakKlaar(t.id, true); melding('Genoteerd. Volgende beurt ingepland.', 'ok'); teken(); } },
+      }),
+      h('span', { class: 'groei' },
+        t.omschrijving, h('br'),
+        h('span', { class: 'mini zacht' }, teLaat ? '⏰ te laat · ' : '', `${t.termijn} (${datum(t.vervalt, false)})`)),
+      h('div', { class: 'kolom', style: { gap: '4px', flex: 'none' } },
+        h('button', {
+          class: 'chip', type: 'button', title: 'Ik heb dit eerder al gedaan',
+          onclick: () => routineEerderGedaan(t),
+        }, '📅 Al gedaan'),
+        h('button', {
+          class: 'chip', type: 'button', title: 'Routine stoppen',
+          onclick: async () => {
+            if (await bevestig('Routine stoppen?', `"${t.omschrijving}" wordt niet meer vanzelf opnieuw ingepland.`, 'Stoppen')) {
+              await store.verwijderTaak(t.id); teken();
+            }
+          },
+        }, '✕ Stoppen')));
+  })));
+  return blok;
+}
+
+/** "Ik heb dit eerder al gedaan": de volgende beurt telt vanaf die datum, niet vanaf vandaag. */
+async function routineEerderGedaan(t) {
+  const wanneer = invoer({ type: 'date', value: new Date().toISOString().slice(0, 10) });
+  const bevestigd = await dialoog({
+    titel: 'Ik heb dit eerder al gedaan',
+    inhoud: h('div', {},
+      h('p', { class: 'klein zacht' }, `Wanneer deed u "${t.omschrijving}" voor het laatst?`),
+      veld('Datum', wanneer)),
+    acties: [
+      { label: 'Annuleren', waarde: false },
+      { label: 'Bewaren', stijl: 'knop--primair', waarde: true },
+    ],
+  });
+  if (!bevestigd || !wanneer.value) return;
+  await store.voltooiRoutineOp(t.id, new Date(wanneer.value).getTime());
+  melding('Genoteerd. Volgende beurt ingepland.', 'ok');
+  teken();
+}
+
+async function routineFormulier(bak, prof) {
+  const voorstellen = ROUTINE_VOORSTELLEN[prof.group] || ROUTINE_VOORSTELLEN.default;
+  const omschrijving = invoer({ value: '', placeholder: 'bv. Water verversen' });
+  const dagen = invoer({ type: 'number', min: 1, max: 730, value: '14' });
+
+  const chips = h('div', { class: 'rij', style: { flexWrap: 'wrap', gap: '6px', marginBottom: '8px' } },
+    ...voorstellen.map((v) => h('button', {
+      class: 'chip', type: 'button',
+      onclick: () => { omschrijving.value = v.omschrijving; dagen.value = String(v.dagen); },
+    }, v.omschrijving)));
+
+  const bevestigd = await dialoog({
+    titel: 'Routine toevoegen',
+    inhoud: h('div', {},
+      h('p', { class: 'klein zacht' }, 'Kies een voorstel, of vul uw eigen routine in.'),
+      chips,
+      veld('Wat moet er gebeuren?', omschrijving),
+      veld('Om de hoeveel dagen?', dagen)),
+    acties: [
+      { label: 'Annuleren', waarde: false },
+      { label: 'Bewaren', stijl: 'knop--primair', waarde: true },
+    ],
+  });
+  if (!bevestigd) return;
+  if (!omschrijving.value.trim()) { melding('Vul in wat er moet gebeuren.', 'fout'); return; }
+  await store.bewaarRoutine({ bakId: bak.id, omschrijving: omschrijving.value.trim(), herhaalDagen: Number(dagen.value) || 14 });
+  melding('Routine toegevoegd.', 'ok');
+  teken();
 }
