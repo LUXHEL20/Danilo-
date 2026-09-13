@@ -13,6 +13,7 @@ import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 
 const fouten = [];
 const BASIS = process.env.APP_URL || 'http://127.0.0.1:8130/index.html';
+const WACHTWOORD = 'Beau*1412';
 
 const stap = async (naam, fn) => {
   try { await fn(); console.log('✓', naam); }
@@ -46,11 +47,12 @@ await page.waitForTimeout(400);
 await page.getByRole('button', { name: 'Overslaan' }).click();
 await page.waitForTimeout(500);
 
-/* De codes komen uit de app zelf: de test leest de module in, hij kopieert de
-   formule niet. Zo kan de test niet stilletjes uit de pas lopen met de app. */
+/* De winkelcode komt uit de app zelf: de test leest de module in, hij kopieert
+   de formule niet. Zo kan de test niet stilletjes uit de pas lopen met de app.
+   Bijschrijven en resetten gaan met het echte wachtwoord, niet met een code. */
 const codes = await page.evaluate(async () => {
   const m = await import('./js/spaarkaart.js');
-  return { winkel: m.winkelcode(), beheer: m.beheercode(), gisteren: m.winkelcode(Date.now() - 86400e3) };
+  return { winkel: m.winkelcode(), gisteren: m.winkelcode(Date.now() - 86400e3) };
 });
 
 /* Eerst naar start en dan pas naar sparen: staat de hash al op #/spaar, dan
@@ -107,21 +109,21 @@ await stap('code van gisteren blijft één dag geldig', async () => {
   if (!r.ok) throw new Error('code van gisteren geweigerd: ' + r.reden);
 });
 
-await stap('tokens bijschrijven met de beheerscode', async () => {
-  const r = await page.evaluate(async (code) => {
+await stap('tokens bijschrijven met het echte wachtwoord', async () => {
+  const r = await page.evaluate(async (ww) => {
     const m = await import('./js/spaarkaart.js');
-    await m.bijschrijven(8, code);           // 2 gespaard + 8 = 10, de eerste trede
+    await m.bijschrijven(8, ww);           // 2 gespaard + 8 = 10, de eerste trede
     return (await m.haalKaart()).tokens;
-  }, codes.beheer);
+  }, WACHTWOORD);
   if (r !== 10) throw new Error('verwacht 10 tokens, kreeg ' + r);
 });
 
-await stap('bijschrijven met een foute beheerscode lukt niet', async () => {
+await stap('bijschrijven met een fout wachtwoord lukt niet', async () => {
   const r = await page.evaluate(async () => {
     const m = await import('./js/spaarkaart.js');
-    return m.bijschrijven(100, 'ZZZZ');
+    return m.bijschrijven(100, 'fout wachtwoord');
   });
-  if (r.ok) throw new Error('een foute beheerscode werd aanvaard');
+  if (r.ok) throw new Error('een fout wachtwoord werd aanvaard');
 });
 
 await stap('bij 10 tokens verschijnt de keuze', async () => {
@@ -153,45 +155,45 @@ await stap('annuleren geeft de tokens terug', async () => {
 });
 
 await stap('doorsparen naar een hogere trede kan', async () => {
-  const r = await page.evaluate(async (code) => {
+  const r = await page.evaluate(async (ww) => {
     const m = await import('./js/spaarkaart.js');
-    await m.bijschrijven(15, code);           // 10 + 15 = 25, de tweede trede
+    await m.bijschrijven(15, ww);           // 10 + 15 = 25, de tweede trede
     const uit = await m.verzilver(10);
     return { ok: uit.ok, tokens: (await m.haalKaart()).tokens, procent: (await m.haalKaart()).korting?.procent };
-  }, codes.beheer);
+  }, WACHTWOORD);
   if (!r.ok) throw new Error('omzetten naar 10 procent mislukte');
   if (r.tokens !== 0) throw new Error('verwacht 0 tokens over, kreeg ' + r.tokens);
   if (r.procent !== 10) throw new Error('verwacht 10 procent, kreeg ' + r.procent);
 });
 
 await stap('een tweede korting naast de eerste kan niet', async () => {
-  const r = await page.evaluate(async (code) => {
+  const r = await page.evaluate(async (ww) => {
     const m = await import('./js/spaarkaart.js');
-    await m.bijschrijven(20, code);
+    await m.bijschrijven(20, ww);
     return m.verzilver(5);
-  }, codes.beheer);
+  }, WACHTWOORD);
   if (r.ok) throw new Error('twee kortingen tegelijk werden aanvaard');
 });
 
-await stap('kaart op nul zetten met de beheerscode', async () => {
-  const r = await page.evaluate(async (code) => {
+await stap('kaart op nul zetten met het echte wachtwoord', async () => {
+  const r = await page.evaluate(async (ww) => {
     const m = await import('./js/spaarkaart.js');
-    await m.resetKaart(code);
+    await m.resetKaart(ww);
     const k = await m.haalKaart();
     return { tokens: k.tokens, korting: k.korting };
-  }, codes.beheer);
+  }, WACHTWOORD);
   if (r.tokens !== 0 || r.korting) throw new Error('kaart niet leeg: ' + JSON.stringify(r));
 });
 
 await stap('vervallen tokens verdwijnen na de vervaltermijn', async () => {
-  const r = await page.evaluate(async (code) => {
+  const r = await page.evaluate(async (ww) => {
     const m = await import('./js/spaarkaart.js');
     const db = await import('./js/db.js');
-    await m.bijschrijven(20, code);
+    await m.bijschrijven(20, ww);
     const k = await db.get('spaarkaart', 'kaart');
     await db.put('spaarkaart', { ...k, laatsteScan: Date.now() - 400 * 86400e3 });
     return (await m.haalKaart()).tokens;
-  }, codes.beheer);
+  }, WACHTWOORD);
   if (r !== 0) throw new Error('tokens niet vervallen, stand is ' + r);
 });
 

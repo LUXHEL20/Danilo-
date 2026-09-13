@@ -307,10 +307,9 @@ async function spaarkaartBlok(isLux) {
       s.aan ? h('button', { class: 'knop knop--stil', onclick: () => ganaar('spaar') }, 'Mijn spaarkaart openen') : null);
   }
 
-  /* De codes worden uit de datum berekend, dus ze veranderen vanzelf om
+  /* De winkelcode wordt uit de datum berekend, dus ze verandert vanzelf om
      middernacht. Er is niets te bewaren en niets te verzenden. */
   const winkel = sp.winkelcode();
-  const beheer = sp.beheercode();
   const codeEl = h('p', { class: 'winkelcode' }, winkel);
 
   const rijen = s.trap.map((t) => ({
@@ -354,16 +353,17 @@ async function spaarkaartBlok(isLux) {
       h('button', {
         class: 'knop knop--stil',
         onclick: () => dialoog({
-          titel: 'Beheerscode van vandaag',
+          titel: 'Kaart bijwerken op andermans toestel',
           inhoud: h('div', {},
-            h('p', { class: 'beheercode' }, beheer),
             h('p', { class: 'klein zacht' },
-              'Hiermee zet u op het toestel van een klant zijn kaart terug op nul, of schrijft u een vergeten bezoek bij. ' +
-              'De klant vindt de knop onder Sparen, bij Medewerker LUX AQUA.'),
-            h('p', { class: 'klein zacht' }, 'Toon deze code niet aan klanten. Ook zij verandert elke nacht.')),
+              'Wilt u op het toestel van een klant zijn kaart terug op nul zetten of een vergeten bezoek bijschrijven, ' +
+              'ga dan daar naar Sparen en tik op Medewerker LUX AQUA.'),
+            h('p', { class: 'klein zacht' },
+              'Daar vraagt de app om het wachtwoord van LUX AQUA, hetzelfde waarmee u zich hier aanmeldt. ' +
+              'Er blijft niets van uw aanmelding achter op het toestel van de klant.')),
           acties: [{ label: 'Sluiten', waarde: null }],
         }),
-      }, '🔑 Beheerscode'),
+      }, '🔑 Kaart bijwerken bij een klant'),
       h('button', {
         class: `knop ${s.aan ? 'knop--stil' : 'knop--primair'}`,
         onclick: async () => {

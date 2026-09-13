@@ -98,6 +98,22 @@ export async function isAangemeld() {
   return true;
 }
 
+/**
+ * Controleert het wachtwoord zonder een aanmelding te starten: geen rol- of
+ * sessiewijziging, niets dat blijft staan op dit toestel. Bedoeld voor een
+ * kort klusje op andermans toestel (bijvoorbeeld de spaarkaart van een klant
+ * bijwerken aan de toonbank), waar een medewerker het wachtwoord even intikt
+ * zonder zich daar effectief aan te melden.
+ */
+export async function verifieerWachtwoord(wachtwoord) {
+  if (!kanAanmelden()) return { ok: false, reden: 'Dit lukt enkel op een beveiligde verbinding (https).' };
+  if (!wachtwoord) return { ok: false, reden: 'Vul het wachtwoord van LUX AQUA in.' };
+  const a = await account();
+  const berekend = await afleiden(String(wachtwoord), a.zout, a.iteraties);
+  if (!gelijk(berekend, a.hash)) return { ok: false, reden: 'Dat wachtwoord klopt niet.' };
+  return { ok: true, reden: 'Wachtwoord klopt.' };
+}
+
 /** Een eigen wachtwoord instellen, enkel op dit toestel. */
 export async function wijzigWachtwoord(huidig, nieuw) {
   if (!kanAanmelden()) return { ok: false, reden: 'Dit lukt enkel op een beveiligde verbinding (https).' };

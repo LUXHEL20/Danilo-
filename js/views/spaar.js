@@ -193,10 +193,7 @@ async function bevestigOmzetten(trede, s) {
 
 /** Voor een medewerker van LUX AQUA, op het toestel van de klant. */
 async function beheerDialoog() {
-  const codeveld = invoer({
-    placeholder: 'Code van vandaag', autocapitalize: 'characters', autocomplete: 'off', maxlength: 6,
-    style: { textTransform: 'uppercase', textAlign: 'center', letterSpacing: '.18em' },
-  });
+  const wwveld = invoer({ type: 'password', placeholder: 'Wachtwoord van LUX AQUA', autocomplete: 'off' });
   const aantalveld = invoer({ type: 'number', min: '1', max: '50', value: '1' });
   const fout = h('p', { class: 'klein', style: { color: 'var(--kritiek, #c0392b)', minHeight: '1.2em' } }, '');
 
@@ -204,8 +201,9 @@ async function beheerDialoog() {
     titel: 'Medewerker LUX AQUA',
     inhoud: h('div', {},
       h('p', { class: 'klein zacht' },
-        'Enkel voor een medewerker van LUX AQUA. Met de beheerscode van vandaag zet u de kaart terug op nul of schrijft u een vergeten bezoek bij.'),
-      veld('Beheerscode', codeveld),
+        'Enkel voor een medewerker van LUX AQUA. Met het wachtwoord van LUX AQUA zet u de kaart terug op nul of schrijft u een vergeten bezoek bij. ' +
+        'Er blijft niets van deze aanmelding achter op dit toestel.'),
+      veld('Wachtwoord', wwveld),
       veld('Aantal bij te schrijven', aantalveld, 'Enkel van toepassing bij bijschrijven.'),
       fout),
     acties: [
@@ -213,7 +211,7 @@ async function beheerDialoog() {
       {
         label: 'Bijschrijven',
         actie: async () => {
-          const r = await sp.bijschrijven(aantalveld.value, codeveld.value);
+          const r = await sp.bijschrijven(aantalveld.value, wwveld.value);
           if (!r.ok) { fout.textContent = r.reden; return false; }
           melding(r.reden, 'ok'); teken(); return true;
         },
@@ -221,7 +219,7 @@ async function beheerDialoog() {
       {
         label: 'Kaart op nul', stijl: 'knop--gevaar',
         actie: async () => {
-          const r = await sp.resetKaart(codeveld.value);
+          const r = await sp.resetKaart(wwveld.value);
           if (!r.ok) { fout.textContent = r.reden; return false; }
           melding(r.reden, 'ok'); teken(); return true;
         },

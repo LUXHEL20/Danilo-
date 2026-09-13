@@ -21,12 +21,19 @@
  */
 import * as db from './db.js';
 import * as store from './store.js';
+import { verifieerWachtwoord } from './auth.js';
 
-/* Deze twee waarden bepalen de codes. Wijzigt u ze, dan wijzigen alle codes
+/* Deze waarde bepaalt de winkelcode. Wijzigt u ze, dan wijzigen alle winkelcodes
    mee en moeten alle klanten de app vernieuwen. Doe dat enkel als een code
-   uitgelekt is. */
+   uitgelekt is.
+   Er is BEWUST geen gelijkaardig geheim meer voor beheerhandelingen (bijschrijven,
+   kaart op nul): zo'n code staat immers gewoon leesbaar in de code van de app die
+   bij elke klant op het toestel staat, en gaf tot voor kort iedereen die de
+   broncode opende toegang tot gratis tokens. Bijschrijven en resetten vragen nu
+   het echte wachtwoord van LUX AQUA (zie verifieerWachtwoord in auth.js): dat
+   wachtwoord staat wel op elk toestel, maar enkel als PBKDF2-hash, niet als
+   platte tekst of een simpele formule. */
 const GEHEIM_SPAREN = 'LUXAQUA-KAZERNELAAN-11';
-const GEHEIM_BEHEER = 'LUXAQUA-BEHEER-HELCHTEREN';
 
 /* Zonder 0, O, 1, I en L: die worden aan de toonbank te vaak verkeerd gelezen. */
 const SPAAR_TEKENS = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -62,9 +69,6 @@ function codeUit(geheim, lengte, ts) {
 
 /** De winkelcode van vandaag, zes tekens. LUX AQUA toont deze aan de toonbank. */
 export const winkelcode = (ts = Date.now()) => codeUit(GEHEIM_SPAREN, 6, ts);
-
-/** De beheerscode van vandaag, vier tekens. Hiermee zet LUX AQUA een kaart terug op nul. */
-export const beheercode = (ts = Date.now()) => codeUit(GEHEIM_BEHEER, 4, ts);
 
 /** Normaliseert wat de klant intikt: hoofdletters, geen spaties of streepjes. */
 const opschoonCode = (tekst) => String(tekst || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -251,15 +255,12 @@ export async function sluitKorting(gebruikt = true) {
 /* --------------------------------------------------------------------- beheer */
 
 /**
- * Zet de kaart terug op nul. Enkel met de beheerscode van vandaag, die LUX AQUA
- * in de beheerstab ziet. Zo kan de klant zijn eigen kaart niet resetten door
- * een oude code te onthouden.
+ * Zet de kaart terug op nul. Enkel met het echte wachtwoord van LUX AQUA. Zo
+ * kan de klant zijn eigen kaart niet resetten.
  */
-export async function resetKaart(ingetikt) {
-  const code = opschoonCode(ingetikt);
-  if (code !== beheercode() && code !== beheercode(Date.now() - SPAAR_DAG)) {
-    return { ok: false, reden: 'Die beheerscode klopt niet.' };
-  }
+export async function resetKaart(wachtwoord) {
+  const controle = await verifieerWachtwoord(wachtwoord);
+  if (!controle.ok) return { ok: false, reden: 'Dat wachtwoord klopt niet.' };
   const k = await haalKaart();
   const oud = k.tokens;
   k.tokens = 0;
@@ -270,12 +271,10 @@ export async function resetKaart(ingetikt) {
   return { ok: true, reden: 'De kaart staat terug op nul.', kaart: k };
 }
 
-/** Tokens handmatig bijschrijven, met de beheerscode. Voor een vergeten bezoek. */
-export async function bijschrijven(aantal, ingetikt) {
-  const code = opschoonCode(ingetikt);
-  if (code !== beheercode() && code !== beheercode(Date.now() - SPAAR_DAG)) {
-    return { ok: false, reden: 'Die beheerscode klopt niet.' };
-  }
+/** Tokens handmatig bijschrijven, met het echte wachtwoord van LUX AQUA. Voor een vergeten bezoek. */
+export async function bijschrijven(aantal, wachtwoord) {
+  const controle = await verifieerWachtwoord(wachtwoord);
+  if (!controle.ok) return { ok: false, reden: 'Dat wachtwoord klopt niet.' };
   const n = Math.max(1, Math.min(50, Math.round(Number(aantal) || 0)));
   const k = await haalKaart();
   k.tokens += n;
