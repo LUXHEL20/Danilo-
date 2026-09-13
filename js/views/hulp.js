@@ -81,16 +81,26 @@ export async function toonHulp() {
   if (eerdere.length) {
     const blok = kaart('Mijn hulpvragen');
     for (const v of eerdere) {
+      const inhoud = h('div', { class: 'uitklap__inhoud' },
+        h('p', { class: 'klein' }, v.omschrijving || 'Geen omschrijving.'),
+        v.beschikbaarheid ? h('p', { class: 'mini zacht' }, `Beschikbaar: ${v.beschikbaarheid}`) : null,
+        h('p', { class: 'mini zacht' }, `Aangemaakt op ${datum(v.aangemaakt)} · urgentie: ${v.urgentie}`),
+        v.antwoord ? h('div', { class: 'kaart kaart--goed' }, h('strong', {}, 'Antwoord van LUX AQUA: '), v.antwoord) : null);
+      if (v.eigenNotitie) {
+        inhoud.append(h('p', { class: 'klein' }, h('strong', {}, 'Uw eigen notitie: '), v.eigenNotitie));
+      }
+      if (v.status !== 'afgerond') {
+        inhoud.append(h('button', {
+          class: 'knop knop--stil', style: { marginTop: '8px' },
+          onclick: () => afrondenDialoog(v, bak),
+        }, '✅ Afgerond: noteer wat er gebeurd is'));
+      }
       blok.append(h('details', { class: 'uitklap' },
         h('summary', {},
           h('span', { class: 'groei' }, SOORTEN.find((s) => s.id === v.type)?.titel || v.type, h('br'),
             h('span', { class: 'mini zacht' }, geleden(v.aangemaakt))),
           badge(v.status, v.status === 'afgerond' ? 'goed' : v.status === 'nieuw' ? 'let-op' : 'info')),
-        h('div', { class: 'uitklap__inhoud' },
-          h('p', { class: 'klein' }, v.omschrijving || 'Geen omschrijving.'),
-          v.beschikbaarheid ? h('p', { class: 'mini zacht' }, `Beschikbaar: ${v.beschikbaarheid}`) : null,
-          h('p', { class: 'mini zacht' }, `Aangemaakt op ${datum(v.aangemaakt)} · urgentie: ${v.urgentie}`),
-          v.antwoord ? h('div', { class: 'kaart kaart--goed' }, h('strong', {}, 'Antwoord van LUX AQUA: '), v.antwoord) : null)));
+        inhoud));
     }
     wrap.append(blok);
   }
@@ -106,6 +116,31 @@ export async function toonHulp() {
   }
 
   return wrap;
+}
+
+/**
+ * De klant sluit zijn eigen hulpvraag af: wat is er afgesproken en gedaan?
+ * Zonder dit blijft een hulpvraag voor altijd op "nieuw" staan, ook nadat het
+ * probleem al lang opgelost is.
+ */
+async function afrondenDialoog(v, bak) {
+  const notitie = tekstvak({ value: v.eigenNotitie || '', placeholder: 'Bijvoorbeeld: LUX AQUA belde terug, water ververst, twee dagen later terug in orde.' });
+  const bevestigd = await dialoog({
+    titel: 'Hulpvraag afronden',
+    inhoud: h('div', {},
+      h('p', { class: 'klein zacht' }, 'Noteer kort wat er is afgesproken of gedaan. Dat komt ook in het logboek van uw bak, ' +
+        'zodat u het later nog terugvindt.'),
+      veld('Wat is er gebeurd?', notitie)),
+    acties: [
+      { label: 'Annuleren', waarde: false },
+      { label: 'Afgerond', stijl: 'knop--primair', waarde: true },
+    ],
+  });
+  if (!bevestigd) return;
+  await store.bewaarHulpvraag({ ...v, status: 'afgerond', eigenNotitie: notitie.value.trim() });
+  await store.logboek(bak.id, `Hulpvraag afgerond${notitie.value.trim() ? `: ${notitie.value.trim()}` : '.'}`, 'hulp');
+  melding('Hulpvraag afgerond.', 'ok');
+  teken();
 }
 
 /* ------------------------------------------------------------------ formulier */

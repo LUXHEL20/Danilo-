@@ -2,7 +2,7 @@
 import { h, kaart, badge, geleden, legeStaat } from '../ui.js';
 import { ctx, ganaar, teken } from '../app.js';
 import * as store from '../store.js';
-import { maakAdvies } from '../advies.js';
+import { maakAdvies, meetritmeDagen } from '../advies.js';
 import { scoreRing, lijnGrafiek } from '../charts.js';
 import { waardeTegels, adviesKaart, takenLijst } from './onderdelen.js';
 import { profile } from '../params.js';
@@ -24,6 +24,10 @@ export async function toonStart() {
   const advies = laatste ? maakAdvies(laatste, bak, metingen.slice(1), catalogus) : null;
   const taken = (await store.takenVanBak(bak.id)).filter((t) => !t.klaar).sort((a, b) => a.vervalt - b.vervalt);
 
+  /* --- vandaag: over alle bakken heen, met de baknaam erbij --- */
+  const vandaag = await vandaagStrook();
+  if (vandaag) wrap.append(vandaag);
+
   /* --- kop met score --- */
   if (advies) {
     wrap.append(h('section', { class: `kaart kaart--${advies.score >= 80 ? 'goed' : advies.score >= 50 ? 'aandacht' : 'kritiek'}` },
@@ -44,15 +48,6 @@ export async function toonStart() {
         h('h2', {}, 'Doe uw eerste meting'),
         h('p', { class: 'zacht klein' }, 'Fotografeer uw teststrip of vul de waarden zelf in. U krijgt meteen te zien wat er goed zit en wat u kan verbeteren.'),
         h('button', { class: 'knop knop--primair knop--groot knop--vol', onclick: () => ganaar('meten') }, 'Meting starten'))));
-  }
-
-  /* --- herinnering --- */
-  const dagenGeleden = laatste ? (Date.now() - laatste.datum) / 86400e3 : 99;
-  if (laatste && dagenGeleden > 10) {
-    wrap.append(h('section', { class: 'kaart kaart--aandacht' },
-      h('h3', {}, '⏰ Tijd voor een nieuwe meting'),
-      h('p', { class: 'klein zacht' }, `Uw laatste meting is van ${Math.round(dagenGeleden)} dagen geleden. Met een wekelijkse meting bent u problemen vóór.`),
-      h('button', { class: 'knop knop--primair knop--vol', onclick: () => ganaar('meten') }, 'Nu meten')));
   }
 
   /* --- kweek: legsels die vandaag iets vragen --- */
@@ -118,4 +113,45 @@ export async function toonStart() {
   }
 
   return wrap;
+}
+
+/**
+ * Eén korte strook bovenaan, over alle bakken van de klant heen: wat te laat
+ * staat, en wanneer de volgende meting aan de beurt is. Staat er niets open,
+ * dan geeft deze functie null terug en verschijnt er niets: geen strook is
+ * ook een antwoord.
+ */
+async function vandaagStrook() {
+  const alle = await store.bakken();
+  const eigen = ctx.klant ? alle.filter((b) => b.klantId === ctx.klant.id) : (ctx.bak ? [ctx.bak] : []);
+  if (!eigen.length) return null;
+
+  const regels = [];
+  for (const b of eigen) {
+    const naam = b.naam || 'Aquarium';
+    const metingen = await store.metingenVanBak(b.id);
+    const laatste = metingen[0];
+    const openTaken = (await store.takenVanBak(b.id)).filter((t) => !t.klaar);
+    const teLaat = openTaken.filter((t) => t.vervalt < Date.now());
+    if (teLaat.length) {
+      regels.push({ prioriteit: 0, tekst: `${naam}: ${teLaat.length} ${teLaat.length === 1 ? 'punt staat' : 'punten staan'} te laat.` });
+    }
+    const ritme = meetritmeDagen(b, profile(b.profiel));
+    const dagenGeleden = laatste ? (Date.now() - laatste.datum) / 86400e3 : Infinity;
+    if (!laatste) {
+      // Voor de actieve bak toont het startscherm hieronder al een duidelijke
+      // "doe uw eerste meting"-kaart; dat hier herhalen is dubbel op.
+      if (b.id !== ctx.bak?.id) regels.push({ prioriteit: 1, tekst: `${naam}: nog geen enkele meting.` });
+    } else if (dagenGeleden > ritme) {
+      regels.push({ prioriteit: 1, tekst: `${naam}: laatste meting ${geleden(laatste.datum)}, meet opnieuw.` });
+    }
+  }
+  if (!regels.length) return null;
+
+  regels.sort((x, y) => x.prioriteit - y.prioriteit);
+  return h('section', { class: 'kaart kaart--aandacht' },
+    h('h3', {}, '⏰ Vandaag'),
+    h('ul', { class: 'opsomming klein', style: { margin: 0 } },
+      ...regels.slice(0, 3).map((r) => h('li', {}, r.tekst))),
+    h('button', { class: 'knop knop--primair knop--vol', style: { marginTop: '10px' }, onclick: () => ganaar('meten') }, 'Nu meten'));
 }

@@ -343,6 +343,17 @@ function trends(meting, historiek, prof) {
   return uit;
 }
 
+/**
+ * Hoeveel dagen er normaal tussen twee metingen zitten, afhankelijk van de bak.
+ * Een bak die minder dan zes weken geleden is opgestart, draait nog in: daar
+ * meet u vaker. Een vijver is stabieler dan een aquarium en vraagt minder vaak
+ * een meting.
+ */
+export function meetritmeDagen(bak, prof) {
+  if (bak?.opgestart && (Date.now() - bak.opgestart) < 42 * 86400e3) return 2;
+  return prof?.group === 'Vijver' ? 21 : 14;
+}
+
 /** Zet de opvolgpunten van een advies om in taken met een concrete vervaldatum. */
 export function opvolgTaken(advies, vanaf = Date.now()) {
   const taken = [];

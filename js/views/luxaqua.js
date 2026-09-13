@@ -345,6 +345,22 @@ async function hulpvraagDetail(v, klant) {
       veld('Status', status),
       veld('Afspraak', afspraak),
       veld('Notitie / antwoord', antwoord),
+      klant?.telefoon || klant?.email ? h('div', { class: 'knoprij' },
+        klant?.telefoon ? h('button', {
+          class: 'knop knop--stil',
+          onclick: () => {
+            if (!antwoord.value.trim()) { melding('Vul eerst een antwoord in.', 'fout'); return; }
+            window.open(whatsappLink(antwoord.value.trim(), klant.telefoon), '_blank', 'noopener');
+          },
+        }, '💬 Antwoord via WhatsApp') : null,
+        klant?.email ? h('button', {
+          class: 'knop knop--stil',
+          onclick: () => {
+            if (!antwoord.value.trim()) { melding('Vul eerst een antwoord in.', 'fout'); return; }
+            window.location.href = mailLink(antwoord.value.trim(), klant.email, 'LUX AQUA: antwoord op uw hulpvraag');
+          },
+        }, '✉️ Antwoord via e-mail') : null) : null,
+      h('p', { class: 'mini zacht' }, 'Dit stuurt uw antwoord als los bericht; het verschijnt niet automatisch in de app van de klant.'),
       v.bakId ? h('button', {
         class: 'knop knop--stil knop--vol',
         onclick: async () => printDossier(await maakDossier(v.bakId, { hulpvraag: v })),
