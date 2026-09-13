@@ -5,8 +5,9 @@ import * as store from '../store.js';
 import { profile, param } from '../params.js';
 import { maakAdvies } from '../advies.js';
 import { waardeTegels, adviesKaart, bakSamenvatting } from './onderdelen.js';
-import { maakDossier, printDossier, dossierAlsTekst, importeerDossier, exporteerDossier, whatsappLink, mailLink } from '../delen.js';
-import { isNative } from '../native.js';
+import { maakDossier, printDossier, dossierAlsTekst, importeerDossier, exporteerDossier, whatsappLink, mailLink, mailBccLink } from '../delen.js';
+import { isNative, kiesFoto, deel } from '../native.js';
+import { thumbnail } from '../strip.js';
 
 /* --------------------------------------------------------------- klantenlijst */
 export async function toonKlanten() {
@@ -47,7 +48,8 @@ export async function toonKlanten() {
     h('div', { class: 'knoprij', style: { marginTop: '12px' } },
       h('button', { class: 'knop knop--primair', onclick: () => ganaar('hulpvragen') }, '🆘 Hulpvragen'),
       h('button', { class: 'knop knop--stil', onclick: () => klantFormulier() }, '+ Klant'),
-      h('button', { class: 'knop knop--stil', onclick: () => importeerBestand() }, '📥 Dossier inlezen'))));
+      h('button', { class: 'knop knop--stil', onclick: () => importeerBestand() }, '📥 Dossier inlezen'),
+      h('button', { class: 'knop knop--stil', onclick: () => marketingDialoog(klanten) }, '📣 Marketingbericht'))));
 
   if (!klanten.length) {
     wrap.append(legeStaat('👥', 'Nog geen klanten',
@@ -87,6 +89,88 @@ export async function toonKlanten() {
 
 const tegel = (naam, waarde, soort) => h('div', { class: `tegel ${soort ? 'tegel--' + soort : ''}` },
   h('div', { class: 'tegel__naam' }, naam), h('div', { class: 'tegel__waarde' }, String(waarde)));
+
+/**
+ * Marketingbericht: titel, tekst en foto's samenstellen voor de klanten die daar bij het
+ * aanmaken van hun profiel toestemming voor gaven (klant.marketingAkkoord).
+ *
+ * De app heeft geen eigen server, dus ze verstuurt niets automatisch: ze bereidt het bericht
+ * en de contactenlijst voor en laat het versturen zelf over aan WhatsApp, e-mail of het
+ * deelmenu van het toestel. Een mailto-link met bcc erin werkt voor een gewone klantenlijst
+ * prima; enkel bij een erg lange lijst (honderden adressen) loopt een mailto-link tegen de
+ * lengtegrens van sommige e-mailprogramma's aan. Kopieer de adressen dan in plaats daarvan.
+ */
+async function marketingDialoog(klanten) {
+  const akkoord = klanten.filter((k) => k.marketingAkkoord);
+  const metEmail = akkoord.filter((k) => k.email?.trim());
+
+  const titel = invoer({ placeholder: 'Bijvoorbeeld: Nieuwe planten binnen' });
+  const tekst = tekstvak({ rows: 6, placeholder: 'Uw bericht aan de klant...' });
+  const fotos = []; // File-objecten, voor het deelmenu
+  const fotoRij = h('div', { class: 'fotoraster' });
+
+  const tekenFotos = () => {
+    fotoRij.replaceChildren(...fotos.map((f, i) => {
+      const img = h('img', { alt: f.name, loading: 'lazy' });
+      thumbnail(f, 120, 0.7).then((url) => { img.src = url; });
+      return h('div', { class: 'fotokaart' }, img,
+        h('button', { class: 'fotokaart__weg', type: 'button', 'aria-label': 'Foto verwijderen', onclick: () => { fotos.splice(i, 1); tekenFotos(); } }, '✕'));
+    }));
+  };
+  tekenFotos();
+
+  const fotoKnop = h('button', { class: 'knop knop--stil', type: 'button', onclick: async () => {
+    const nieuw = await kiesFoto({ bron: 'vraag', meerdere: true });
+    fotos.push(...nieuw);
+    tekenFotos();
+  } }, '📷 Foto toevoegen');
+
+  await dialoog({
+    titel: '📣 Marketingbericht',
+    breed: true,
+    inhoud: h('div', {},
+      h('p', { class: 'klein zacht' },
+        akkoord.length
+          ? `${akkoord.length} van de ${klanten.length} klant${klanten.length === 1 ? '' : 'en'} gaf${akkoord.length === 1 ? '' : 'en'} toestemming voor marketing, waarvan ${metEmail.length} met een e-mailadres.`
+          : `Nog geen enkele klant gaf toestemming voor marketing. Dat komt vanzelf bij: het aanmaken van een nieuw profiel vraagt het er expliciet bij.`),
+      veld('Titel', titel),
+      veld('Tekst', tekst),
+      veld('Foto\'s (optioneel)', h('div', {}, fotoRij, fotoKnop)),
+      h('p', { class: 'mini zacht' },
+        'De app verstuurt niets zelf: ze bereidt het bericht voor en u kiest daarna zelf WhatsApp, e-mail of het deelmenu van uw toestel. Foto\'s gaan enkel mee via "Delen", niet via de e-mailknoppen.')),
+    acties: [
+      { label: 'Sluiten', waarde: null },
+      {
+        label: 'Kopieer bericht', stijl: 'knop--stil',
+        actie: async () => { await kopieer(`${titel.value}\n\n${tekst.value}`); return false; },
+      },
+      {
+        label: `Kopieer e-mailadressen (${metEmail.length})`, stijl: 'knop--stil',
+        actie: async () => {
+          if (!metEmail.length) { melding('Geen enkele klant met toestemming heeft een e-mailadres.', 'fout'); return false; }
+          await kopieer(metEmail.map((k) => k.email.trim()).join('; '));
+          return false;
+        },
+      },
+      {
+        label: 'Open e-mail (bcc)', stijl: 'knop--stil',
+        actie: () => {
+          if (!metEmail.length) { melding('Geen enkele klant met toestemming heeft een e-mailadres.', 'fout'); return false; }
+          window.location.href = mailBccLink(tekst.value, metEmail.map((k) => k.email.trim()), titel.value || 'Nieuws van LUX AQUA');
+          return false;
+        },
+      },
+      {
+        label: 'Delen...', stijl: 'knop--primair',
+        actie: async () => {
+          if (!titel.value.trim() && !tekst.value.trim()) { melding('Vul eerst een titel of tekst in.', 'fout'); return false; }
+          await deel({ titel: titel.value || 'LUX AQUA', tekst: `${titel.value}\n\n${tekst.value}`.trim(), bestanden: fotos });
+          return false;
+        },
+      },
+    ],
+  });
+}
 
 /* ------------------------------------------------------------------ klantdetail */
 export async function toonKlant(id) {

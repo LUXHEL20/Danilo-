@@ -191,4 +191,20 @@ het beginscherm, ga opnieuw naar het tandwiel en kies **Back-up terugzetten**.
   rondstuurt.
 - Wijzigt het adres toch nog, voer dan `node scripts/maak-qr.mjs <nieuw adres>` uit en controleer de
   nieuwe QR-code door hem zelf te scannen.
-- **[TE BEVESTIGEN]** Formaat, aantal en drukker van de kassakaartjes.
+- **Formaat, aantal en drukker van de kassakaartjes.** Voorstel, aan te passen naar eigen smaak:
+  - Formaat 85 x 55 mm (een gewoon visitekaartje): past in een kaartenbakje aan de kassa en in een
+    portefeuille, en is bij zowat elke drukker een standaardformaat zonder meerprijs voor een
+    afwijkende snijmaat.
+    - Voorkant: de lange tekst uit onderdeel 3 hierboven, met de QR-code (`qr-luxaqua.png`) rechts
+      of onderaan, minstens 2,5 x 2,5 cm groot: kleiner scant onbetrouwbaar op een klein scherm.
+    - Achterkant: de korte variant ("Scan en zet LUX AQUA op uw beginscherm...") in groot
+      lettertype, voor wie het kaartje enkel even in het voorbijgaan ziet liggen.
+  - Aantal: 250 stuks als eerste oplage. Genoeg voor een seizoen aan de kassa en om mee te geven bij
+    een verkoop, zonder een grote voorraad papier te moeten bewaren; makkelijk bij te drukken zodra
+    de QR-code en het adres definitief vaststaan.
+  - Drukker: geen voorkeur vastgelegd, drukken bij een gewone online drukkerij (bijvoorbeeld
+    Helloprint, Drukwerkdeal of Zelfdrukken.nl) op 300 grams glanzend of mat karton volstaat; een
+    lokale drukker in de buurt van Helchteren kan natuurlijk ook, en heeft als voordeel dat u de
+    proefdruk zelf ter plekke kan nakijken voor het volledige aantal gedrukt wordt.
+  - Vraag in elk geval eerst één proefexemplaar (de meeste drukkers bieden dat aan), en scan de
+    QR-code op dat proefexemplaar zelf voor de rest van de oplage besteld wordt.

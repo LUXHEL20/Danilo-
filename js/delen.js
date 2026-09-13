@@ -158,6 +158,10 @@ export const whatsappLink = (tekst, nummer = '') =>
 export const mailLink = (tekst, adres = '', onderwerp = 'LUX AQUA: dossier en hulpvraag') =>
   `mailto:${adres}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(tekst)}`;
 
+/** Mailto-link met een lijst adressen in BCC, voor een bericht naar meerdere klanten tegelijk. */
+export const mailBccLink = (tekst, bccLijst = [], onderwerp = 'Nieuws van LUX AQUA') =>
+  `mailto:?bcc=${encodeURIComponent(bccLijst.join(','))}&subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(tekst)}`;
+
 /** Leest een dossierbestand in bij LUX AQUA en voegt het toe aan de eigen gegevens. */
 export async function importeerDossier(json) {
   const d = typeof json === 'string' ? JSON.parse(json) : json;
