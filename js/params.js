@@ -217,8 +217,11 @@ export const PROFILES = {
   vijver_koi: {
     id: 'vijver_koi', label: 'Koivijver', group: 'Vijver',
     params: ['temp', 'ph', 'kh', 'gh', 'no2', 'no3', 'nh4', 'o2', 'po4'],
+    // De ondergrens van 'ok' ligt bewust op 0: een vijver zonder verwarming zakt
+    // in een gewone Belgische winter naar een paar graden, en koi gaan dan gewoon
+    // in winterrust. Dat is geen storing om als kritiek te melden.
     targets: {
-      temp: { ideal: [16, 24], ok: [4, 28] },
+      temp: { ideal: [16, 24], ok: [0, 28] },
       ph: { ideal: [7.2, 8.5], ok: [6.8, 9.0] },
       kh: { ideal: [6, 12], ok: [4, 16] },
       gh: { ideal: [8, 16], ok: [6, 22] },
@@ -232,8 +235,9 @@ export const PROFILES = {
   vijver_sier: {
     id: 'vijver_sier', label: 'Siervijver / natuurvijver', group: 'Vijver',
     params: ['temp', 'ph', 'kh', 'gh', 'no2', 'no3', 'po4', 'o2'],
+    // Zie de opmerking bij vijver_koi: 0 als ondergrens, winterrust is normaal.
     targets: {
-      temp: { ideal: [12, 24], ok: [2, 28] },
+      temp: { ideal: [12, 24], ok: [0, 28] },
       ph: { ideal: [7.0, 8.5], ok: [6.5, 9.0] },
       kh: { ideal: [5, 10], ok: [3, 16] },
       gh: { ideal: [8, 16], ok: [5, 22] },

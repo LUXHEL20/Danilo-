@@ -281,7 +281,7 @@ export async function toonMeten() {
 
       const advies = maakAdvies(meting, bak, historiek, catalogus);
       const taken = opvolgTaken(advies, meting.datum);
-      if (taken.length) await store.bewaarTaken(bak.id, taken.slice(0, 10));
+      await store.vervangMetingTaken(bak.id, taken.slice(0, 10));
       await store.logboek(bak.id, `Meting toegevoegd: ${advies.samenvatting}`, 'meting');
 
       melding('Meting opgeslagen.', 'ok');

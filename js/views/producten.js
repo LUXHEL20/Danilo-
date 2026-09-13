@@ -191,7 +191,7 @@ export async function toonProduct(p, liters, bak) {
           await store.logboek(bak.id, `${p.naam} gedoseerd${r ? `: ${r.hoeveelheid} ${r.eenheid}` : ''}`, 'product');
           const taken = (p.opvolging || []).map((o, i) => ({
             id: `taak-${p.id}-${i}-${Date.now()}`, omschrijving: o.actie, termijn: o.na, product: p.naam,
-            vervalt: Date.now() + termijnMs(o.na), klaar: false,
+            vervalt: Date.now() + termijnMs(o.na), klaar: false, bron: 'product',
           }));
           if (taken.length) await store.bewaarTaken(bak.id, taken);
           melding('Genoteerd, met de opvolging erbij.', 'ok');

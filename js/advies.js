@@ -280,11 +280,25 @@ const regelsPer = {
          'Meet ook uw leidingwater op fosfaat.']
       : ['In een beplante bak hebt u een klein beetje fosfaat nodig; doseer bij met plantenvoeding.'],
   }),
-  temp: (v, { teHoog }) => ({
-    stappen: teHoog
-      ? ['Controleer de instelling van uw verwarming.', 'Koel geleidelijk af (max. 1 °C per uur) en zorg voor extra beluchting.']
-      : ['Controleer of uw verwarming werkt en juist staat.', 'Verwarm geleidelijk, max. 1 °C per uur.'],
-  }),
+  temp: (v, { teHoog, prof }) => {
+    /* De meeste vijvers hebben geen verwarming: een koude periode is daar geen
+       storing maar het seizoen. Verwijs niet naar een verwarming die er niet is. */
+    if (prof.group === 'Vijver' && !teHoog) {
+      return {
+        stappen: v < 10
+          ? ['Normaal in het koude seizoen: vijvervissen gaan bij koud water in winterrust en hebben dan bijna geen voeding nodig.',
+             'Stop met voederen zolang het water onder 10 °C blijft: onverteerd voer vervuilt het water.',
+             'Zorg dat de vijver niet helemaal dichtvriest: houd met een vijverontdooier of een luchtpomp één open plek in het ijs, voor de gaswisseling.']
+          : ['Een koelere periode is op zich geen probleem: de meeste vijvers hebben geen verwarming.',
+             'Voeder aangepast aan de temperatuur: hoe kouder het water, hoe minder uw vis nodig heeft.'],
+      };
+    }
+    return {
+      stappen: teHoog
+        ? ['Controleer de instelling van uw verwarming.', 'Koel geleidelijk af (max. 1 °C per uur) en zorg voor extra beluchting.']
+        : ['Controleer of uw verwarming werkt en juist staat.', 'Verwarm geleidelijk, max. 1 °C per uur.'],
+    };
+  },
   o2: () => ({
     urgentie: 'kritiek',
     stappen: [
@@ -345,6 +359,7 @@ export function opvolgTaken(advies, vanaf = Date.now()) {
         product: o.product || null,
         vervalt: vanaf + parseTermijn(o.na),
         klaar: false,
+        bron: 'meting',
       });
     }
   }

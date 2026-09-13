@@ -173,6 +173,20 @@ export async function bewaarTaken(bakId, taken) {
   await db.putVeel('taken', taken.map((t) => ({ ...t, bakId })));
   meld('taken');
 }
+
+/**
+ * Vervangt de nog openstaande taken die uit een MÉTING kwamen (bron: 'meting')
+ * door een nieuwe reeks. Zonder dit stapelen taken zich op: elke meting voegt
+ * anders opnieuw "opnieuw meten binnen 24 uur" toe, ook als een latere meting
+ * dat punt allang heeft ingehaald. Taken uit een andere bron (bijvoorbeeld een
+ * product dat net gedoseerd is) blijven onaangeroerd: die lopen op hun eigen
+ * termijn, los van de volgende meting.
+ */
+export async function vervangMetingTaken(bakId, taken) {
+  const oud = (await takenVanBak(bakId)).filter((t) => !t.klaar && t.bron === 'meting');
+  for (const t of oud) await db.del('taken', t.id);
+  await bewaarTaken(bakId, taken);
+}
 export async function zetTaakKlaar(id, klaar = true) {
   const t = await db.get('taken', id);
   if (!t) return;
